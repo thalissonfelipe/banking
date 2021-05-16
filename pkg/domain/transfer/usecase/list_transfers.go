@@ -8,5 +8,8 @@ import (
 
 func (t Transfer) ListTransfers(ctx context.Context) ([]entities.Transfer, error) {
 	transfers, err := t.repository.GetTransfers(ctx)
-	return transfers, err
+	if err != nil {
+		return nil, err
+	}
+	return transfers, nil
 }
