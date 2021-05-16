@@ -8,8 +8,12 @@ import (
 
 type StubRepository struct {
 	transfers []entities.Transfer
+	err       error
 }
 
 func (s StubRepository) GetTransfers(ctx context.Context) ([]entities.Transfer, error) {
+	if s.err != nil {
+		return nil, s.err
+	}
 	return s.transfers, nil
 }
