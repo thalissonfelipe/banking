@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -20,5 +21,14 @@ func TestGetBalanceByAccountID(t *testing.T) {
 
 		assert.Nil(t, err)
 		assert.Equal(t, expected, result)
+	})
+
+	t.Run("should return an error if something went wrong on repository", func(t *testing.T) {
+		repo := StubRepository{accounts: nil, err: errors.New("could not fetch account balance")}
+		usecase := Account{&repo}
+		result, err := usecase.GetAccountBalanceByID(ctx, entities.NewAccountID())
+
+		assert.Zero(t, result)
+		assert.NotNil(t, err)
 	})
 }

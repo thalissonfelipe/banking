@@ -8,6 +8,7 @@ import (
 
 type StubRepository struct {
 	accounts []entities.Account
+	balance  int
 	err      error
 }
 
@@ -19,5 +20,8 @@ func (s StubRepository) GetAccounts(ctx context.Context) ([]entities.Account, er
 }
 
 func (s StubRepository) GetBalanceByID(ctx context.Context, id string) (int, error) {
-	return 0, nil
+	if s.err != nil {
+		return 0, s.err
+	}
+	return s.balance, nil
 }
