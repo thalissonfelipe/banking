@@ -7,5 +7,6 @@ import (
 )
 
 func (a Account) ListAccounts(ctx context.Context) ([]entities.Account, error) {
-	return nil, nil
+	accounts, err := a.repository.GetAccounts(ctx)
+	return accounts, err
 }

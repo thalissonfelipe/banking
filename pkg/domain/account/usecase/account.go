@@ -1,7 +1,11 @@
 package usecase
 
-type Account struct{}
+import "github.com/thalissonfelipe/banking/pkg/domain/account"
 
-func NewAccountUseCase() *Account {
-	return &Account{}
+type Account struct {
+	repository account.Repository
+}
+
+func NewAccountUseCase(repo account.Repository) *Account {
+	return &Account{repository: repo}
 }
