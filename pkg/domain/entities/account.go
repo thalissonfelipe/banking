@@ -1,6 +1,7 @@
 package entities
 
 import (
+	"errors"
 	"time"
 
 	"github.com/google/uuid"
@@ -16,6 +17,8 @@ type Account struct {
 }
 
 const DefaultBalance = 0
+
+var ErrAccountDoesNotExist error = errors.New("account does not exist")
 
 func NewAccountID() string {
 	return uuid.New().String()
