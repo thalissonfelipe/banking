@@ -30,4 +30,16 @@ func TestGetBalanceByAccountID(t *testing.T) {
 		assert.Zero(t, result)
 		assert.Equal(t, err, entities.ErrAccountDoesNotExist)
 	})
+
+	t.Run("should return correct balance when balance is not 0", func(t *testing.T) {
+		acc := entities.NewAccount("Piter", "12345678", "123.456.789-00")
+		acc.Balance = 100
+		repo := StubRepository{accounts: []entities.Account{acc}, err: nil}
+		usecase := Account{&repo}
+		expected := 100
+		result, err := usecase.GetAccountBalanceByID(ctx, acc.ID)
+
+		assert.Nil(t, err)
+		assert.Equal(t, expected, result)
+	})
 }
