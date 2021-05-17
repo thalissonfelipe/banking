@@ -15,7 +15,7 @@ type StubRepository struct {
 
 func (s StubRepository) GetAccounts(ctx context.Context) ([]entities.Account, error) {
 	if s.err != nil {
-		return nil, s.err
+		return nil, entities.ErrInternalError
 	}
 	return s.accounts, nil
 }
@@ -31,7 +31,7 @@ func (s StubRepository) GetBalanceByID(ctx context.Context, id string) (int, err
 
 func (s *StubRepository) PostAccount(ctx context.Context, account entities.Account) error {
 	if s.err != nil {
-		return s.err
+		return entities.ErrInternalError
 	}
 	s.accounts = append(s.accounts, account)
 	return nil
@@ -61,7 +61,7 @@ type StubHash struct {
 
 func (s StubHash) Hash(secret string) ([]byte, error) {
 	if s.err != nil {
-		return nil, s.err
+		return nil, entities.ErrInternalError
 	}
 
 	return []byte(generateRandomSecret(len(secret))), nil

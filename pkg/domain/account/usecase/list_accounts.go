@@ -9,7 +9,8 @@ import (
 func (a Account) ListAccounts(ctx context.Context) ([]entities.Account, error) {
 	accounts, err := a.repository.GetAccounts(ctx)
 	if err != nil {
-		return nil, err
+		return nil, entities.ErrInternalError
 	}
+
 	return accounts, nil
 }
