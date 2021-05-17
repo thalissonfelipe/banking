@@ -34,4 +34,26 @@ func TestCreateTransfer(t *testing.T) {
 		assert.Nil(t, err)
 		assert.Len(t, repo.transfers, 1)
 	})
+
+	t.Run("should return an error if accOrigin does not have sufficient funds", func(t *testing.T) {
+		acc1 := entities.NewAccount("Pedro", "123.456.789-00", "12345678")
+		acc2 := entities.NewAccount("Maria", "123.456.789-01", "12345678")
+
+		transferInput := transfer.CreateTransferInput{
+			AccountOriginID:      acc1.ID,
+			AccountDestinationID: acc2.ID,
+			Amount:               100,
+		}
+
+		repo := StubRepository{}
+		accUseCase := StubAccountUseCase{
+			accounts: []entities.Account{acc1, acc2},
+		}
+		usecase := NewTransfer(&repo, accUseCase)
+
+		err := usecase.CreateTransfer(ctx, transferInput)
+
+		assert.Equal(t, err, entities.ErrInsufficientFunds)
+		assert.Len(t, repo.transfers, 0)
+	})
 }
