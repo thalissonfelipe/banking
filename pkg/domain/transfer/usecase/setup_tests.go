@@ -53,3 +53,12 @@ func (s StubAccountUseCase) ListAccounts(ctx context.Context) ([]entities.Accoun
 func (s StubAccountUseCase) CreateAccount(ctx context.Context, input account.CreateAccountInput) (*entities.Account, error) {
 	return nil, nil
 }
+
+func (s StubAccountUseCase) GetAccountByID(ctx context.Context, accountID string) (*entities.Account, error) {
+	for _, acc := range s.accounts {
+		if acc.ID == accountID {
+			return &acc, nil
+		}
+	}
+	return nil, nil
+}

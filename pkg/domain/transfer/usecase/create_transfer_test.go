@@ -71,4 +71,24 @@ func TestCreateTransfer(t *testing.T) {
 		assert.NotNil(t, err)
 		assert.Len(t, repo.transfers, 0)
 	})
+
+	t.Run("should return an error if account destination does not exist", func(t *testing.T) {
+		acc1.Balance = 100
+		transferInput := transfer.CreateTransferInput{
+			AccountOriginID:      acc1.ID,
+			AccountDestinationID: "undefined",
+			Amount:               100,
+		}
+
+		repo := StubRepository{err: errors.New("account dest does not exist")}
+		accUseCase := StubAccountUseCase{
+			accounts: []entities.Account{acc1, acc2},
+		}
+		usecase := NewTransfer(&repo, accUseCase)
+
+		err := usecase.CreateTransfer(ctx, transferInput)
+
+		assert.Equal(t, err, entities.ErrAccountDestinationDoesNotExist)
+		assert.Len(t, repo.transfers, 0)
+	})
 }
