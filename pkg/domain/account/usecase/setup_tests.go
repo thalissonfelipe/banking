@@ -29,5 +29,6 @@ func (s StubRepository) GetBalanceByID(ctx context.Context, id string) (int, err
 }
 
 func (s StubRepository) PostAccount(ctx context.Context, input account.CreateAccountInput) (entities.Account, error) {
-	return entities.Account{}, nil
+	acc := entities.NewAccount(input.Name, input.Secret, input.CPF)
+	return acc, nil
 }
