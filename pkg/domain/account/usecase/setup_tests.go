@@ -27,7 +27,7 @@ func (s StubRepository) GetBalanceByID(ctx context.Context, id string) (int, err
 	return 0, entities.ErrAccountDoesNotExist
 }
 
-func (s StubRepository) PostAccount(ctx context.Context, account entities.Account) error {
+func (s *StubRepository) PostAccount(ctx context.Context, account entities.Account) error {
 	if s.err != nil {
 		return s.err
 	}

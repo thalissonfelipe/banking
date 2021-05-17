@@ -15,7 +15,7 @@ func TestListAccounts(t *testing.T) {
 	t.Run("should return a list of accounts", func(t *testing.T) {
 		acc := entities.NewAccount("Piter", "12345678", "123.456.789-00")
 		repo := StubRepository{accounts: []entities.Account{acc}, err: nil}
-		usecase := NewAccountUseCase(repo)
+		usecase := NewAccountUseCase(&repo)
 		expected := []entities.Account{acc}
 		result, err := usecase.ListAccounts(ctx)
 
@@ -25,7 +25,7 @@ func TestListAccounts(t *testing.T) {
 
 	t.Run("should return an error if something went wrong on repository", func(t *testing.T) {
 		repo := StubRepository{accounts: nil, err: errors.New("failed to fetch accounts")}
-		usecase := NewAccountUseCase(repo)
+		usecase := NewAccountUseCase(&repo)
 		result, err := usecase.ListAccounts(ctx)
 
 		assert.Nil(t, result)
