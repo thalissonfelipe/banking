@@ -13,6 +13,14 @@ func (t Transfer) CreateTransfer(ctx context.Context, input transfer.CreateTrans
 		return err
 	}
 
+	accDestination, err := t.accountUseCase.GetAccountByID(ctx, input.AccountDestinationID)
+	if err != nil {
+		return err
+	}
+	if accDestination == nil {
+		return entities.ErrAccountDestinationDoesNotExist
+	}
+
 	if (accountOriginBalance - input.Amount) < 0 {
 		return entities.ErrInsufficientFunds
 	}

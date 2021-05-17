@@ -15,7 +15,10 @@ type Transfer struct {
 	CreatedAt            time.Time
 }
 
-var ErrInsufficientFunds error = errors.New("insufficient funds")
+var (
+	ErrInsufficientFunds              error = errors.New("insufficient funds")
+	ErrAccountDestinationDoesNotExist error = errors.New("account destination does not exist")
+)
 
 func NewTransferID() string {
 	return uuid.New().String()
