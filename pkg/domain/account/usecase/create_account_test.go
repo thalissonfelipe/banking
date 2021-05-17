@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -24,5 +25,19 @@ func TestCreateAccount(t *testing.T) {
 		assert.Nil(t, err)
 		assert.Equal(t, input.Name, result.Name)
 		assert.Equal(t, input.CPF, result.CPF)
+	})
+
+	t.Run("should return an error if repository fails to save", func(t *testing.T) {
+		input := account.CreateAccountInput{
+			Name:   "Pedro",
+			CPF:    "123.456.789-00",
+			Secret: "12345678",
+		}
+		repo := StubRepository{err: errors.New("failed to save account")}
+		usecase := NewAccountUseCase(repo)
+		result, err := usecase.CreateAccount(ctx, input)
+
+		assert.Nil(t, result)
+		assert.NotNil(t, err)
 	})
 }
