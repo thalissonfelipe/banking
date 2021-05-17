@@ -15,7 +15,7 @@ func TestListTransfers(t *testing.T) {
 	t.Run("should return a list of transfers", func(t *testing.T) {
 		transfer := entities.NewTransfer(entities.NewAccountID(), entities.NewAccountID(), 100)
 		repo := StubRepository{transfers: []entities.Transfer{transfer}}
-		usecase := Transfer{&repo}
+		usecase := NewTransfer(repo)
 		expected := []entities.Transfer{transfer}
 		result, err := usecase.ListTransfers(ctx)
 
@@ -25,7 +25,7 @@ func TestListTransfers(t *testing.T) {
 
 	t.Run("should return an error if something went wrong on repository", func(t *testing.T) {
 		repo := StubRepository{transfers: nil, err: errors.New("failed to fetch transfers")}
-		usecase := Transfer{&repo}
+		usecase := NewTransfer(repo)
 		result, err := usecase.ListTransfers(ctx)
 
 		assert.Nil(t, result)

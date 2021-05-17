@@ -13,7 +13,7 @@ type StubRepository struct {
 
 func (s StubRepository) GetTransfers(ctx context.Context) ([]entities.Transfer, error) {
 	if s.err != nil {
-		return nil, s.err
+		return nil, entities.ErrInternalError
 	}
 	return s.transfers, nil
 }
