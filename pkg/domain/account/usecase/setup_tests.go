@@ -3,7 +3,6 @@ package usecase
 import (
 	"context"
 
-	"github.com/thalissonfelipe/banking/pkg/domain/account"
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
 )
 
@@ -28,10 +27,10 @@ func (s StubRepository) GetBalanceByID(ctx context.Context, id string) (int, err
 	return 0, entities.ErrAccountDoesNotExist
 }
 
-func (s StubRepository) PostAccount(ctx context.Context, input account.CreateAccountInput) (*entities.Account, error) {
+func (s StubRepository) PostAccount(ctx context.Context, account entities.Account) error {
 	if s.err != nil {
-		return nil, s.err
+		return s.err
 	}
-	acc := entities.NewAccount(input.Name, input.Secret, input.CPF)
-	return &acc, nil
+	s.accounts = append(s.accounts, account)
+	return nil
 }
