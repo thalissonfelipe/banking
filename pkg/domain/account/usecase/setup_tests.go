@@ -43,7 +43,16 @@ func (s StubRepository) GetAccountByCPF(ctx context.Context, cpf string) (*entit
 			return &acc, s.err
 		}
 	}
-	return nil, nil
+	return nil, s.err
+}
+
+func (s StubRepository) GetAccountByID(ctx context.Context, id string) (*entities.Account, error) {
+	for _, acc := range s.accounts {
+		if acc.ID == id {
+			return &acc, s.err
+		}
+	}
+	return nil, s.err
 }
 
 type StubHash struct {
