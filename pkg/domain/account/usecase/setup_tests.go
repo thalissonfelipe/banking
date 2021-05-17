@@ -40,7 +40,7 @@ func (s *StubRepository) PostAccount(ctx context.Context, account entities.Accou
 func (s StubRepository) GetAccountByCPF(ctx context.Context, cpf string) (*entities.Account, error) {
 	for _, acc := range s.accounts {
 		if acc.CPF == cpf {
-			return &acc, entities.ErrAccountAlreadyExists
+			return &acc, s.err
 		}
 	}
 	return nil, nil
