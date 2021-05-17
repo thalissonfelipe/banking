@@ -34,6 +34,7 @@ func (s *StubRepository) UpdateBalance(ctx context.Context, transfer entities.Tr
 
 type StubAccountUseCase struct {
 	accounts []entities.Account
+	err      error
 }
 
 func (s StubAccountUseCase) GetAccountBalanceByID(ctx context.Context, accountID string) (int, error) {

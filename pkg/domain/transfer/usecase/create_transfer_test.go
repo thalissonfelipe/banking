@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -51,6 +52,23 @@ func TestCreateTransfer(t *testing.T) {
 		err := usecase.CreateTransfer(ctx, transferInput)
 
 		assert.Equal(t, err, entities.ErrInsufficientFunds)
+		assert.Len(t, repo.transfers, 0)
+	})
+
+	t.Run("should return an error if accountUseCase fails", func(t *testing.T) {
+		transferInput := transfer.CreateTransferInput{
+			AccountOriginID:      acc1.ID,
+			AccountDestinationID: acc2.ID,
+			Amount:               100,
+		}
+
+		repo := StubRepository{}
+		accUseCase := StubAccountUseCase{err: errors.New("failed to get account origin balance")}
+		usecase := NewTransfer(&repo, accUseCase)
+
+		err := usecase.CreateTransfer(ctx, transferInput)
+
+		assert.NotNil(t, err)
 		assert.Len(t, repo.transfers, 0)
 	})
 }
