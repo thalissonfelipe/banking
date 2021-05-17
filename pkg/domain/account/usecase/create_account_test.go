@@ -43,7 +43,7 @@ func TestCreateAccount(t *testing.T) {
 	})
 
 	t.Run("should return an error if cpf already exists", func(t *testing.T) {
-		acc := entities.NewAccount(input.Name, input.Secret, input.CPF)
+		acc := entities.NewAccount(input.Name, input.CPF, input.Secret)
 		repo := StubRepository{
 			accounts: []entities.Account{acc},
 		}

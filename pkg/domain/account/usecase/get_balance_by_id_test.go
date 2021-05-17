@@ -12,7 +12,7 @@ func TestGetBalanceByAccountID(t *testing.T) {
 	ctx := context.Background()
 
 	t.Run("should return a balance by account ID", func(t *testing.T) {
-		acc := entities.NewAccount("Piter", "12345678", "123.456.789-00")
+		acc := entities.NewAccount("Piter", "123.456.789-00", "12345678")
 		repo := StubRepository{accounts: []entities.Account{acc}}
 		usecase := NewAccountUseCase(&repo, nil)
 		expected := entities.DefaultBalance
@@ -32,7 +32,7 @@ func TestGetBalanceByAccountID(t *testing.T) {
 	})
 
 	t.Run("should return correct balance when balance is not 0", func(t *testing.T) {
-		acc := entities.NewAccount("Piter", "12345678", "123.456.789-00")
+		acc := entities.NewAccount("Piter", "123.456.789-00", "12345678")
 		acc.Balance = 100
 		repo := StubRepository{accounts: []entities.Account{acc}}
 		usecase := NewAccountUseCase(&repo, nil)

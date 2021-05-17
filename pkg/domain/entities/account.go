@@ -28,7 +28,7 @@ func NewAccountID() string {
 	return uuid.New().String()
 }
 
-func NewAccount(name, secret, cpf string) Account {
+func NewAccount(name, cpf, secret string) Account {
 	return Account{
 		ID:        NewAccountID(),
 		Name:      name,

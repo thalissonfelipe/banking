@@ -21,8 +21,7 @@ func (a Account) CreateAccount(ctx context.Context, input account.CreateAccountI
 		return nil, entities.ErrInternalError
 	}
 
-	input.Secret = string(hashedSecret)
-	acc := entities.NewAccount(input.Name, input.Secret, input.CPF)
+	acc := entities.NewAccount(input.Name, input.CPF, string(hashedSecret))
 	err = a.repository.PostAccount(ctx, acc)
 	if err != nil {
 		return nil, entities.ErrInternalError

@@ -13,7 +13,7 @@ func TestListAccounts(t *testing.T) {
 	ctx := context.Background()
 
 	t.Run("should return a list of accounts", func(t *testing.T) {
-		acc := entities.NewAccount("Piter", "12345678", "123.456.789-00")
+		acc := entities.NewAccount("Piter", "123.456.789-00", "12345678")
 		repo := StubRepository{accounts: []entities.Account{acc}, err: nil}
 		usecase := NewAccountUseCase(&repo, nil)
 		expected := []entities.Account{acc}
