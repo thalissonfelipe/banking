@@ -12,13 +12,13 @@ import (
 
 func TestCreateAccount(t *testing.T) {
 	ctx := context.Background()
+	input := account.CreateAccountInput{
+		Name:   "Pedro",
+		CPF:    "123.456.789-00",
+		Secret: "12345678",
+	}
 
 	t.Run("should create an account", func(t *testing.T) {
-		input := account.CreateAccountInput{
-			Name:   "Pedro",
-			CPF:    "123.456.789-00",
-			Secret: "12345678",
-		}
 		repo := StubRepository{}
 		enc := StubHash{}
 		usecase := NewAccountUseCase(&repo, enc)
@@ -32,11 +32,6 @@ func TestCreateAccount(t *testing.T) {
 	})
 
 	t.Run("should return an error if repository fails to fetch or save", func(t *testing.T) {
-		input := account.CreateAccountInput{
-			Name:   "Pedro",
-			CPF:    "123.456.789-00",
-			Secret: "12345678",
-		}
 		repo := StubRepository{err: errors.New("failed to save account")}
 		enc := StubHash{}
 		usecase := NewAccountUseCase(&repo, enc)
@@ -48,11 +43,6 @@ func TestCreateAccount(t *testing.T) {
 	})
 
 	t.Run("should return an error if cpf already exists", func(t *testing.T) {
-		input := account.CreateAccountInput{
-			Name:   "Pedro",
-			CPF:    "123.456.789-00",
-			Secret: "12345678",
-		}
 		acc := entities.NewAccount(input.Name, input.Secret, input.CPF)
 		repo := StubRepository{
 			accounts: []entities.Account{acc},
@@ -66,11 +56,6 @@ func TestCreateAccount(t *testing.T) {
 	})
 
 	t.Run("should return an error if hash secret fails", func(t *testing.T) {
-		input := account.CreateAccountInput{
-			Name:   "Pedro",
-			CPF:    "123.456.789-00",
-			Secret: "12345678",
-		}
 		repo := StubRepository{}
 		enc := StubHash{err: errors.New("could not hash secret")}
 		usecase := NewAccountUseCase(&repo, enc)
