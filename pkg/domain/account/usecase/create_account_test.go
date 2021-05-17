@@ -31,7 +31,7 @@ func TestCreateAccount(t *testing.T) {
 		assert.Len(t, repo.accounts, 1)
 	})
 
-	t.Run("should return an error if repository fails to save", func(t *testing.T) {
+	t.Run("should return an error if repository fails to fetch or save", func(t *testing.T) {
 		input := account.CreateAccountInput{
 			Name:   "Pedro",
 			CPF:    "123.456.789-00",

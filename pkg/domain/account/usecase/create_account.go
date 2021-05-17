@@ -8,8 +8,11 @@ import (
 )
 
 func (a Account) CreateAccount(ctx context.Context, input account.CreateAccountInput) (*entities.Account, error) {
-	_, err := a.repository.GetAccountByCPF(ctx, input.CPF)
+	accExists, err := a.repository.GetAccountByCPF(ctx, input.CPF)
 	if err != nil {
+		return nil, err
+	}
+	if accExists != nil {
 		return nil, entities.ErrAccountAlreadyExists
 	}
 
