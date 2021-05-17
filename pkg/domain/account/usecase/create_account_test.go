@@ -7,6 +7,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/thalissonfelipe/banking/pkg/domain/account"
+	"github.com/thalissonfelipe/banking/pkg/domain/entities"
 )
 
 func TestCreateAccount(t *testing.T) {
@@ -41,5 +42,22 @@ func TestCreateAccount(t *testing.T) {
 		assert.Nil(t, result)
 		assert.NotNil(t, err)
 		assert.Len(t, repo.accounts, 0)
+	})
+
+	t.Run("should return an error if cpf already exists", func(t *testing.T) {
+		input := account.CreateAccountInput{
+			Name:   "Pedro",
+			CPF:    "123.456.789-00",
+			Secret: "12345678",
+		}
+		acc := entities.NewAccount(input.Name, input.Secret, input.CPF)
+		repo := StubRepository{
+			accounts: []entities.Account{acc},
+		}
+		usecase := NewAccountUseCase(&repo)
+		result, err := usecase.CreateAccount(ctx, input)
+
+		assert.Nil(t, result)
+		assert.Equal(t, entities.ErrAccountAlreadyExists, err)
 	})
 }
