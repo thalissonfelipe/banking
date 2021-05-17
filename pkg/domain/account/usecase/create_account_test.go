@@ -20,12 +20,14 @@ func TestCreateAccount(t *testing.T) {
 			Secret: "12345678",
 		}
 		repo := StubRepository{}
-		usecase := NewAccountUseCase(&repo)
+		enc := StubHash{}
+		usecase := NewAccountUseCase(&repo, enc)
 		result, err := usecase.CreateAccount(ctx, input)
 
 		assert.Nil(t, err)
 		assert.Equal(t, input.Name, result.Name)
 		assert.Equal(t, input.CPF, result.CPF)
+		assert.NotEqual(t, input.Secret, result.Secret)
 		assert.Len(t, repo.accounts, 1)
 	})
 
@@ -36,7 +38,8 @@ func TestCreateAccount(t *testing.T) {
 			Secret: "12345678",
 		}
 		repo := StubRepository{err: errors.New("failed to save account")}
-		usecase := NewAccountUseCase(&repo)
+		enc := StubHash{}
+		usecase := NewAccountUseCase(&repo, enc)
 		result, err := usecase.CreateAccount(ctx, input)
 
 		assert.Nil(t, result)
@@ -54,7 +57,8 @@ func TestCreateAccount(t *testing.T) {
 		repo := StubRepository{
 			accounts: []entities.Account{acc},
 		}
-		usecase := NewAccountUseCase(&repo)
+		enc := StubHash{}
+		usecase := NewAccountUseCase(&repo, enc)
 		result, err := usecase.CreateAccount(ctx, input)
 
 		assert.Nil(t, result)

@@ -2,6 +2,8 @@ package usecase
 
 import (
 	"context"
+	"crypto/rand"
+	"encoding/hex"
 
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
 )
@@ -42,4 +44,24 @@ func (s StubRepository) GetAccountByCPF(ctx context.Context, cpf string) (*entit
 		}
 	}
 	return nil, nil
+}
+
+type StubHash struct {
+	err error
+}
+
+func (s StubHash) Hash(secret string) ([]byte, error) {
+	if s.err != nil {
+		return nil, s.err
+	}
+
+	return []byte(generateRandomSecret(len(secret))), nil
+}
+
+func generateRandomSecret(length int) string {
+	b := make([]byte, length)
+	if _, err := rand.Read(b); err != nil {
+		return ""
+	}
+	return hex.EncodeToString(b)
 }

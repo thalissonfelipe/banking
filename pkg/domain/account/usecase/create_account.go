@@ -13,6 +13,12 @@ func (a Account) CreateAccount(ctx context.Context, input account.CreateAccountI
 		return nil, entities.ErrAccountAlreadyExists
 	}
 
+	hashedSecret, err := a.encrypter.Hash(input.Secret)
+	if err != nil {
+		return nil, err
+	}
+
+	input.Secret = string(hashedSecret)
 	acc := entities.NewAccount(input.Name, input.Secret, input.CPF)
 	err = a.repository.PostAccount(ctx, acc)
 	if err != nil {
