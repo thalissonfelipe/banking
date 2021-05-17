@@ -11,12 +11,11 @@ import (
 
 func TestCreateTransfer(t *testing.T) {
 	ctx := context.Background()
+	acc1 := entities.NewAccount("Pedro", "123.456.789-00", "12345678")
+	acc2 := entities.NewAccount("Maria", "123.456.789-01", "12345678")
 
 	t.Run("should perform a transfer successfully", func(t *testing.T) {
-		acc1 := entities.NewAccount("Pedro", "123.456.789-00", "12345678")
 		acc1.Balance = 100
-		acc2 := entities.NewAccount("Maria", "123.456.789-01", "12345678")
-
 		transferInput := transfer.CreateTransferInput{
 			AccountOriginID:      acc1.ID,
 			AccountDestinationID: acc2.ID,
@@ -36,9 +35,7 @@ func TestCreateTransfer(t *testing.T) {
 	})
 
 	t.Run("should return an error if accOrigin does not have sufficient funds", func(t *testing.T) {
-		acc1 := entities.NewAccount("Pedro", "123.456.789-00", "12345678")
-		acc2 := entities.NewAccount("Maria", "123.456.789-01", "12345678")
-
+		acc1.Balance = 0
 		transferInput := transfer.CreateTransferInput{
 			AccountOriginID:      acc1.ID,
 			AccountDestinationID: acc2.ID,
