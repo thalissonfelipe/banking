@@ -18,7 +18,10 @@ type Account struct {
 
 const DefaultBalance = 0
 
-var ErrAccountDoesNotExist error = errors.New("account does not exist")
+var (
+	ErrAccountDoesNotExist  error = errors.New("account does not exist")
+	ErrAccountAlreadyExists error = errors.New("account already exists")
+)
 
 func NewAccountID() string {
 	return uuid.New().String()

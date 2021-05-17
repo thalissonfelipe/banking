@@ -10,4 +10,5 @@ type Repository interface {
 	GetAccounts(ctx context.Context) ([]entities.Account, error)
 	GetBalanceByID(ctx context.Context, id string) (int, error)
 	PostAccount(ctx context.Context, account entities.Account) error
+	GetAccountByCPF(ctx context.Context, cpf string) (*entities.Account, error)
 }
