@@ -1,6 +1,7 @@
 package entities
 
 import (
+	"errors"
 	"time"
 
 	"github.com/google/uuid"
@@ -13,6 +14,8 @@ type Transfer struct {
 	Amount               int
 	CreatedAt            time.Time
 }
+
+var ErrInsufficientFunds error = errors.New("insufficient funds")
 
 func NewTransferID() string {
 	return uuid.New().String()
