@@ -25,3 +25,7 @@ func (s StubRepository) GetTransfers(ctx context.Context, id string) ([]entities
 
 	return transfers, nil
 }
+
+func (s StubRepository) UpdateBalance(ctx context.Context, transfer entities.Transfer) error {
+	return nil
+}
