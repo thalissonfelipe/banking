@@ -7,6 +7,5 @@ import (
 )
 
 type UseCase interface {
-	ListTransfers(ctx context.Context) ([]entities.Transfer, error)
-	// TODO: CreateTransfer
+	ListTransfers(ctx context.Context, accountID string) ([]entities.Transfer, error)
 }

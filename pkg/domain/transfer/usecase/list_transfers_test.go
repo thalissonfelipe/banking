@@ -13,11 +13,16 @@ func TestListTransfers(t *testing.T) {
 	ctx := context.Background()
 
 	t.Run("should return a list of transfers", func(t *testing.T) {
-		transfer := entities.NewTransfer(entities.NewAccountID(), entities.NewAccountID(), 100)
+		accountOriginID := entities.NewAccountID()
+		transfer := entities.NewTransfer(
+			accountOriginID,
+			entities.NewAccountID(),
+			100,
+		)
 		repo := StubRepository{transfers: []entities.Transfer{transfer}}
 		usecase := NewTransfer(repo)
 		expected := []entities.Transfer{transfer}
-		result, err := usecase.ListTransfers(ctx)
+		result, err := usecase.ListTransfers(ctx, accountOriginID)
 
 		assert.Nil(t, err)
 		assert.Equal(t, expected, result)
@@ -26,7 +31,7 @@ func TestListTransfers(t *testing.T) {
 	t.Run("should return an error if something went wrong on repository", func(t *testing.T) {
 		repo := StubRepository{transfers: nil, err: errors.New("failed to fetch transfers")}
 		usecase := NewTransfer(repo)
-		result, err := usecase.ListTransfers(ctx)
+		result, err := usecase.ListTransfers(ctx, entities.NewAccountID())
 
 		assert.Nil(t, result)
 		assert.NotNil(t, err)

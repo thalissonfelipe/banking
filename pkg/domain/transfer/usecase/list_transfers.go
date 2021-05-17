@@ -6,8 +6,8 @@ import (
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
 )
 
-func (t Transfer) ListTransfers(ctx context.Context) ([]entities.Transfer, error) {
-	transfers, err := t.repository.GetTransfers(ctx)
+func (t Transfer) ListTransfers(ctx context.Context, accountID string) ([]entities.Transfer, error) {
+	transfers, err := t.repository.GetTransfers(ctx, accountID)
 	if err != nil {
 		return nil, entities.ErrInternalError
 	}

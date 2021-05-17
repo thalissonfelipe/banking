@@ -7,5 +7,5 @@ import (
 )
 
 type Repository interface {
-	GetTransfers(ctx context.Context) ([]entities.Transfer, error)
+	GetTransfers(ctx context.Context, id string) ([]entities.Transfer, error)
 }

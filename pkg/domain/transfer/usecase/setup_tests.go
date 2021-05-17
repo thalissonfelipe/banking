@@ -11,9 +11,17 @@ type StubRepository struct {
 	err       error
 }
 
-func (s StubRepository) GetTransfers(ctx context.Context) ([]entities.Transfer, error) {
+func (s StubRepository) GetTransfers(ctx context.Context, id string) ([]entities.Transfer, error) {
 	if s.err != nil {
 		return nil, entities.ErrInternalError
 	}
-	return s.transfers, nil
+
+	var transfers []entities.Transfer
+	for _, tr := range s.transfers {
+		if tr.AccountOriginID == id {
+			transfers = append(transfers, tr)
+		}
+	}
+
+	return transfers, nil
 }
