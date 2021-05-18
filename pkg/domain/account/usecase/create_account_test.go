@@ -15,7 +15,7 @@ func TestCreateAccount(t *testing.T) {
 	ctx := context.Background()
 	input := account.CreateAccountInput{
 		Name:   "Pedro",
-		CPF:    "123.456.789-00",
+		CPF:    "648.446.967-93",
 		Secret: "aZ1234Ds",
 	}
 
@@ -65,7 +65,19 @@ func TestCreateAccount(t *testing.T) {
 		assert.Equal(t, entities.ErrInternalError, err)
 	})
 
+	t.Run("should return an error if cpf is not valid", func(t *testing.T) {
+		input.CPF = "123.456.789-00"
+		repo := mocks.StubAccountRepository{}
+		enc := mocks.StubHash{}
+		usecase := NewAccountUseCase(&repo, enc)
+		result, err := usecase.CreateAccount(ctx, input)
+
+		assert.Nil(t, result)
+		assert.Equal(t, entities.ErrInvalidCPF, err)
+	})
+
 	t.Run("should return an error if secret is not valid", func(t *testing.T) {
+		input.CPF = "648.446.967-93"
 		input.Secret = "invalid_secret"
 		repo := mocks.StubAccountRepository{}
 		enc := mocks.StubHash{}
