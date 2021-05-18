@@ -12,10 +12,11 @@ func (h Handler) ListAccounts(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("Internal Error."))
 	}
 
-	var accountsResponse []AccountResponse
+	accountsResponse := make([]AccountResponse, 0)
 	for _, acc := range accounts {
 		accountsResponse = append(accountsResponse, convertAccountToAccountResponse(acc))
 	}
 
+	w.Header().Add("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(accountsResponse)
 }
