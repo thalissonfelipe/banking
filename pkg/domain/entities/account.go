@@ -23,6 +23,7 @@ var (
 	ErrAccountAlreadyExists error = errors.New("account already exists")
 	ErrInternalError        error = errors.New("internal server error")
 	ErrInvalidSecret        error = errors.New("invalid secret")
+	ErrInvalidCPF           error = errors.New("invalid cpf")
 )
 
 func NewAccountID() string {

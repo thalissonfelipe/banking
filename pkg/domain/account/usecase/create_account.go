@@ -9,6 +9,11 @@ import (
 )
 
 func (a Account) CreateAccount(ctx context.Context, input account.CreateAccountInput) (*entities.Account, error) {
+	cpf := vos.NewCPF(input.CPF)
+	if ok := cpf.IsValid(); !ok {
+		return nil, entities.ErrInvalidCPF
+	}
+
 	secret := vos.NewSecret(input.Secret)
 	if ok := secret.IsValid(); !ok {
 		return nil, entities.ErrInvalidSecret
