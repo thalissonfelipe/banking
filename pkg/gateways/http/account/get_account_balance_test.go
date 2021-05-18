@@ -12,6 +12,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/thalissonfelipe/banking/pkg/domain/account/usecase"
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
+	"github.com/thalissonfelipe/banking/pkg/gateways/http/responses"
 	"github.com/thalissonfelipe/banking/pkg/tests/mocks"
 )
 
@@ -81,8 +82,13 @@ func TestGetAccountBalance(t *testing.T) {
 
 		http.HandlerFunc(handler.GetAccountBalance).ServeHTTP(response, request)
 
+		expected := responses.ErrorResponse{Message: "Account not found."}
+		var result responses.ErrorResponse
+		json.NewDecoder(response.Body).Decode(&result)
+
 		assert.Equal(t, http.StatusNotFound, response.Code)
-		assert.Equal(t, "Account not found.", response.Body.String())
+		assert.Equal(t, "application/json", response.Header().Get("Content-Type"))
+		assert.Equal(t, expected, result)
 	})
 
 	t.Run("should return status 500 if something went wrong on usecase", func(t *testing.T) {
@@ -100,7 +106,12 @@ func TestGetAccountBalance(t *testing.T) {
 
 		http.HandlerFunc(handler.GetAccountBalance).ServeHTTP(response, request)
 
+		expected := responses.ErrorResponse{Message: "Internal Error."}
+		var result responses.ErrorResponse
+		json.NewDecoder(response.Body).Decode(&result)
+
 		assert.Equal(t, http.StatusInternalServerError, response.Code)
-		assert.Equal(t, "Internal Error.", response.Body.String())
+		assert.Equal(t, "application/json", response.Header().Get("Content-Type"))
+		assert.Equal(t, expected, result)
 	})
 }

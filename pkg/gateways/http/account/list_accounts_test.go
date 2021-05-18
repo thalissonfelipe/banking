@@ -11,6 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/thalissonfelipe/banking/pkg/domain/account/usecase"
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
+	"github.com/thalissonfelipe/banking/pkg/gateways/http/responses"
 	"github.com/thalissonfelipe/banking/pkg/tests/mocks"
 )
 
@@ -65,7 +66,12 @@ func TestListAccounts(t *testing.T) {
 
 		http.HandlerFunc(handler.ListAccounts).ServeHTTP(response, request)
 
+		expected := responses.ErrorResponse{Message: "Internal Error."}
+		var accounts responses.ErrorResponse
+		json.NewDecoder(response.Body).Decode(&accounts)
+
 		assert.Equal(t, http.StatusInternalServerError, response.Code)
-		assert.Equal(t, "Internal Error.", response.Body.String())
+		assert.Equal(t, "application/json", response.Header().Get("Content-Type"))
+		assert.Equal(t, expected, accounts)
 	})
 }

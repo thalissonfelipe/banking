@@ -1,12 +1,12 @@
 package account
 
 import (
-	"encoding/json"
 	"net/http"
 
 	"github.com/gorilla/mux"
 
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
+	"github.com/thalissonfelipe/banking/pkg/gateways/http/responses"
 )
 
 func (h Handler) GetAccountBalance(w http.ResponseWriter, r *http.Request) {
@@ -15,17 +15,13 @@ func (h Handler) GetAccountBalance(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		switch err {
 		case entities.ErrAccountDoesNotExist:
-			w.WriteHeader(http.StatusNotFound)
-			w.Write([]byte("Account not found."))
-			return
+			responses.SendError(w, http.StatusNotFound, "Account not found.")
 		default:
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte("Internal Error."))
-			return
+			responses.SendError(w, http.StatusInternalServerError, "Internal Error.")
 		}
+		return
 	}
 
 	response := BalanceResponse{Balance: balance}
-	w.Header().Add("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(&response)
+	responses.SendJSON(w, http.StatusOK, response)
 }
