@@ -2,7 +2,6 @@ package account
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -11,10 +10,8 @@ import (
 )
 
 func (h Handler) GetAccountBalance(w http.ResponseWriter, r *http.Request) {
-	log.Println(mux.Vars(r))
 	accountID := mux.Vars(r)["id"]
 	balance, err := h.usecase.GetAccountBalanceByID(r.Context(), accountID)
-	// log.Println(balance, err)
 	if err != nil {
 		switch err {
 		case entities.ErrAccountDoesNotExist:
