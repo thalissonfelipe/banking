@@ -10,6 +10,7 @@ func (h Handler) ListAccounts(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(500)
 		w.Write([]byte("Internal Error."))
+		return
 	}
 
 	accountsResponse := make([]AccountResponse, 0)
