@@ -30,6 +30,7 @@ func TestListAccounts(t *testing.T) {
 		json.NewDecoder(response.Body).Decode(&accounts)
 
 		assert.Equal(t, response.Code, http.StatusOK)
+		assert.Equal(t, "application/json", response.Header().Get("Content-Type"))
 		assert.Empty(t, accounts)
 	})
 
@@ -49,6 +50,7 @@ func TestListAccounts(t *testing.T) {
 		json.NewDecoder(response.Body).Decode(&accounts)
 
 		assert.Equal(t, response.Code, http.StatusOK)
+		assert.Equal(t, "application/json", response.Header().Get("Content-Type"))
 		assert.Equal(t, expected, accounts)
 	})
 
@@ -63,5 +65,6 @@ func TestListAccounts(t *testing.T) {
 		http.HandlerFunc(handler.ListAccounts).ServeHTTP(response, request)
 
 		assert.Equal(t, http.StatusInternalServerError, response.Code)
+		assert.Equal(t, "Internal Error.", response.Body.String())
 	})
 }
