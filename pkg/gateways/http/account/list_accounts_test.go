@@ -14,8 +14,6 @@ import (
 )
 
 func TestListAccounts(t *testing.T) {
-	r := mux.NewRouter()
-
 	testCases := []struct {
 		name         string
 		repoSetup    func() mocks.StubAccountRepository
@@ -51,6 +49,7 @@ func TestListAccounts(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			repo := tt.repoSetup()
 			accUseCase := usecase.NewAccountUseCase(&repo, nil)
+			r := mux.NewRouter()
 			handler := NewHandler(r, accUseCase)
 
 			request, _ := http.NewRequest(http.MethodGet, "/accounts", nil)
