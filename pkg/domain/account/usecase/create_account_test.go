@@ -16,10 +16,10 @@ func TestCreateAccount(t *testing.T) {
 	input := account.CreateAccountInput{
 		Name:   "Pedro",
 		CPF:    "123.456.789-00",
-		Secret: "12345678",
+		Secret: "aZ1234Ds",
 	}
 
-	t.Run("should create an account", func(t *testing.T) {
+	t.Run("should create an account successfully", func(t *testing.T) {
 		repo := mocks.StubAccountRepository{}
 		enc := mocks.StubHash{}
 		usecase := NewAccountUseCase(&repo, enc)
@@ -39,8 +39,7 @@ func TestCreateAccount(t *testing.T) {
 		result, err := usecase.CreateAccount(ctx, input)
 
 		assert.Nil(t, result)
-		assert.NotNil(t, err)
-		assert.Len(t, repo.Accounts, 0)
+		assert.Equal(t, entities.ErrInternalError, err)
 	})
 
 	t.Run("should return an error if cpf already exists", func(t *testing.T) {
@@ -63,6 +62,17 @@ func TestCreateAccount(t *testing.T) {
 		result, err := usecase.CreateAccount(ctx, input)
 
 		assert.Nil(t, result)
-		assert.NotNil(t, err)
+		assert.Equal(t, entities.ErrInternalError, err)
+	})
+
+	t.Run("should return an error if secret is not valid", func(t *testing.T) {
+		input.Secret = "invalid_secret"
+		repo := mocks.StubAccountRepository{}
+		enc := mocks.StubHash{}
+		usecase := NewAccountUseCase(&repo, enc)
+		result, err := usecase.CreateAccount(ctx, input)
+
+		assert.Nil(t, result)
+		assert.Equal(t, entities.ErrInvalidSecret, err)
 	})
 }
