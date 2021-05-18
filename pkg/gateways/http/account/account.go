@@ -13,6 +13,10 @@ type AccountResponse struct {
 	CreatedAt string
 }
 
+type BalanceResponse struct {
+	Balance int
+}
+
 func convertAccountToAccountResponse(account entities.Account) AccountResponse {
 	return AccountResponse{
 		Name:      account.Name,

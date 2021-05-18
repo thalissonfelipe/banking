@@ -13,6 +13,7 @@ func NewHandler(r *mux.Router, usecase account.UseCase) *Handler {
 	handler := Handler{usecase: usecase}
 
 	r.HandleFunc("/accounts", handler.ListAccounts).Methods("GET")
+	r.HandleFunc("/accounts/{id}/balance", handler.GetAccountBalance).Methods("GET")
 
 	return &handler
 }
