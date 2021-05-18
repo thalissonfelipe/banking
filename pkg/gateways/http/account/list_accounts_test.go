@@ -11,13 +11,14 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/thalissonfelipe/banking/pkg/domain/account/usecase"
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
+	"github.com/thalissonfelipe/banking/pkg/tests/mocks"
 )
 
 func TestListAccounts(t *testing.T) {
 	r := mux.NewRouter()
 
 	t.Run("should return 200 and an empty slice of accounts", func(t *testing.T) {
-		repo := StubAccountRepository{}
+		repo := mocks.StubAccountRepository{}
 		accUseCase := usecase.NewAccountUseCase(&repo, nil)
 		handler := NewHandler(r, accUseCase)
 
@@ -36,7 +37,7 @@ func TestListAccounts(t *testing.T) {
 
 	t.Run("should return 200 and an slice of accounts", func(t *testing.T) {
 		acc := entities.NewAccount("Pedro", "123.456.789-00", "12345678")
-		repo := StubAccountRepository{accounts: []entities.Account{acc}}
+		repo := mocks.StubAccountRepository{Accounts: []entities.Account{acc}}
 		accUseCase := usecase.NewAccountUseCase(&repo, nil)
 		handler := NewHandler(r, accUseCase)
 
@@ -55,7 +56,7 @@ func TestListAccounts(t *testing.T) {
 	})
 
 	t.Run("should return 500 and error message if something went wrong", func(t *testing.T) {
-		repo := StubAccountRepository{err: errors.New("failed to list accounts")}
+		repo := mocks.StubAccountRepository{Err: errors.New("failed to list accounts")}
 		accUseCase := usecase.NewAccountUseCase(&repo, nil)
 		handler := NewHandler(r, accUseCase)
 

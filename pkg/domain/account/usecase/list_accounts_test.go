@@ -7,6 +7,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
+	"github.com/thalissonfelipe/banking/pkg/tests/mocks"
 )
 
 func TestListAccounts(t *testing.T) {
@@ -14,7 +15,7 @@ func TestListAccounts(t *testing.T) {
 
 	t.Run("should return a list of accounts", func(t *testing.T) {
 		acc := entities.NewAccount("Piter", "123.456.789-00", "12345678")
-		repo := StubRepository{accounts: []entities.Account{acc}, err: nil}
+		repo := mocks.StubAccountRepository{Accounts: []entities.Account{acc}, Err: nil}
 		usecase := NewAccountUseCase(&repo, nil)
 		expected := []entities.Account{acc}
 		result, err := usecase.ListAccounts(ctx)
@@ -24,7 +25,7 @@ func TestListAccounts(t *testing.T) {
 	})
 
 	t.Run("should return an error if something went wrong on repository", func(t *testing.T) {
-		repo := StubRepository{accounts: nil, err: errors.New("failed to fetch accounts")}
+		repo := mocks.StubAccountRepository{Accounts: nil, Err: errors.New("failed to fetch accounts")}
 		usecase := NewAccountUseCase(&repo, nil)
 		result, err := usecase.ListAccounts(ctx)
 

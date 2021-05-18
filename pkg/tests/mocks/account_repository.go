@@ -1,4 +1,4 @@
-package account
+package mocks
 
 import (
 	"context"
@@ -7,19 +7,19 @@ import (
 )
 
 type StubAccountRepository struct {
-	accounts []entities.Account
-	err      error
+	Accounts []entities.Account
+	Err      error
 }
 
 func (s StubAccountRepository) GetAccounts(ctx context.Context) ([]entities.Account, error) {
-	if s.err != nil {
-		return nil, s.err
+	if s.Err != nil {
+		return nil, entities.ErrInternalError
 	}
-	return s.accounts, nil
+	return s.Accounts, nil
 }
 
 func (s StubAccountRepository) GetBalanceByID(ctx context.Context, id string) (int, error) {
-	for _, account := range s.accounts {
+	for _, account := range s.Accounts {
 		if account.ID == id {
 			return account.Balance, nil
 		}
@@ -28,27 +28,27 @@ func (s StubAccountRepository) GetBalanceByID(ctx context.Context, id string) (i
 }
 
 func (s *StubAccountRepository) PostAccount(ctx context.Context, account entities.Account) error {
-	if s.err != nil {
+	if s.Err != nil {
 		return entities.ErrInternalError
 	}
-	s.accounts = append(s.accounts, account)
+	s.Accounts = append(s.Accounts, account)
 	return nil
 }
 
 func (s StubAccountRepository) GetAccountByCPF(ctx context.Context, cpf string) (*entities.Account, error) {
-	for _, acc := range s.accounts {
+	for _, acc := range s.Accounts {
 		if acc.CPF == cpf {
-			return &acc, s.err
+			return &acc, s.Err
 		}
 	}
-	return nil, s.err
+	return nil, s.Err
 }
 
 func (s StubAccountRepository) GetAccountByID(ctx context.Context, id string) (*entities.Account, error) {
-	for _, acc := range s.accounts {
+	for _, acc := range s.Accounts {
 		if acc.ID == id {
-			return &acc, s.err
+			return &acc, s.Err
 		}
 	}
-	return nil, s.err
+	return nil, s.Err
 }

@@ -6,6 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
+	"github.com/thalissonfelipe/banking/pkg/tests/mocks"
 )
 
 func TestGetBalanceByAccountID(t *testing.T) {
@@ -13,7 +14,7 @@ func TestGetBalanceByAccountID(t *testing.T) {
 
 	t.Run("should return a balance by account ID", func(t *testing.T) {
 		acc := entities.NewAccount("Piter", "123.456.789-00", "12345678")
-		repo := StubRepository{accounts: []entities.Account{acc}}
+		repo := mocks.StubAccountRepository{Accounts: []entities.Account{acc}}
 		usecase := NewAccountUseCase(&repo, nil)
 		expected := entities.DefaultBalance
 		result, err := usecase.GetAccountBalanceByID(ctx, acc.ID)
@@ -23,7 +24,7 @@ func TestGetBalanceByAccountID(t *testing.T) {
 	})
 
 	t.Run("should return an error if account does not exist", func(t *testing.T) {
-		repo := StubRepository{accounts: nil}
+		repo := mocks.StubAccountRepository{Accounts: nil}
 		usecase := NewAccountUseCase(&repo, nil)
 		result, err := usecase.GetAccountBalanceByID(ctx, entities.NewAccountID())
 
@@ -34,7 +35,7 @@ func TestGetBalanceByAccountID(t *testing.T) {
 	t.Run("should return correct balance when balance is not 0", func(t *testing.T) {
 		acc := entities.NewAccount("Piter", "123.456.789-00", "12345678")
 		acc.Balance = 100
-		repo := StubRepository{accounts: []entities.Account{acc}}
+		repo := mocks.StubAccountRepository{Accounts: []entities.Account{acc}}
 		usecase := NewAccountUseCase(&repo, nil)
 		expected := 100
 		result, err := usecase.GetAccountBalanceByID(ctx, acc.ID)

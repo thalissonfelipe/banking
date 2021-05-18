@@ -7,6 +7,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
+	"github.com/thalissonfelipe/banking/pkg/tests/mocks"
 )
 
 func TestListTransfers(t *testing.T) {
@@ -19,7 +20,7 @@ func TestListTransfers(t *testing.T) {
 			entities.NewAccountID(),
 			100,
 		)
-		repo := StubRepository{transfers: []entities.Transfer{transfer}}
+		repo := mocks.StubTransferRepository{Transfers: []entities.Transfer{transfer}}
 		usecase := NewTransfer(&repo, nil)
 		expected := []entities.Transfer{transfer}
 		result, err := usecase.ListTransfers(ctx, accountOriginID)
@@ -29,7 +30,7 @@ func TestListTransfers(t *testing.T) {
 	})
 
 	t.Run("should return an error if something went wrong on repository", func(t *testing.T) {
-		repo := StubRepository{transfers: nil, err: errors.New("failed to fetch transfers")}
+		repo := mocks.StubTransferRepository{Transfers: nil, Err: errors.New("failed to fetch transfers")}
 		usecase := NewTransfer(&repo, nil)
 		result, err := usecase.ListTransfers(ctx, entities.NewAccountID())
 

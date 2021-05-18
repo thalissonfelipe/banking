@@ -12,6 +12,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/thalissonfelipe/banking/pkg/domain/account/usecase"
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
+	"github.com/thalissonfelipe/banking/pkg/tests/mocks"
 )
 
 func TestGetAccountBalance(t *testing.T) {
@@ -19,7 +20,7 @@ func TestGetAccountBalance(t *testing.T) {
 
 	t.Run("should return status 200 and a balance equal to 0", func(t *testing.T) {
 		acc := entities.NewAccount("Pedro", "123.456.789-00", "12345678")
-		repo := StubAccountRepository{accounts: []entities.Account{acc}}
+		repo := mocks.StubAccountRepository{Accounts: []entities.Account{acc}}
 		accUseCase := usecase.NewAccountUseCase(&repo, nil)
 		handler := NewHandler(r, accUseCase)
 
@@ -44,7 +45,7 @@ func TestGetAccountBalance(t *testing.T) {
 	t.Run("should return status 200 and a balance equal to 100", func(t *testing.T) {
 		acc := entities.NewAccount("Pedro", "123.456.789-00", "12345678")
 		acc.Balance = 100
-		repo := StubAccountRepository{accounts: []entities.Account{acc}}
+		repo := mocks.StubAccountRepository{Accounts: []entities.Account{acc}}
 		accUseCase := usecase.NewAccountUseCase(&repo, nil)
 		handler := NewHandler(r, accUseCase)
 
@@ -67,7 +68,7 @@ func TestGetAccountBalance(t *testing.T) {
 	})
 
 	t.Run("should return status 404 if account does not exist", func(t *testing.T) {
-		repo := StubAccountRepository{}
+		repo := mocks.StubAccountRepository{}
 		accUseCase := usecase.NewAccountUseCase(&repo, nil)
 		handler := NewHandler(r, accUseCase)
 
@@ -86,7 +87,7 @@ func TestGetAccountBalance(t *testing.T) {
 
 	t.Run("should return status 500 if something went wrong on usecase", func(t *testing.T) {
 		acc := entities.NewAccount("Pedro", "123.456.789-00", "12345678")
-		repo := StubAccountRepository{accounts: []entities.Account{acc}, err: errors.New("usecase fails")}
+		repo := mocks.StubAccountRepository{Accounts: []entities.Account{acc}, Err: errors.New("usecase fails")}
 		accUseCase := usecase.NewAccountUseCase(&repo, nil)
 		handler := NewHandler(r, accUseCase)
 
