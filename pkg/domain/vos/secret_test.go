@@ -22,7 +22,7 @@ func TestSecretIsValid(t *testing.T) {
 
 	for _, tt := range testCases {
 		t.Run(tt.name, func(t *testing.T) {
-			secret := Secret{value: tt.secret}
+			secret := NewSecret(tt.secret)
 			result := secret.IsValid()
 
 			assert.Equal(t, tt.expected, result)
