@@ -44,3 +44,7 @@ func (s Secret) String() string {
 func (s Secret) Size() int {
 	return len(s.value)
 }
+
+func NewSecret(secret string) Secret {
+	return Secret{value: secret}
+}
