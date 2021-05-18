@@ -2,8 +2,8 @@ package account
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
-	"log"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -24,8 +24,10 @@ func TestGetAccountBalance(t *testing.T) {
 		handler := NewHandler(r, accUseCase)
 
 		requestURI := fmt.Sprintf("/accounts/%s/balance", acc.ID)
-		log.Println(requestURI)
-		request, _ := http.NewRequest(http.MethodGet, requestURI, nil)
+		request := httptest.NewRequest(http.MethodGet, requestURI, nil)
+		request = mux.SetURLVars(request, map[string]string{
+			"id": acc.ID,
+		})
 		response := httptest.NewRecorder()
 
 		http.HandlerFunc(handler.GetAccountBalance).ServeHTTP(response, request)
@@ -39,40 +41,65 @@ func TestGetAccountBalance(t *testing.T) {
 		assert.Equal(t, expected, balance.Balance)
 	})
 
-	// t.Run("should return status 200 and a balance equal to 100", func(t *testing.T) {
-	// 	acc := entities.NewAccount("Pedro", "123.456.789-00", "12345678")
-	// 	acc.Balance = 100
-	// 	repo := StubAccountRepository{accounts: []entities.Account{acc}}
-	// 	accUseCase := usecase.NewAccountUseCase(&repo, nil)
-	// 	handler := NewHandler(r, accUseCase)
+	t.Run("should return status 200 and a balance equal to 100", func(t *testing.T) {
+		acc := entities.NewAccount("Pedro", "123.456.789-00", "12345678")
+		acc.Balance = 100
+		repo := StubAccountRepository{accounts: []entities.Account{acc}}
+		accUseCase := usecase.NewAccountUseCase(&repo, nil)
+		handler := NewHandler(r, accUseCase)
 
-	// 	requestURI := fmt.Sprintf("/accounts/%s/balance", acc.ID)
-	// 	request, _ := http.NewRequest(http.MethodGet, requestURI, nil)
-	// 	response := httptest.NewRecorder()
+		requestURI := fmt.Sprintf("/accounts/%s/balance", acc.ID)
+		request := httptest.NewRequest(http.MethodGet, requestURI, nil)
+		request = mux.SetURLVars(request, map[string]string{
+			"id": acc.ID,
+		})
+		response := httptest.NewRecorder()
 
-	// 	http.HandlerFunc(handler.GetAccountBalance).ServeHTTP(response, request)
+		http.HandlerFunc(handler.GetAccountBalance).ServeHTTP(response, request)
 
-	// 	expected := 100
-	// 	var balance BalanceResponse
-	// 	json.NewDecoder(response.Body).Decode(&balance)
+		expected := 100
+		var balance BalanceResponse
+		json.NewDecoder(response.Body).Decode(&balance)
 
-	// 	assert.Equal(t, http.StatusOK, response.Code)
-	// 	assert.Equal(t, "application/json", response.Header().Get("Content-Type"))
-	// 	assert.Equal(t, expected, balance.Balance)
-	// })
+		assert.Equal(t, http.StatusOK, response.Code)
+		assert.Equal(t, "application/json", response.Header().Get("Content-Type"))
+		assert.Equal(t, expected, balance.Balance)
+	})
 
-	// t.Run("should return status 404", func(t *testing.T) {
-	// 	repo := StubAccountRepository{}
-	// 	accUseCase := usecase.NewAccountUseCase(&repo, nil)
-	// 	handler := NewHandler(r, accUseCase)
+	t.Run("should return status 404 if account does not exist", func(t *testing.T) {
+		repo := StubAccountRepository{}
+		accUseCase := usecase.NewAccountUseCase(&repo, nil)
+		handler := NewHandler(r, accUseCase)
 
-	// 	requestURI := fmt.Sprintf("/accounts/%s/balance", "123456")
-	// 	request, _ := http.NewRequest(http.MethodGet, requestURI, nil)
-	// 	response := httptest.NewRecorder()
+		requestURI := fmt.Sprintf("/accounts/%s/balance", "unknown-id")
+		request := httptest.NewRequest(http.MethodGet, requestURI, nil)
+		request = mux.SetURLVars(request, map[string]string{
+			"id": "unknown-id",
+		})
+		response := httptest.NewRecorder()
 
-	// 	http.HandlerFunc(handler.GetAccountBalance).ServeHTTP(response, request)
+		http.HandlerFunc(handler.GetAccountBalance).ServeHTTP(response, request)
 
-	// 	assert.Equal(t, http.StatusNotFound, response.Code)
-	// 	assert.Equal(t, "Account not found.", response.Body.String())
-	// })
+		assert.Equal(t, http.StatusNotFound, response.Code)
+		assert.Equal(t, "Account not found.", response.Body.String())
+	})
+
+	t.Run("should return status 500 if something went wrong on usecase", func(t *testing.T) {
+		acc := entities.NewAccount("Pedro", "123.456.789-00", "12345678")
+		repo := StubAccountRepository{accounts: []entities.Account{acc}, err: errors.New("usecase fails")}
+		accUseCase := usecase.NewAccountUseCase(&repo, nil)
+		handler := NewHandler(r, accUseCase)
+
+		requestURI := fmt.Sprintf("/accounts/%s/balance", acc.ID)
+		request := httptest.NewRequest(http.MethodGet, requestURI, nil)
+		request = mux.SetURLVars(request, map[string]string{
+			"id": acc.ID,
+		})
+		response := httptest.NewRecorder()
+
+		http.HandlerFunc(handler.GetAccountBalance).ServeHTTP(response, request)
+
+		assert.Equal(t, http.StatusInternalServerError, response.Code)
+		assert.Equal(t, "Internal Error.", response.Body.String())
+	})
 }
