@@ -18,3 +18,11 @@ type CreateAccountInput struct {
 	CPF    string
 	Secret string
 }
+
+func NewCreateAccountInput(name, cpf, secret string) CreateAccountInput {
+	return CreateAccountInput{
+		Name:   name,
+		CPF:    cpf,
+		Secret: secret,
+	}
+}

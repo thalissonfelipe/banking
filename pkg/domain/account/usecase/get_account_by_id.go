@@ -11,6 +11,9 @@ func (a Account) GetAccountByID(ctx context.Context, accountID string) (*entitie
 	if err != nil {
 		return nil, entities.ErrInternalError
 	}
+	if acc == nil {
+		return nil, entities.ErrAccountDoesNotExist
+	}
 
 	return acc, nil
 }

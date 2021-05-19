@@ -10,37 +10,57 @@ import (
 )
 
 func TestGetBalanceByAccountID(t *testing.T) {
-	ctx := context.Background()
+	accBalanceDefault := entities.NewAccount("Piter", "123.456.789-00", "12345678")
+	accBalance100 := entities.NewAccount("Piter", "123.456.789-00", "12345678")
+	accBalance100.Balance = 100
 
-	t.Run("should return a balance by account ID", func(t *testing.T) {
-		acc := entities.NewAccount("Piter", "123.456.789-00", "12345678")
-		repo := mocks.StubAccountRepository{Accounts: []entities.Account{acc}}
-		usecase := NewAccountUseCase(&repo, nil)
-		expected := entities.DefaultBalance
-		result, err := usecase.GetAccountBalanceByID(ctx, acc.ID)
+	testCases := []struct {
+		name        string
+		repoSetup   *mocks.StubAccountRepository
+		accountId   string
+		expected    int
+		errExpected error
+	}{
+		{
+			name: "should return a default balance",
+			repoSetup: &mocks.StubAccountRepository{
+				Accounts: []entities.Account{accBalanceDefault},
+				Err:      nil,
+			},
+			accountId:   accBalanceDefault.ID,
+			expected:    entities.DefaultBalance,
+			errExpected: nil,
+		},
+		{
+			name: "should return an error if account does not exist",
+			repoSetup: &mocks.StubAccountRepository{
+				Accounts: nil,
+				Err:      nil,
+			},
+			accountId:   "unknown-id",
+			expected:    entities.DefaultBalance,
+			errExpected: entities.ErrAccountDoesNotExist,
+		},
+		{
+			name: "should return correct balance when balance is not default",
+			repoSetup: &mocks.StubAccountRepository{
+				Accounts: []entities.Account{accBalance100},
+				Err:      nil,
+			},
+			accountId:   accBalance100.ID,
+			expected:    100,
+			errExpected: nil,
+		},
+	}
 
-		assert.Nil(t, err)
-		assert.Equal(t, expected, result)
-	})
+	for _, tt := range testCases {
+		t.Run(tt.name, func(t *testing.T) {
+			ctx := context.Background()
+			usecase := NewAccountUseCase(tt.repoSetup, nil)
+			result, err := usecase.GetAccountBalanceByID(ctx, tt.accountId)
 
-	t.Run("should return an error if account does not exist", func(t *testing.T) {
-		repo := mocks.StubAccountRepository{Accounts: nil}
-		usecase := NewAccountUseCase(&repo, nil)
-		result, err := usecase.GetAccountBalanceByID(ctx, entities.NewAccountID())
-
-		assert.Zero(t, result)
-		assert.Equal(t, err, entities.ErrAccountDoesNotExist)
-	})
-
-	t.Run("should return correct balance when balance is not 0", func(t *testing.T) {
-		acc := entities.NewAccount("Piter", "123.456.789-00", "12345678")
-		acc.Balance = 100
-		repo := mocks.StubAccountRepository{Accounts: []entities.Account{acc}}
-		usecase := NewAccountUseCase(&repo, nil)
-		expected := 100
-		result, err := usecase.GetAccountBalanceByID(ctx, acc.ID)
-
-		assert.Nil(t, err)
-		assert.Equal(t, expected, result)
-	})
+			assert.Equal(t, tt.expected, result)
+			assert.Equal(t, tt.errExpected, err)
+		})
+	}
 }

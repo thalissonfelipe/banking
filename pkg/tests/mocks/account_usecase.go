@@ -13,11 +13,15 @@ type StubAccountUseCase struct {
 }
 
 func (s StubAccountUseCase) GetAccountBalanceByID(ctx context.Context, accountID string) (int, error) {
+	if s.Err != nil {
+		return 0, entities.ErrInternalError
+	}
 	for _, acc := range s.Accounts {
 		if acc.ID == accountID {
 			return acc.Balance, nil
 		}
 	}
+
 	return 0, nil
 }
 
@@ -30,10 +34,14 @@ func (s StubAccountUseCase) CreateAccount(ctx context.Context, input account.Cre
 }
 
 func (s StubAccountUseCase) GetAccountByID(ctx context.Context, accountID string) (*entities.Account, error) {
+	if s.Err != nil {
+		return nil, entities.ErrInternalError
+	}
 	for _, acc := range s.Accounts {
 		if acc.ID == accountID {
 			return &acc, nil
 		}
 	}
+
 	return nil, nil
 }

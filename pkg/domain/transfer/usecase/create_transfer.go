@@ -8,9 +8,12 @@ import (
 )
 
 func (t Transfer) CreateTransfer(ctx context.Context, input transfer.CreateTransferInput) error {
-	accountOriginBalance, err := t.accountUseCase.GetAccountBalanceByID(ctx, input.AccountOriginID)
+	accOrigin, err := t.accountUseCase.GetAccountByID(ctx, input.AccountOriginID)
 	if err != nil {
 		return err
+	}
+	if accOrigin == nil {
+		return entities.ErrAccountDoesNotExist
 	}
 
 	accDestination, err := t.accountUseCase.GetAccountByID(ctx, input.AccountDestinationID)
@@ -21,7 +24,7 @@ func (t Transfer) CreateTransfer(ctx context.Context, input transfer.CreateTrans
 		return entities.ErrAccountDestinationDoesNotExist
 	}
 
-	if (accountOriginBalance - input.Amount) < 0 {
+	if (accOrigin.Balance - input.Amount) < 0 {
 		return entities.ErrInsufficientFunds
 	}
 
