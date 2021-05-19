@@ -47,7 +47,7 @@ func TestListAccounts(t *testing.T) {
 		{
 			name:         "should return 500 and error message if something went wrong",
 			repoSetup:    &mocks.StubAccountRepository{Err: errors.New("failed to list accounts")},
-			expectedBody: responses.ErrorResponse{Message: "Internal Error."},
+			expectedBody: responses.ErrorResponse{Message: "internal server error"},
 			decoder:      tests.ErrorMessageDecoder{},
 			expectedCode: http.StatusInternalServerError,
 		},
