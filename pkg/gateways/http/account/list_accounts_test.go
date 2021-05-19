@@ -1,6 +1,7 @@
 package account
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"net/http"
@@ -12,6 +13,7 @@ import (
 	"github.com/thalissonfelipe/banking/pkg/domain/account/usecase"
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
 	"github.com/thalissonfelipe/banking/pkg/gateways/http/responses"
+	"github.com/thalissonfelipe/banking/pkg/tests"
 	"github.com/thalissonfelipe/banking/pkg/tests/fakes"
 	"github.com/thalissonfelipe/banking/pkg/tests/mocks"
 )
@@ -22,6 +24,7 @@ func TestListAccounts(t *testing.T) {
 		name         string
 		repoSetup    *mocks.StubAccountRepository
 		expectedBody interface{}
+		decoder      tests.Decoder
 		expectedCode int
 	}{
 		{
@@ -29,6 +32,7 @@ func TestListAccounts(t *testing.T) {
 			repoSetup:    &mocks.StubAccountRepository{},
 			expectedBody: []AccountResponse{},
 			expectedCode: http.StatusOK,
+			decoder:      ListAccountsSuccessDecoder{},
 		},
 		{
 			name: "should return 200 and an slice of accounts",
@@ -36,12 +40,14 @@ func TestListAccounts(t *testing.T) {
 				Accounts: []entities.Account{acc},
 			},
 			expectedBody: []AccountResponse{convertAccountToAccountResponse(acc)},
+			decoder:      ListAccountsSuccessDecoder{},
 			expectedCode: http.StatusOK,
 		},
 		{
 			name:         "should return 500 and error message if something went wrong",
 			repoSetup:    &mocks.StubAccountRepository{Err: errors.New("failed to list accounts")},
 			expectedBody: responses.ErrorResponse{Message: "Internal Error."},
+			decoder:      tests.ErrorMessageDecoder{},
 			expectedCode: http.StatusInternalServerError,
 		},
 	}
@@ -57,31 +63,19 @@ func TestListAccounts(t *testing.T) {
 
 			http.HandlerFunc(handler.ListAccounts).ServeHTTP(response, request)
 
+			result := tt.decoder.Decode(response.Body)
+
 			assert.Equal(t, tt.expectedCode, response.Code)
 			assert.Equal(t, "application/json", response.Header().Get("Content-Type"))
-			assertResponseBody(t, tt.expectedBody, response)
+			assert.Equal(t, tt.expectedBody, result)
 		})
 	}
 }
 
-func assertResponseBody(t *testing.T, expected interface{}, response *httptest.ResponseRecorder) {
-	t.Helper()
+type ListAccountsSuccessDecoder struct{}
 
-	expectedBytes, err := json.Marshal(expected)
-	if err != nil {
-		t.Errorf("could not marshall expected interface")
-	}
-
-	var result interface{}
-	err = json.NewDecoder(response.Body).Decode(&result)
-	if err != nil {
-		t.Errorf("could not decode response body")
-	}
-
-	resultBytes, err := json.Marshal(result)
-	if err != nil {
-		t.Errorf("could not marshall response body")
-	}
-
-	assert.ObjectsAreEqualValues(expectedBytes, resultBytes)
+func (ListAccountsSuccessDecoder) Decode(body *bytes.Buffer) interface{} {
+	var result []AccountResponse
+	json.NewDecoder(body).Decode(&result)
+	return result
 }
