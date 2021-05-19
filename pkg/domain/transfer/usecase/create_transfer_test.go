@@ -8,12 +8,13 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
 	"github.com/thalissonfelipe/banking/pkg/domain/transfer"
+	"github.com/thalissonfelipe/banking/pkg/domain/vos"
 	"github.com/thalissonfelipe/banking/pkg/tests/mocks"
 )
 
 func TestCreateTransfer(t *testing.T) {
-	accOrigin := entities.NewAccount("Pedro", "123.456.789-00", "12345678")
-	accDest := entities.NewAccount("Maria", "123.456.789-01", "12345678")
+	accOrigin := entities.NewAccount("Pedro", vos.NewCPF("123.456.789-00"), "12345678")
+	accDest := entities.NewAccount("Maria", vos.NewCPF("123.456.789-01"), "12345678")
 
 	testCases := []struct {
 		name       string

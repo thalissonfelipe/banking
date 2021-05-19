@@ -8,11 +8,12 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
+	"github.com/thalissonfelipe/banking/pkg/domain/vos"
 	"github.com/thalissonfelipe/banking/pkg/tests/mocks"
 )
 
 func TestListAccounts(t *testing.T) {
-	acc := entities.NewAccount("Piter", "123.456.789-00", "12345678")
+	acc := entities.NewAccount("Piter", vos.NewCPF("123.456.789-00"), "12345678")
 	testCases := []struct {
 		name        string
 		repoSetup   *mocks.StubAccountRepository

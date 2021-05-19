@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
+	"github.com/thalissonfelipe/banking/pkg/domain/vos"
 )
 
 type UseCase interface {
@@ -15,11 +16,11 @@ type UseCase interface {
 
 type CreateAccountInput struct {
 	Name   string
-	CPF    string
+	CPF    vos.CPF
 	Secret string
 }
 
-func NewCreateAccountInput(name, cpf, secret string) CreateAccountInput {
+func NewCreateAccountInput(name string, cpf vos.CPF, secret string) CreateAccountInput {
 	return CreateAccountInput{
 		Name:   name,
 		CPF:    cpf,

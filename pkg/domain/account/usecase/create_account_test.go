@@ -9,13 +9,13 @@ import (
 
 	"github.com/thalissonfelipe/banking/pkg/domain/account"
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
+	"github.com/thalissonfelipe/banking/pkg/domain/vos"
 	"github.com/thalissonfelipe/banking/pkg/tests/mocks"
 )
 
 func TestCreateAccount(t *testing.T) {
-	validInput := account.NewCreateAccountInput("Pedro", "648.446.967-93", "aZ1234Ds")
-	invalidCpfInput := account.NewCreateAccountInput("Maria", "111.222.333-00", "aZ1234Ds")
-	invalidSecretInput := account.NewCreateAccountInput("João", "648.446.967-93", "12345678")
+	validInput := account.NewCreateAccountInput("Pedro", vos.NewCPF("648.446.967-93"), "aZ1234Ds")
+	invalidSecretInput := account.NewCreateAccountInput("João", vos.NewCPF("648.446.967-93"), "12345678")
 
 	testCases := []struct {
 		name        string
@@ -64,15 +64,6 @@ func TestCreateAccount(t *testing.T) {
 			input:       validInput,
 			encSetup:    &mocks.StubHash{Err: errors.New("could not hash secret")},
 			errExpected: entities.ErrInternalError,
-		},
-		{
-			name: "should return an error if cpf is not valid",
-			repoSetup: func() *mocks.StubAccountRepository {
-				return &mocks.StubAccountRepository{}
-			},
-			input:       invalidCpfInput,
-			encSetup:    &mocks.StubHash{},
-			errExpected: entities.ErrInvalidCPF,
 		},
 		{
 			name: "should return an error if secret is not valid",

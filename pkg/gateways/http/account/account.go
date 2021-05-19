@@ -20,7 +20,7 @@ type BalanceResponse struct {
 func convertAccountToAccountResponse(account entities.Account) AccountResponse {
 	return AccountResponse{
 		Name:      account.Name,
-		CPF:       account.CPF,
+		CPF:       account.CPF.String(),
 		Balance:   account.Balance,
 		CreatedAt: formatTime(account.CreatedAt),
 	}

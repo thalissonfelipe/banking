@@ -40,7 +40,7 @@ func (s StubAccountRepository) GetAccountByCPF(ctx context.Context, cpf string) 
 		return nil, entities.ErrInternalError
 	}
 	for _, acc := range s.Accounts {
-		if acc.CPF == cpf {
+		if acc.CPF.String() == cpf {
 			return &acc, nil
 		}
 	}

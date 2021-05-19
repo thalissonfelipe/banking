@@ -6,12 +6,13 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
+	"github.com/thalissonfelipe/banking/pkg/domain/vos"
 	"github.com/thalissonfelipe/banking/pkg/tests/mocks"
 )
 
 func TestGetBalanceByAccountID(t *testing.T) {
-	accBalanceDefault := entities.NewAccount("Piter", "123.456.789-00", "12345678")
-	accBalance100 := entities.NewAccount("Piter", "123.456.789-00", "12345678")
+	accBalanceDefault := entities.NewAccount("Piter", vos.NewCPF("123.456.789-00"), "12345678")
+	accBalance100 := entities.NewAccount("Piter", vos.NewCPF("123.456.789-00"), "12345678")
 	accBalance100.Balance = 100
 
 	testCases := []struct {
