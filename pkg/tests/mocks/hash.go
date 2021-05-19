@@ -19,6 +19,10 @@ func (s StubHash) Hash(secret string) ([]byte, error) {
 	return []byte(generateRandomSecret(len(secret))), nil
 }
 
+func (s StubHash) CompareHashAndSecret(hashedSecret, secret []byte) error {
+	return s.Err
+}
+
 func generateRandomSecret(length int) string {
 	b := make([]byte, length)
 	if _, err := rand.Read(b); err != nil {
