@@ -45,3 +45,16 @@ func (s StubAccountUseCase) GetAccountByID(ctx context.Context, accountID string
 
 	return nil, nil
 }
+
+func (s StubAccountUseCase) GetAccountByCPF(ctx context.Context, cpf string) (*entities.Account, error) {
+	if s.Err != nil {
+		return nil, entities.ErrInternalError
+	}
+	for _, acc := range s.Accounts {
+		if acc.CPF.String() == cpf {
+			return &acc, nil
+		}
+	}
+
+	return nil, nil
+}

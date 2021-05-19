@@ -12,6 +12,7 @@ type UseCase interface {
 	GetAccountBalanceByID(ctx context.Context, accountID string) (int, error)
 	CreateAccount(ctx context.Context, input CreateAccountInput) (*entities.Account, error)
 	GetAccountByID(ctx context.Context, accountID string) (*entities.Account, error)
+	GetAccountByCPF(ctx context.Context, cpf string) (*entities.Account, error)
 }
 
 type CreateAccountInput struct {
