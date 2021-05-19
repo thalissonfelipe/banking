@@ -14,8 +14,7 @@ import (
 )
 
 func TestCreateAccount(t *testing.T) {
-	validInput := account.NewCreateAccountInput("Pedro", vos.NewCPF("648.446.967-93"), "aZ1234Ds")
-	invalidSecretInput := account.NewCreateAccountInput("João", vos.NewCPF("648.446.967-93"), "12345678")
+	validInput := account.NewCreateAccountInput("Pedro", vos.NewCPF("648.446.967-93"), vos.NewSecret("aZ1234Ds"))
 
 	testCases := []struct {
 		name        string
@@ -64,15 +63,6 @@ func TestCreateAccount(t *testing.T) {
 			input:       validInput,
 			encSetup:    &mocks.StubHash{Err: errors.New("could not hash secret")},
 			errExpected: entities.ErrInternalError,
-		},
-		{
-			name: "should return an error if secret is not valid",
-			repoSetup: func() *mocks.StubAccountRepository {
-				return &mocks.StubAccountRepository{}
-			},
-			input:       invalidSecretInput,
-			encSetup:    &mocks.StubHash{},
-			errExpected: entities.ErrInvalidSecret,
 		},
 	}
 

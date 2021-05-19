@@ -17,10 +17,10 @@ type UseCase interface {
 type CreateAccountInput struct {
 	Name   string
 	CPF    vos.CPF
-	Secret string
+	Secret vos.Secret
 }
 
-func NewCreateAccountInput(name string, cpf vos.CPF, secret string) CreateAccountInput {
+func NewCreateAccountInput(name string, cpf vos.CPF, secret vos.Secret) CreateAccountInput {
 	return CreateAccountInput{
 		Name:   name,
 		CPF:    cpf,

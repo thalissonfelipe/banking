@@ -13,7 +13,7 @@ import (
 )
 
 func TestListAccounts(t *testing.T) {
-	acc := entities.NewAccount("Piter", vos.NewCPF("123.456.789-00"), "12345678")
+	acc := entities.NewAccount("Piter", vos.NewCPF("123.456.789-00"), vos.NewSecret("12345678"))
 	testCases := []struct {
 		name        string
 		repoSetup   *mocks.StubAccountRepository

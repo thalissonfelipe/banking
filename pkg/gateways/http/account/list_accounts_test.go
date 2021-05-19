@@ -38,7 +38,7 @@ func TestListAccounts(t *testing.T) {
 	})
 
 	t.Run("should return 200 and an slice of accounts", func(t *testing.T) {
-		acc := entities.NewAccount("Pedro", vos.NewCPF("123.456.789-00"), "12345678")
+		acc := entities.NewAccount("Pedro", vos.NewCPF("123.456.789-00"), vos.NewSecret("12345678"))
 		repo := mocks.StubAccountRepository{Accounts: []entities.Account{acc}}
 		accUseCase := usecase.NewAccountUseCase(&repo, nil)
 		handler := NewHandler(r, accUseCase)

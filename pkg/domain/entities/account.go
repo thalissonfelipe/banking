@@ -12,7 +12,7 @@ type Account struct {
 	ID        string
 	Name      string
 	CPF       vos.CPF
-	Secret    string
+	Secret    vos.Secret
 	Balance   int
 	CreatedAt time.Time
 }
@@ -31,7 +31,7 @@ func NewAccountID() string {
 	return uuid.New().String()
 }
 
-func NewAccount(name string, cpf vos.CPF, secret string) Account {
+func NewAccount(name string, cpf vos.CPF, secret vos.Secret) Account {
 	return Account{
 		ID:        NewAccountID(),
 		Name:      name,
