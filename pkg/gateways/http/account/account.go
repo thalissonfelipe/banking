@@ -6,19 +6,19 @@ import (
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
 )
 
-type AccountResponse struct {
+type accountResponse struct {
 	Name      string
 	CPF       string
 	Balance   int
 	CreatedAt string
 }
 
-type BalanceResponse struct {
+type balanceResponse struct {
 	Balance int
 }
 
-func convertAccountToAccountResponse(account entities.Account) AccountResponse {
-	return AccountResponse{
+func convertAccountToAccountResponse(account entities.Account) accountResponse {
+	return accountResponse{
 		Name:      account.Name,
 		CPF:       account.CPF.String(),
 		Balance:   account.Balance,

@@ -13,7 +13,7 @@ func (h Handler) ListAccounts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	accountsResponse := make([]AccountResponse, 0)
+	accountsResponse := make([]accountResponse, 0)
 	for _, acc := range accounts {
 		accountsResponse = append(accountsResponse, convertAccountToAccountResponse(acc))
 	}

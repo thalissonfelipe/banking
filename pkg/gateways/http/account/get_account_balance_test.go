@@ -36,13 +36,13 @@ func TestGetAccountBalance(t *testing.T) {
 
 		http.HandlerFunc(handler.GetAccountBalance).ServeHTTP(response, request)
 
-		expected := 0
-		var balance BalanceResponse
-		json.NewDecoder(response.Body).Decode(&balance)
+		expected := balanceResponse{Balance: 0}
+		var result balanceResponse
+		json.NewDecoder(response.Body).Decode(&result)
 
 		assert.Equal(t, http.StatusOK, response.Code)
 		assert.Equal(t, "application/json", response.Header().Get("Content-Type"))
-		assert.Equal(t, expected, balance.Balance)
+		assert.Equal(t, expected, result)
 	})
 
 	t.Run("should return status 200 and a balance equal to 100", func(t *testing.T) {
@@ -61,13 +61,13 @@ func TestGetAccountBalance(t *testing.T) {
 
 		http.HandlerFunc(handler.GetAccountBalance).ServeHTTP(response, request)
 
-		expected := 100
-		var balance BalanceResponse
-		json.NewDecoder(response.Body).Decode(&balance)
+		expected := balanceResponse{Balance: 100}
+		var result balanceResponse
+		json.NewDecoder(response.Body).Decode(&result)
 
 		assert.Equal(t, http.StatusOK, response.Code)
 		assert.Equal(t, "application/json", response.Header().Get("Content-Type"))
-		assert.Equal(t, expected, balance.Balance)
+		assert.Equal(t, expected, result)
 	})
 
 	t.Run("should return status 404 if account does not exist", func(t *testing.T) {

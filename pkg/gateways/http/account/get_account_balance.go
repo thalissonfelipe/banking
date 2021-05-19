@@ -22,6 +22,6 @@ func (h Handler) GetAccountBalance(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response := BalanceResponse{Balance: balance}
+	response := balanceResponse{Balance: balance}
 	responses.SendJSON(w, http.StatusOK, response)
 }
