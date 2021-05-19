@@ -1,6 +1,7 @@
 package account
 
 import (
+	"encoding/json"
 	"errors"
 	"net/http"
 	"net/http/httptest"
@@ -10,13 +11,17 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/thalissonfelipe/banking/pkg/domain/account/usecase"
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
+	"github.com/thalissonfelipe/banking/pkg/gateways/http/responses"
+	"github.com/thalissonfelipe/banking/pkg/tests/fakes"
 	"github.com/thalissonfelipe/banking/pkg/tests/mocks"
 )
 
 func TestListAccounts(t *testing.T) {
+	acc := entities.NewAccount("Pedro", "123.456.789-00", "12345678")
 	testCases := []struct {
 		name         string
 		repoSetup    func() mocks.StubAccountRepository
+		expectedBody func() interface{}
 		expectedCode int
 	}{
 		{
@@ -24,15 +29,20 @@ func TestListAccounts(t *testing.T) {
 			repoSetup: func() mocks.StubAccountRepository {
 				return mocks.StubAccountRepository{}
 			},
+			expectedBody: func() interface{} {
+				return []AccountResponse{}
+			},
 			expectedCode: http.StatusOK,
 		},
 		{
 			name: "should return 200 and an slice of accounts",
 			repoSetup: func() mocks.StubAccountRepository {
-				acc := entities.NewAccount("Pedro", "123.456.789-00", "12345678")
 				return mocks.StubAccountRepository{
 					Accounts: []entities.Account{acc},
 				}
+			},
+			expectedBody: func() interface{} {
+				return []AccountResponse{convertAccountToAccountResponse(acc)}
 			},
 			expectedCode: http.StatusOK,
 		},
@@ -40,6 +50,9 @@ func TestListAccounts(t *testing.T) {
 			name: "should return 500 and error message if something went wrong",
 			repoSetup: func() mocks.StubAccountRepository {
 				return mocks.StubAccountRepository{Err: errors.New("failed to list accounts")}
+			},
+			expectedBody: func() interface{} {
+				return responses.ErrorResponse{Message: "Internal Error."}
 			},
 			expectedCode: http.StatusInternalServerError,
 		},
@@ -52,13 +65,17 @@ func TestListAccounts(t *testing.T) {
 			r := mux.NewRouter()
 			handler := NewHandler(r, accUseCase)
 
-			request, _ := http.NewRequest(http.MethodGet, "/accounts", nil)
+			request := fakes.FakeRequest(http.MethodGet, "/accounts", nil)
 			response := httptest.NewRecorder()
 
 			http.HandlerFunc(handler.ListAccounts).ServeHTTP(response, request)
 
+			var result []AccountResponse
+			json.NewDecoder(request.Body).Decode(&result)
+
 			assert.Equal(t, tt.expectedCode, response.Code)
 			assert.Equal(t, "application/json", response.Header().Get("Content-Type"))
+			assert.Equal(t, tt.expectedBody(), result)
 		})
 	}
 
