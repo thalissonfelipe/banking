@@ -1,6 +1,7 @@
 package account
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -14,106 +15,99 @@ import (
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
 	"github.com/thalissonfelipe/banking/pkg/domain/vos"
 	"github.com/thalissonfelipe/banking/pkg/gateways/http/responses"
+	"github.com/thalissonfelipe/banking/pkg/tests"
 	"github.com/thalissonfelipe/banking/pkg/tests/fakes"
 	"github.com/thalissonfelipe/banking/pkg/tests/mocks"
 )
 
 func TestGetAccountBalance(t *testing.T) {
-	r := mux.NewRouter()
+	acc := entities.NewAccount("Pedro", vos.NewCPF("123.456.789-00"), vos.NewSecret("12345678"))
 
-	t.Run("should return status 200 and a balance equal to 0", func(t *testing.T) {
-		acc := entities.NewAccount("Pedro", vos.NewCPF("123.456.789-00"), vos.NewSecret("12345678"))
-		repo := mocks.StubAccountRepository{Accounts: []entities.Account{acc}}
-		accUseCase := usecase.NewAccountUseCase(&repo, nil)
-		handler := NewHandler(r, accUseCase)
+	testCases := []struct {
+		name         string
+		repo         func() *mocks.StubAccountRepository
+		requestURI   string
+		decoder      tests.Decoder
+		expectedBody interface{}
+		expectedCode int
+	}{
+		{
+			name: "should return status 200 and a balance equal to 0",
+			repo: func() *mocks.StubAccountRepository {
+				return &mocks.StubAccountRepository{
+					Accounts: []entities.Account{acc},
+				}
+			},
+			requestURI:   fmt.Sprintf("/accounts/%s/balance", acc.ID),
+			decoder:      balanceResponseDecoder{},
+			expectedBody: balanceResponse{Balance: 0},
+			expectedCode: http.StatusOK,
+		},
+		{
+			name: "should return status 200 and a balance equal to 100",
+			repo: func() *mocks.StubAccountRepository {
+				accWithBalance := acc
+				accWithBalance.Balance = 100
+				return &mocks.StubAccountRepository{
+					Accounts: []entities.Account{accWithBalance},
+				}
+			},
+			requestURI:   fmt.Sprintf("/accounts/%s/balance", acc.ID),
+			decoder:      balanceResponseDecoder{},
+			expectedBody: balanceResponse{Balance: 100},
+			expectedCode: http.StatusOK,
+		},
+		{
+			name: "should return status 404 if account does not exist",
+			repo: func() *mocks.StubAccountRepository {
+				return &mocks.StubAccountRepository{}
+			},
+			requestURI:   fmt.Sprintf("/accounts/%s/balance", acc.ID),
+			decoder:      tests.ErrorMessageDecoder{},
+			expectedBody: responses.ErrorResponse{Message: "account does not exist"},
+			expectedCode: http.StatusNotFound,
+		},
+		{
+			name: "should return status 500 if something went wrong on usecase",
+			repo: func() *mocks.StubAccountRepository {
+				return &mocks.StubAccountRepository{
+					Err: errors.New("usecase fails to fetch balance"),
+				}
+			},
+			requestURI:   fmt.Sprintf("/accounts/%s/balance", acc.ID),
+			decoder:      tests.ErrorMessageDecoder{},
+			expectedBody: responses.ErrorResponse{Message: "internal server error"},
+			expectedCode: http.StatusInternalServerError,
+		},
+	}
 
-		requestURI := fmt.Sprintf("/accounts/%s/balance", acc.ID)
-		request := fakes.FakeRequest(http.MethodGet, requestURI, nil)
-		request = mux.SetURLVars(request, map[string]string{
-			"id": acc.ID,
+	for _, tt := range testCases {
+		t.Run(tt.name, func(t *testing.T) {
+			r := mux.NewRouter()
+			usecase := usecase.NewAccountUseCase(tt.repo(), nil)
+			handler := NewHandler(r, usecase)
+
+			request := fakes.FakeRequest(http.MethodGet, tt.requestURI, nil)
+			request = mux.SetURLVars(request, map[string]string{
+				"id": acc.ID,
+			})
+			response := httptest.NewRecorder()
+
+			http.HandlerFunc(handler.GetAccountBalance).ServeHTTP(response, request)
+
+			result := tt.decoder.Decode(response.Body)
+
+			assert.Equal(t, tt.expectedBody, result)
+			assert.Equal(t, tt.expectedCode, response.Code)
+			assert.Equal(t, "application/json", response.Header().Get("Content-Type"))
 		})
-		response := httptest.NewRecorder()
+	}
+}
 
-		http.HandlerFunc(handler.GetAccountBalance).ServeHTTP(response, request)
+type balanceResponseDecoder struct{}
 
-		expected := balanceResponse{Balance: 0}
-		var result balanceResponse
-		json.NewDecoder(response.Body).Decode(&result)
-
-		assert.Equal(t, http.StatusOK, response.Code)
-		assert.Equal(t, "application/json", response.Header().Get("Content-Type"))
-		assert.Equal(t, expected, result)
-	})
-
-	t.Run("should return status 200 and a balance equal to 100", func(t *testing.T) {
-		acc := entities.NewAccount("Pedro", vos.NewCPF("123.456.789-00"), vos.NewSecret("12345678"))
-		acc.Balance = 100
-		repo := mocks.StubAccountRepository{Accounts: []entities.Account{acc}}
-		accUseCase := usecase.NewAccountUseCase(&repo, nil)
-		handler := NewHandler(r, accUseCase)
-
-		requestURI := fmt.Sprintf("/accounts/%s/balance", acc.ID)
-		request := fakes.FakeRequest(http.MethodGet, requestURI, nil)
-		request = mux.SetURLVars(request, map[string]string{
-			"id": acc.ID,
-		})
-		response := httptest.NewRecorder()
-
-		http.HandlerFunc(handler.GetAccountBalance).ServeHTTP(response, request)
-
-		expected := balanceResponse{Balance: 100}
-		var result balanceResponse
-		json.NewDecoder(response.Body).Decode(&result)
-
-		assert.Equal(t, http.StatusOK, response.Code)
-		assert.Equal(t, "application/json", response.Header().Get("Content-Type"))
-		assert.Equal(t, expected, result)
-	})
-
-	t.Run("should return status 404 if account does not exist", func(t *testing.T) {
-		repo := mocks.StubAccountRepository{}
-		accUseCase := usecase.NewAccountUseCase(&repo, nil)
-		handler := NewHandler(r, accUseCase)
-
-		requestURI := fmt.Sprintf("/accounts/%s/balance", "unknown-id")
-		request := fakes.FakeRequest(http.MethodGet, requestURI, nil)
-		request = mux.SetURLVars(request, map[string]string{
-			"id": "unknown-id",
-		})
-		response := httptest.NewRecorder()
-
-		http.HandlerFunc(handler.GetAccountBalance).ServeHTTP(response, request)
-
-		expected := responses.ErrorResponse{Message: "Account not found."}
-		var result responses.ErrorResponse
-		json.NewDecoder(response.Body).Decode(&result)
-
-		assert.Equal(t, http.StatusNotFound, response.Code)
-		assert.Equal(t, "application/json", response.Header().Get("Content-Type"))
-		assert.Equal(t, expected, result)
-	})
-
-	t.Run("should return status 500 if something went wrong on usecase", func(t *testing.T) {
-		acc := entities.NewAccount("Pedro", vos.NewCPF("123.456.789-00"), vos.NewSecret("12345678"))
-		repo := mocks.StubAccountRepository{Accounts: []entities.Account{acc}, Err: errors.New("usecase fails")}
-		accUseCase := usecase.NewAccountUseCase(&repo, nil)
-		handler := NewHandler(r, accUseCase)
-
-		requestURI := fmt.Sprintf("/accounts/%s/balance", acc.ID)
-		request := httptest.NewRequest(http.MethodGet, requestURI, nil)
-		request = mux.SetURLVars(request, map[string]string{
-			"id": acc.ID,
-		})
-		response := httptest.NewRecorder()
-
-		http.HandlerFunc(handler.GetAccountBalance).ServeHTTP(response, request)
-
-		expected := responses.ErrorResponse{Message: "Internal Error."}
-		var result responses.ErrorResponse
-		json.NewDecoder(response.Body).Decode(&result)
-
-		assert.Equal(t, http.StatusInternalServerError, response.Code)
-		assert.Equal(t, "application/json", response.Header().Get("Content-Type"))
-		assert.Equal(t, expected, result)
-	})
+func (balanceResponseDecoder) Decode(body *bytes.Buffer) interface{} {
+	var result balanceResponse
+	json.NewDecoder(body).Decode(&result)
+	return result
 }
