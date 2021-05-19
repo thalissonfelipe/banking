@@ -15,9 +15,9 @@ func (h Handler) GetAccountBalance(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		switch err {
 		case entities.ErrAccountDoesNotExist:
-			responses.SendError(w, http.StatusNotFound, "Account not found.")
+			responses.SendError(w, http.StatusNotFound, err.Error())
 		default:
-			responses.SendError(w, http.StatusInternalServerError, "Internal Error.")
+			responses.SendError(w, http.StatusInternalServerError, err.Error())
 		}
 		return
 	}
