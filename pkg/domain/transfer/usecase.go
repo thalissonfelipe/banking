@@ -16,3 +16,11 @@ type CreateTransferInput struct {
 	AccountDestinationID string
 	Amount               int
 }
+
+func NewTransferInput(accOriginID, accDestID string, amount int) CreateTransferInput {
+	return CreateTransferInput{
+		AccountOriginID:      accOriginID,
+		AccountDestinationID: accDestID,
+		Amount:               amount,
+	}
+}

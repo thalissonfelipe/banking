@@ -5,9 +5,20 @@ import (
 
 	"github.com/thalissonfelipe/banking/pkg/domain/account"
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
+	"github.com/thalissonfelipe/banking/pkg/domain/vos"
 )
 
 func (a Account) CreateAccount(ctx context.Context, input account.CreateAccountInput) (*entities.Account, error) {
+	cpf := vos.NewCPF(input.CPF)
+	if ok := cpf.IsValid(); !ok {
+		return nil, entities.ErrInvalidCPF
+	}
+
+	secret := vos.NewSecret(input.Secret)
+	if ok := secret.IsValid(); !ok {
+		return nil, entities.ErrInvalidSecret
+	}
+
 	accExists, err := a.repository.GetAccountByCPF(ctx, input.CPF)
 	if err != nil {
 		return nil, entities.ErrInternalError
