@@ -1,6 +1,7 @@
 package account
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"net/http"
@@ -12,66 +13,69 @@ import (
 	"github.com/thalissonfelipe/banking/pkg/domain/account/usecase"
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
 	"github.com/thalissonfelipe/banking/pkg/gateways/http/responses"
+	"github.com/thalissonfelipe/banking/pkg/tests"
+	"github.com/thalissonfelipe/banking/pkg/tests/fakes"
 	"github.com/thalissonfelipe/banking/pkg/tests/mocks"
 )
 
 func TestListAccounts(t *testing.T) {
-	r := mux.NewRouter()
+	acc := entities.NewAccount("Pedro", "123.456.789-00", "12345678")
+	testCases := []struct {
+		name         string
+		repoSetup    *mocks.StubAccountRepository
+		expectedBody interface{}
+		decoder      tests.Decoder
+		expectedCode int
+	}{
+		{
+			name:         "should return 200 and an empty slice of accounts",
+			repoSetup:    &mocks.StubAccountRepository{},
+			expectedBody: []AccountResponse{},
+			expectedCode: http.StatusOK,
+			decoder:      ListAccountsSuccessDecoder{},
+		},
+		{
+			name: "should return 200 and an slice of accounts",
+			repoSetup: &mocks.StubAccountRepository{
+				Accounts: []entities.Account{acc},
+			},
+			expectedBody: []AccountResponse{convertAccountToAccountResponse(acc)},
+			decoder:      ListAccountsSuccessDecoder{},
+			expectedCode: http.StatusOK,
+		},
+		{
+			name:         "should return 500 and error message if something went wrong",
+			repoSetup:    &mocks.StubAccountRepository{Err: errors.New("failed to list accounts")},
+			expectedBody: responses.ErrorResponse{Message: "Internal Error."},
+			decoder:      tests.ErrorMessageDecoder{},
+			expectedCode: http.StatusInternalServerError,
+		},
+	}
 
-	t.Run("should return 200 and an empty slice of accounts", func(t *testing.T) {
-		repo := mocks.StubAccountRepository{}
-		accUseCase := usecase.NewAccountUseCase(&repo, nil)
-		handler := NewHandler(r, accUseCase)
+	for _, tt := range testCases {
+		t.Run(tt.name, func(t *testing.T) {
+			accUseCase := usecase.NewAccountUseCase(tt.repoSetup, nil)
+			r := mux.NewRouter()
+			handler := NewHandler(r, accUseCase)
 
-		request, _ := http.NewRequest(http.MethodGet, "/accounts", nil)
-		response := httptest.NewRecorder()
+			request := fakes.FakeRequest(http.MethodGet, "/accounts", nil)
+			response := httptest.NewRecorder()
 
-		http.HandlerFunc(handler.ListAccounts).ServeHTTP(response, request)
+			http.HandlerFunc(handler.ListAccounts).ServeHTTP(response, request)
 
-		var accounts []entities.Account
-		json.NewDecoder(response.Body).Decode(&accounts)
+			result := tt.decoder.Decode(response.Body)
 
-		assert.Equal(t, response.Code, http.StatusOK)
-		assert.Equal(t, "application/json", response.Header().Get("Content-Type"))
-		assert.Empty(t, accounts)
-	})
+			assert.Equal(t, tt.expectedCode, response.Code)
+			assert.Equal(t, "application/json", response.Header().Get("Content-Type"))
+			assert.Equal(t, tt.expectedBody, result)
+		})
+	}
+}
 
-	t.Run("should return 200 and an slice of accounts", func(t *testing.T) {
-		acc := entities.NewAccount("Pedro", "123.456.789-00", "12345678")
-		repo := mocks.StubAccountRepository{Accounts: []entities.Account{acc}}
-		accUseCase := usecase.NewAccountUseCase(&repo, nil)
-		handler := NewHandler(r, accUseCase)
+type ListAccountsSuccessDecoder struct{}
 
-		request, _ := http.NewRequest(http.MethodGet, "/accounts", nil)
-		response := httptest.NewRecorder()
-
-		http.HandlerFunc(handler.ListAccounts).ServeHTTP(response, request)
-
-		expected := []AccountResponse{convertAccountToAccountResponse(acc)}
-		var accounts []AccountResponse
-		json.NewDecoder(response.Body).Decode(&accounts)
-
-		assert.Equal(t, response.Code, http.StatusOK)
-		assert.Equal(t, "application/json", response.Header().Get("Content-Type"))
-		assert.Equal(t, expected, accounts)
-	})
-
-	t.Run("should return 500 and error message if something went wrong", func(t *testing.T) {
-		repo := mocks.StubAccountRepository{Err: errors.New("failed to list accounts")}
-		accUseCase := usecase.NewAccountUseCase(&repo, nil)
-		handler := NewHandler(r, accUseCase)
-
-		request, _ := http.NewRequest(http.MethodGet, "/accounts", nil)
-		response := httptest.NewRecorder()
-
-		http.HandlerFunc(handler.ListAccounts).ServeHTTP(response, request)
-
-		expected := responses.ErrorResponse{Message: "Internal Error."}
-		var accounts responses.ErrorResponse
-		json.NewDecoder(response.Body).Decode(&accounts)
-
-		assert.Equal(t, http.StatusInternalServerError, response.Code)
-		assert.Equal(t, "application/json", response.Header().Get("Content-Type"))
-		assert.Equal(t, expected, accounts)
-	})
+func (ListAccountsSuccessDecoder) Decode(body *bytes.Buffer) interface{} {
+	var result []AccountResponse
+	json.NewDecoder(body).Decode(&result)
+	return result
 }
