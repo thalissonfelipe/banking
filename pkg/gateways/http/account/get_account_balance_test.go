@@ -14,6 +14,7 @@ import (
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
 	"github.com/thalissonfelipe/banking/pkg/domain/vos"
 	"github.com/thalissonfelipe/banking/pkg/gateways/http/responses"
+	"github.com/thalissonfelipe/banking/pkg/tests/fakes"
 	"github.com/thalissonfelipe/banking/pkg/tests/mocks"
 )
 
@@ -27,7 +28,7 @@ func TestGetAccountBalance(t *testing.T) {
 		handler := NewHandler(r, accUseCase)
 
 		requestURI := fmt.Sprintf("/accounts/%s/balance", acc.ID)
-		request := httptest.NewRequest(http.MethodGet, requestURI, nil)
+		request := fakes.FakeRequest(http.MethodGet, requestURI, nil)
 		request = mux.SetURLVars(request, map[string]string{
 			"id": acc.ID,
 		})
@@ -52,7 +53,7 @@ func TestGetAccountBalance(t *testing.T) {
 		handler := NewHandler(r, accUseCase)
 
 		requestURI := fmt.Sprintf("/accounts/%s/balance", acc.ID)
-		request := httptest.NewRequest(http.MethodGet, requestURI, nil)
+		request := fakes.FakeRequest(http.MethodGet, requestURI, nil)
 		request = mux.SetURLVars(request, map[string]string{
 			"id": acc.ID,
 		})
@@ -75,7 +76,7 @@ func TestGetAccountBalance(t *testing.T) {
 		handler := NewHandler(r, accUseCase)
 
 		requestURI := fmt.Sprintf("/accounts/%s/balance", "unknown-id")
-		request := httptest.NewRequest(http.MethodGet, requestURI, nil)
+		request := fakes.FakeRequest(http.MethodGet, requestURI, nil)
 		request = mux.SetURLVars(request, map[string]string{
 			"id": "unknown-id",
 		})
