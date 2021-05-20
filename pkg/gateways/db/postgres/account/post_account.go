@@ -2,7 +2,6 @@ package account
 
 import (
 	"context"
-	"log"
 
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
 )
@@ -27,8 +26,8 @@ func (r Repository) PostAccount(ctx context.Context, account entities.Account) e
 		account.CPF.String(),
 		account.Secret.String(),
 		account.Balance,
-		account.CreatedAt.Format("2006-01-02 15:04:05.000000"), // TODO: refactor
+		account.CreatedAt,
 	)
-	log.Println(err)
+
 	return err
 }
