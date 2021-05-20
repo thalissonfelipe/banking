@@ -14,7 +14,7 @@ type claims struct {
 	jwt.StandardClaims
 }
 
-func newToken(accountOriginID string) (string, error) {
+func NewToken(accountOriginID string) (string, error) {
 	expirationTime := time.Now().Add(10 * time.Minute)
 	claims := &claims{
 		AccountOriginID: accountOriginID,

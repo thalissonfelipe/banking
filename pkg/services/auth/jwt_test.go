@@ -9,7 +9,7 @@ import (
 func TestNewToken(t *testing.T) {
 	t.Run("should create a token successfully", func(t *testing.T) {
 		accountID := "account_id"
-		token, err := newToken(accountID)
+		token, err := NewToken(accountID)
 
 		assert.Nil(t, err)
 		assert.NotNil(t, token)
@@ -19,7 +19,7 @@ func TestNewToken(t *testing.T) {
 func TestIsValidToken(t *testing.T) {
 	t.Run("should return nil when token is valid", func(t *testing.T) {
 		accountID := "account_id"
-		token, _ := newToken(accountID)
+		token, _ := NewToken(accountID)
 		err := IsValidToken(token)
 
 		assert.Nil(t, err)
@@ -29,7 +29,7 @@ func TestIsValidToken(t *testing.T) {
 func TestGetIDFromToken(t *testing.T) {
 	t.Run("should get id from token", func(t *testing.T) {
 		accountID := "account_id"
-		token, _ := newToken(accountID)
+		token, _ := NewToken(accountID)
 		id := GetIDFromToken(token)
 
 		assert.Equal(t, accountID, id)
