@@ -20,7 +20,7 @@ func (r Repository) PostAccount(ctx context.Context, account entities.Account) e
 		)
 	`
 
-	_, err := r.DB.ExecContext(ctx, query,
+	_, err := r.db.Exec(ctx, query,
 		account.ID,
 		account.Name,
 		account.CPF.String(),

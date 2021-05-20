@@ -1,11 +1,11 @@
 package transfer
 
-import "database/sql"
+import "github.com/jackc/pgx/v4"
 
 type Repository struct {
-	DB *sql.DB
+	db *pgx.Conn
 }
 
-func NewRepository(db *sql.DB) *Repository {
-	return &Repository{DB: db}
+func NewRepository(db *pgx.Conn) *Repository {
+	return &Repository{db: db}
 }

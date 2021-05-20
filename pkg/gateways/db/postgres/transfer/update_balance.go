@@ -2,7 +2,8 @@ package transfer
 
 import (
 	"context"
-	"database/sql"
+
+	"github.com/jackc/pgx/v4"
 
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
 )
@@ -10,12 +11,12 @@ import (
 func (r Repository) UpdateBalance(ctx context.Context, transfer entities.Transfer) error {
 	// First experience with rollback.
 	// Tutorial: https://www.sohamkamani.com/golang/sql-transactions/
-	tx, err := r.DB.BeginTx(ctx, nil)
+	tx, err := r.db.Begin(ctx)
 	if err != nil {
 		return err
 	}
 
-	defer tx.Rollback()
+	defer tx.Rollback(ctx)
 
 	err = r.updateBalance(ctx, tx, -transfer.Amount, transfer.AccountOriginID)
 	if err != nil {
@@ -32,19 +33,19 @@ func (r Repository) UpdateBalance(ctx context.Context, transfer entities.Transfe
 		return err
 	}
 
-	tx.Commit()
+	tx.Commit(ctx)
 
 	return nil
 }
 
-func (r Repository) updateBalance(ctx context.Context, tx *sql.Tx, balance int, id string) error {
+func (r Repository) updateBalance(ctx context.Context, tx pgx.Tx, balance int, id string) error {
 	const query = `UPDATE account SET balance=balance+$1 WHERE id=$2`
 
-	_, err := tx.ExecContext(ctx, query, balance, id)
+	_, err := tx.Exec(ctx, query, balance, id)
 	return err
 }
 
-func (r Repository) saveTransfer(ctx context.Context, tx *sql.Tx, transfer entities.Transfer) error {
+func (r Repository) saveTransfer(ctx context.Context, tx pgx.Tx, transfer entities.Transfer) error {
 	const query = `
 		INSERT INTO transfer (
 			id,
@@ -57,7 +58,7 @@ func (r Repository) saveTransfer(ctx context.Context, tx *sql.Tx, transfer entit
 		)
 	`
 
-	_, err := tx.ExecContext(ctx, query,
+	_, err := tx.Exec(ctx, query,
 		transfer.ID,
 		transfer.AccountOriginID,
 		transfer.AccountDestinationID,

@@ -9,7 +9,7 @@ import (
 func (r Repository) GetAccounts(ctx context.Context) ([]entities.Account, error) {
 	const query = "SELECT id, name, cpf, balance, created_at FROM account"
 
-	rows, err := r.DB.QueryContext(ctx, query)
+	rows, err := r.db.Query(ctx, query)
 	if err != nil {
 		return nil, err
 	}
@@ -30,11 +30,6 @@ func (r Repository) GetAccounts(ctx context.Context) ([]entities.Account, error)
 			return nil, err
 		}
 		accounts = append(accounts, account)
-	}
-
-	rerr := rows.Close()
-	if rerr != nil {
-		return nil, err
 	}
 
 	if err := rows.Err(); err != nil {

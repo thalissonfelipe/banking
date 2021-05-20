@@ -2,8 +2,9 @@ package account
 
 import (
 	"context"
-	"database/sql"
 	"errors"
+
+	"github.com/jackc/pgx/v4"
 
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
 )
@@ -23,7 +24,7 @@ func (r Repository) GetAccountByCPF(ctx context.Context, cpf string) (*entities.
 			cpf=$1`
 
 	var account entities.Account
-	err := r.DB.QueryRowContext(ctx, query, cpf).Scan(
+	err := r.db.QueryRow(ctx, query, cpf).Scan(
 		&account.ID,
 		&account.Name,
 		&account.CPF,
@@ -32,7 +33,7 @@ func (r Repository) GetAccountByCPF(ctx context.Context, cpf string) (*entities.
 		&account.CreatedAt,
 	)
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
+		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, entities.ErrAccountDoesNotExist
 		}
 		return nil, err

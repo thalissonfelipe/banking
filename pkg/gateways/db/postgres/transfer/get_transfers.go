@@ -18,7 +18,7 @@ func (r Repository) GetTransfers(ctx context.Context, id string) ([]entities.Tra
 		WHERE account_origin_id=$1
 	`
 
-	rows, err := r.DB.QueryContext(ctx, query, id)
+	rows, err := r.db.Query(ctx, query, id)
 	if err != nil {
 		return nil, err
 	}
@@ -39,11 +39,6 @@ func (r Repository) GetTransfers(ctx context.Context, id string) ([]entities.Tra
 			return nil, err
 		}
 		transfers = append(transfers, account)
-	}
-
-	rerr := rows.Close()
-	if rerr != nil {
-		return nil, err
 	}
 
 	if err := rows.Err(); err != nil {
