@@ -6,8 +6,8 @@ import (
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
 )
 
-func (a Account) GetAccountByID(ctx context.Context, accountID string) (*entities.Account, error) {
-	acc, err := a.repository.GetAccountByID(ctx, accountID)
+func (a Account) GetAccountByCPF(ctx context.Context, cpf string) (*entities.Account, error) {
+	acc, err := a.repository.GetAccountByCPF(ctx, cpf)
 	if err != nil {
 		return nil, entities.ErrInternalError
 	}

@@ -1,4 +1,4 @@
-package usecase
+package mocks
 
 import (
 	"context"
@@ -7,42 +7,21 @@ import (
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
 )
 
-type StubRepository struct {
-	transfers []entities.Transfer
-	err       error
-}
-
-func (s StubRepository) GetTransfers(ctx context.Context, id string) ([]entities.Transfer, error) {
-	if s.err != nil {
-		return nil, entities.ErrInternalError
-	}
-
-	var transfers []entities.Transfer
-	for _, tr := range s.transfers {
-		if tr.AccountOriginID == id {
-			transfers = append(transfers, tr)
-		}
-	}
-
-	return transfers, nil
-}
-
-func (s *StubRepository) UpdateBalance(ctx context.Context, transfer entities.Transfer) error {
-	s.transfers = append(s.transfers, transfer)
-	return nil
-}
-
 type StubAccountUseCase struct {
-	accounts []entities.Account
-	err      error
+	Accounts []entities.Account
+	Err      error
 }
 
 func (s StubAccountUseCase) GetAccountBalanceByID(ctx context.Context, accountID string) (int, error) {
-	for _, acc := range s.accounts {
+	if s.Err != nil {
+		return 0, entities.ErrInternalError
+	}
+	for _, acc := range s.Accounts {
 		if acc.ID == accountID {
 			return acc.Balance, nil
 		}
 	}
+
 	return 0, nil
 }
 
@@ -55,10 +34,27 @@ func (s StubAccountUseCase) CreateAccount(ctx context.Context, input account.Cre
 }
 
 func (s StubAccountUseCase) GetAccountByID(ctx context.Context, accountID string) (*entities.Account, error) {
-	for _, acc := range s.accounts {
+	if s.Err != nil {
+		return nil, entities.ErrInternalError
+	}
+	for _, acc := range s.Accounts {
 		if acc.ID == accountID {
 			return &acc, nil
 		}
 	}
+
+	return nil, nil
+}
+
+func (s StubAccountUseCase) GetAccountByCPF(ctx context.Context, cpf string) (*entities.Account, error) {
+	if s.Err != nil {
+		return nil, entities.ErrInternalError
+	}
+	for _, acc := range s.Accounts {
+		if acc.CPF.String() == cpf {
+			return &acc, nil
+		}
+	}
+
 	return nil, nil
 }

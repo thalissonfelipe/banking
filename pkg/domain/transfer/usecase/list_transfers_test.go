@@ -6,34 +6,55 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
+	"github.com/thalissonfelipe/banking/pkg/tests/mocks"
 )
 
 func TestListTransfers(t *testing.T) {
-	ctx := context.Background()
+	accountOriginID := entities.NewAccountID()
 
-	t.Run("should return a list of transfers", func(t *testing.T) {
-		accountOriginID := entities.NewAccountID()
-		transfer := entities.NewTransfer(
-			accountOriginID,
-			entities.NewAccountID(),
-			100,
-		)
-		repo := StubRepository{transfers: []entities.Transfer{transfer}}
-		usecase := NewTransfer(&repo, nil)
-		expected := []entities.Transfer{transfer}
-		result, err := usecase.ListTransfers(ctx, accountOriginID)
+	testCases := []struct {
+		name        string
+		repoSetup   func() *mocks.StubTransferRepository
+		accountId   string
+		errExpected error
+	}{
+		{
+			name: "should return a list of transfers",
+			repoSetup: func() *mocks.StubTransferRepository {
+				transfer := entities.NewTransfer(
+					accountOriginID,
+					entities.NewAccountID(),
+					100,
+				)
+				return &mocks.StubTransferRepository{
+					Transfers: []entities.Transfer{transfer},
+				}
+			},
+			accountId:   accountOriginID,
+			errExpected: nil,
+		},
+		{
+			name: "should return an error if something went wrong on repository",
+			repoSetup: func() *mocks.StubTransferRepository {
+				return &mocks.StubTransferRepository{
+					Err: errors.New("failed to fetch transfers"),
+				}
+			},
+			accountId:   accountOriginID,
+			errExpected: entities.ErrInternalError,
+		},
+	}
 
-		assert.Nil(t, err)
-		assert.Equal(t, expected, result)
-	})
+	for _, tt := range testCases {
+		t.Run(tt.name, func(t *testing.T) {
+			ctx := context.Background()
+			usecase := NewTransfer(tt.repoSetup(), nil)
+			_, err := usecase.ListTransfers(ctx, tt.accountId)
 
-	t.Run("should return an error if something went wrong on repository", func(t *testing.T) {
-		repo := StubRepository{transfers: nil, err: errors.New("failed to fetch transfers")}
-		usecase := NewTransfer(&repo, nil)
-		result, err := usecase.ListTransfers(ctx, entities.NewAccountID())
-
-		assert.Nil(t, result)
-		assert.NotNil(t, err)
-	})
+			// TODO: add result validation
+			assert.Equal(t, tt.errExpected, err)
+		})
+	}
 }

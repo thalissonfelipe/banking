@@ -5,13 +5,14 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/thalissonfelipe/banking/pkg/domain/vos"
 )
 
 type Account struct {
 	ID        string
 	Name      string
-	CPF       string
-	Secret    string
+	CPF       vos.CPF
+	Secret    vos.Secret
 	Balance   int
 	CreatedAt time.Time
 }
@@ -22,13 +23,15 @@ var (
 	ErrAccountDoesNotExist  error = errors.New("account does not exist")
 	ErrAccountAlreadyExists error = errors.New("account already exists")
 	ErrInternalError        error = errors.New("internal server error")
+	ErrInvalidSecret        error = errors.New("invalid secret")
+	ErrInvalidCPF           error = errors.New("invalid cpf")
 )
 
 func NewAccountID() string {
 	return uuid.New().String()
 }
 
-func NewAccount(name, cpf, secret string) Account {
+func NewAccount(name string, cpf vos.CPF, secret vos.Secret) Account {
 	return Account{
 		ID:        NewAccountID(),
 		Name:      name,
