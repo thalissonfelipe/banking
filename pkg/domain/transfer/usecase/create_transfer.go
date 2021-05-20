@@ -10,7 +10,7 @@ import (
 func (t Transfer) CreateTransfer(ctx context.Context, input transfer.CreateTransferInput) error {
 	accOrigin, err := t.accountUseCase.GetAccountByID(ctx, input.AccountOriginID)
 	if err != nil {
-		return err
+		return entities.ErrInternalError
 	}
 	if accOrigin == nil {
 		return entities.ErrAccountDoesNotExist
@@ -18,7 +18,7 @@ func (t Transfer) CreateTransfer(ctx context.Context, input transfer.CreateTrans
 
 	accDestination, err := t.accountUseCase.GetAccountByID(ctx, input.AccountDestinationID)
 	if err != nil {
-		return err
+		return entities.ErrInternalError
 	}
 	if accDestination == nil {
 		return entities.ErrAccountDestinationDoesNotExist
@@ -34,6 +34,9 @@ func (t Transfer) CreateTransfer(ctx context.Context, input transfer.CreateTrans
 		input.Amount,
 	)
 	err = t.repository.UpdateBalance(ctx, transfer)
+	if err != nil {
+		return entities.ErrInternalError
+	}
 
-	return err
+	return nil
 }
