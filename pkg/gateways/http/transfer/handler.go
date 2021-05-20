@@ -14,7 +14,7 @@ type Handler struct {
 func NewHandler(r *mux.Router, usecase transfer.UseCase) *Handler {
 	handler := Handler{usecase: usecase}
 
-	r.HandleFunc("/accounts", handler.ListTransfers).Methods(http.MethodGet)
+	r.HandleFunc("/transfers", handler.ListTransfers).Methods(http.MethodGet)
 
 	return &handler
 }
