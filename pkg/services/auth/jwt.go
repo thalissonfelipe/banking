@@ -32,15 +32,22 @@ func newToken(accountOriginID string) (string, error) {
 	return tokenString, nil
 }
 
-func GetIDFromToken(tokenString string) (string, error) {
-	claims := &claims{}
-
-	token, err := jwt.ParseWithClaims(tokenString, claims, func(t *jwt.Token) (interface{}, error) {
+func IsValidToken(tokenString string) error {
+	token, err := jwt.Parse(tokenString, func(t *jwt.Token) (interface{}, error) {
 		return jwtKey, nil
 	})
 	if err != nil || !token.Valid {
-		return "", ErrUnauthorized
+		return ErrUnauthorized
 	}
 
-	return claims.AccountOriginID, nil
+	return nil
+}
+
+func GetIDFromToken(tokenString string) string {
+	claims := &claims{}
+	jwt.ParseWithClaims(tokenString, claims, func(t *jwt.Token) (interface{}, error) {
+		return jwtKey, nil
+	})
+
+	return claims.AccountOriginID
 }
