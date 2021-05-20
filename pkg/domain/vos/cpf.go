@@ -1,6 +1,11 @@
 package vos
 
-import "github.com/Nhanderu/brdoc"
+import (
+	"database/sql/driver"
+	"errors"
+
+	"github.com/Nhanderu/brdoc"
+)
 
 type CPF struct {
 	value string
@@ -19,4 +24,23 @@ func (c CPF) String() string {
 
 func NewCPF(cpf string) CPF {
 	return CPF{value: cpf}
+}
+
+func (c CPF) Value() (driver.Value, error) {
+	return c.String(), nil
+}
+
+func (c *CPF) Scan(value interface{}) error {
+	if value == nil {
+		*c = CPF(CPF{})
+		return nil
+	}
+	if bv, err := driver.String.ConvertValue(value); err == nil {
+		if v, ok := bv.(string); ok {
+			*c = CPF(CPF{v})
+			return nil
+		}
+	}
+
+	return errors.New("failed to scan CPF")
 }

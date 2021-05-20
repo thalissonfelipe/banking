@@ -1,6 +1,10 @@
 package vos
 
-import "regexp"
+import (
+	"database/sql/driver"
+	"errors"
+	"regexp"
+)
 
 const (
 	secretMaxSize = 20
@@ -47,4 +51,23 @@ func (s Secret) Size() int {
 
 func NewSecret(secret string) Secret {
 	return Secret{value: secret}
+}
+
+func (c Secret) Value() (driver.Value, error) {
+	return c.String(), nil
+}
+
+func (c *Secret) Scan(value interface{}) error {
+	if value == nil {
+		*c = Secret(Secret{})
+		return nil
+	}
+	if bv, err := driver.String.ConvertValue(value); err == nil {
+		if v, ok := bv.(string); ok {
+			*c = Secret(Secret{v})
+			return nil
+		}
+	}
+
+	return errors.New("failed to scan Secret")
 }
