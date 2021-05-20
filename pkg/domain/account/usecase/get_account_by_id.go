@@ -9,10 +9,7 @@ import (
 func (a Account) GetAccountByID(ctx context.Context, accountID string) (*entities.Account, error) {
 	acc, err := a.repository.GetAccountByID(ctx, accountID)
 	if err != nil {
-		return nil, entities.ErrInternalError
-	}
-	if acc == nil {
-		return nil, entities.ErrAccountDoesNotExist
+		return nil, err
 	}
 
 	return acc, nil
