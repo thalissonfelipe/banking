@@ -19,6 +19,9 @@ func (s StubAccountRepository) GetAccounts(ctx context.Context) ([]entities.Acco
 }
 
 func (s StubAccountRepository) GetBalanceByID(ctx context.Context, id string) (int, error) {
+	if s.Err != nil {
+		return 0, s.Err
+	}
 	for _, account := range s.Accounts {
 		if account.ID == id {
 			return account.Balance, nil

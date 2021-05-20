@@ -3,7 +3,6 @@ package account
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -71,7 +70,7 @@ func TestGetAccountBalance(t *testing.T) {
 			name: "should return status 500 if something went wrong on usecase",
 			repo: func() *mocks.StubAccountRepository {
 				return &mocks.StubAccountRepository{
-					Err: errors.New("usecase fails to fetch balance"),
+					Err: entities.ErrInternalError,
 				}
 			},
 			requestURI:   fmt.Sprintf("/accounts/%s/balance", acc.ID),
