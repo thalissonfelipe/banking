@@ -43,7 +43,7 @@ func (s StubAccountUseCase) GetAccountByID(ctx context.Context, accountID string
 		}
 	}
 
-	return nil, nil
+	return nil, entities.ErrAccountDoesNotExist
 }
 
 func (s StubAccountUseCase) GetAccountByCPF(ctx context.Context, cpf string) (*entities.Account, error) {
@@ -56,5 +56,5 @@ func (s StubAccountUseCase) GetAccountByCPF(ctx context.Context, cpf string) (*e
 		}
 	}
 
-	return nil, nil
+	return nil, entities.ErrAccountDoesNotExist
 }
