@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"errors"
 
 	"github.com/thalissonfelipe/banking/pkg/domain/account"
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
@@ -9,12 +10,12 @@ import (
 )
 
 func (a Account) CreateAccount(ctx context.Context, input account.CreateAccountInput) (*entities.Account, error) {
-	accExists, err := a.repository.GetAccountByCPF(ctx, input.CPF.String())
-	if err != nil {
-		return nil, entities.ErrInternalError
-	}
-	if accExists != nil {
+	_, err := a.repository.GetAccountByCPF(ctx, input.CPF.String())
+	if errors.Is(err, nil) {
 		return nil, entities.ErrAccountAlreadyExists
+	}
+	if !errors.Is(err, entities.ErrAccountDoesNotExist) {
+		return nil, entities.ErrInternalError
 	}
 
 	hashedSecret, err := a.encrypter.Hash(input.Secret.String())
