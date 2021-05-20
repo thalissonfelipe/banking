@@ -16,6 +16,7 @@ func (h Handler) CreateAccount(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&body)
 	if err != nil {
 		responses.SendError(w, http.StatusBadRequest, errInvalidJSON.Error())
+		return
 	}
 
 	if err := body.isValid(); err != nil {
