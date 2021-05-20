@@ -13,9 +13,9 @@ func getTokenFromHeader(authHeader string) string {
 }
 
 type transferResponse struct {
-	AccountDestinationID string `json"account_destination_id"`
-	Amount               int    `json"amount"`
-	CreatedAt            string `json"createt_at"`
+	AccountDestinationID string
+	Amount               int
+	CreatedAt            string
 }
 
 func convertTransferToTransferResponse(transfer entities.Transfer) transferResponse {
