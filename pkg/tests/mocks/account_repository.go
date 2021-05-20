@@ -40,24 +40,24 @@ func (s *StubAccountRepository) PostAccount(ctx context.Context, account entitie
 
 func (s StubAccountRepository) GetAccountByCPF(ctx context.Context, cpf string) (*entities.Account, error) {
 	if s.Err != nil {
-		return nil, entities.ErrInternalError
+		return nil, s.Err
 	}
 	for _, acc := range s.Accounts {
 		if acc.CPF.String() == cpf {
 			return &acc, nil
 		}
 	}
-	return nil, nil
+	return nil, entities.ErrAccountDoesNotExist
 }
 
 func (s StubAccountRepository) GetAccountByID(ctx context.Context, id string) (*entities.Account, error) {
 	if s.Err != nil {
-		return nil, entities.ErrInternalError
+		return nil, s.Err
 	}
 	for _, acc := range s.Accounts {
 		if acc.ID == id {
 			return &acc, nil
 		}
 	}
-	return nil, nil
+	return nil, entities.ErrAccountDoesNotExist
 }
