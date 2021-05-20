@@ -3,7 +3,6 @@ package transfer
 import (
 	"context"
 	"database/sql"
-	"log"
 
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
 )
@@ -16,31 +15,32 @@ func (r Repository) UpdateBalance(ctx context.Context, transfer entities.Transfe
 		return err
 	}
 
+	defer tx.Rollback()
+
 	err = r.updateBalance(ctx, tx, -transfer.Amount, transfer.AccountOriginID)
 	if err != nil {
-		return tx.Rollback()
+		return err
 	}
 
 	err = r.updateBalance(ctx, tx, transfer.Amount, transfer.AccountDestinationID)
 	if err != nil {
-		return tx.Rollback()
+		return err
 	}
 
 	err = r.saveTransfer(ctx, tx, transfer)
 	if err != nil {
-		return tx.Rollback()
+		return err
 	}
 
-	err = tx.Commit()
-	return err
+	tx.Commit()
+
+	return nil
 }
 
 func (r Repository) updateBalance(ctx context.Context, tx *sql.Tx, balance int, id string) error {
 	const query = `UPDATE account SET balance=balance+$1 WHERE id=$2`
 
-	w, err := tx.ExecContext(ctx, query, balance, id)
-	t, f := w.RowsAffected()
-	log.Println(t, f)
+	_, err := tx.ExecContext(ctx, query, balance, id)
 	return err
 }
 
@@ -64,5 +64,6 @@ func (r Repository) saveTransfer(ctx context.Context, tx *sql.Tx, transfer entit
 		transfer.Amount,
 		transfer.CreatedAt,
 	)
+
 	return err
 }
