@@ -20,8 +20,8 @@ type postgresConfig struct {
 	DatabaseName     string `envconfig:"DB_NAME" default:"banking_db"`
 	DatabaseUser     string `envconfig:"DB_USER" default:"postgres"`
 	DatabasePassword string `envconfig:"DB_PASSWORD" default:"postgres"`
-	DatabaseHost     string `envconfig:"DB_HOST" default:"0.0.0.0"`
-	DatabasePort     string `envconfig:"DB_PORT" default:"5433"`
+	DatabaseHost     string `envconfig:"DB_HOST" default:"localhost"`
+	DatabasePort     string `envconfig:"DB_PORT" default:"5432"`
 	SSLMode          string `envconfig:"DB_SSL_MODE" default:"disable"`
 }
 

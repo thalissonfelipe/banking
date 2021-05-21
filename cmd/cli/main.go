@@ -21,12 +21,11 @@ func main() {
 						Name:  "up",
 						Usage: "migrate up",
 						Action: func(c *cli.Context) error {
-							_, err := config.LoadConfig()
+							cfg, err := config.LoadConfig()
 							if err != nil {
 								log.Fatalf("unable to load config: %s", err.Error())
 							}
-							uri := "postgres://postgres:postgres@127.0.0.1:5432/postgres?sslmode=disable"
-							m, err := postgres.GetMigrationHandler(uri)
+							m, err := postgres.GetMigrationHandler(cfg.Postgres.DSN())
 							if err != nil {
 								log.Fatal(err)
 							}

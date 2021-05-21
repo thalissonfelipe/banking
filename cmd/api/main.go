@@ -26,7 +26,6 @@ func main() {
 	defer conn.Close(context.Background())
 
 	err = postgres.RunMigrations(cfg.Postgres.DSN())
-	log.Println(cfg.Postgres.DSN())
 	if err != nil {
 		log.Fatalf("unable to run migrations: %s", err.Error())
 	}
