@@ -9,6 +9,7 @@ import (
 	"github.com/jackc/pgx/v4"
 
 	"github.com/thalissonfelipe/banking/pkg/config"
+	"github.com/thalissonfelipe/banking/pkg/gateways/db/postgres"
 	h "github.com/thalissonfelipe/banking/pkg/gateways/http"
 )
 
@@ -18,11 +19,16 @@ func main() {
 		log.Fatalf("unable to load config: %s", err.Error())
 	}
 
-	conn, err := pgx.ConnectConfig(context.Background(), cfg.Postgres)
+	conn, err := pgx.Connect(context.Background(), cfg.Postgres.DSN())
 	if err != nil {
 		log.Fatalf("unable to connect to database: %s", err.Error())
 	}
 	defer conn.Close(context.Background())
+
+	err = postgres.RunMigrations(cfg.Postgres.DSN())
+	if err != nil {
+		log.Fatalf("unable to run migrations: %s", err.Error())
+	}
 
 	router := h.NewRouter(conn)
 
