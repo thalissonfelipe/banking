@@ -130,6 +130,21 @@ func TestCreateTransfer(t *testing.T) {
 			expectedCode: http.StatusInternalServerError,
 		},
 		{
+			name:        "should return status 400 if accDestID is the account origin id",
+			repo:        &mocks.StubTransferRepository{},
+			accUsecase:  &mocks.StubAccountUseCase{},
+			decoder:     tests.ErrorMessageDecoder{},
+			accOriginID: accOrigin.ID,
+			body: transferRequest{
+				AccountDestinationID: accOrigin.ID,
+				Amount:               100,
+			},
+			expectedBody: responses.ErrorResponse{
+				Message: "account destination cannot be the account origin id",
+			},
+			expectedCode: http.StatusBadRequest,
+		},
+		{
 			name: "should transfer successfully",
 			repo: &mocks.StubTransferRepository{},
 			accUsecase: &mocks.StubAccountUseCase{

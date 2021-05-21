@@ -26,8 +26,13 @@ func (h Handler) CreateTransfer(w http.ResponseWriter, r *http.Request) {
 
 	token := getTokenFromHeader(r.Header.Get("Authorization"))
 	accountID := auth.GetIDFromToken(token)
-	input := transfer.NewTransferInput(accountID, body.AccountDestinationID, body.Amount)
 
+	if accountID == body.AccountDestinationID {
+		responses.SendError(w, http.StatusBadRequest, errDestIDEqualCurrentID.Error())
+		return
+	}
+
+	input := transfer.NewTransferInput(accountID, body.AccountDestinationID, body.Amount)
 	err = h.usecase.CreateTransfer(r.Context(), input)
 	if err != nil {
 		if errors.Is(err, entities.ErrAccountDoesNotExist) {
