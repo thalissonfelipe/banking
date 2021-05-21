@@ -8,11 +8,12 @@ import (
 
 	"github.com/jackc/pgx/v4"
 
+	"github.com/thalissonfelipe/banking/pkg/config"
 	h "github.com/thalissonfelipe/banking/pkg/gateways/http"
 )
 
 func main() {
-	cfg, err := loadConfig()
+	cfg, err := config.LoadConfig()
 	if err != nil {
 		log.Fatalf("unable to load config: %s", err.Error())
 	}

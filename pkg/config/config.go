@@ -1,4 +1,4 @@
-package main
+package config
 
 import (
 	"fmt"
@@ -13,7 +13,7 @@ type config struct {
 }
 
 type apiConfig struct {
-	Host string `env.config:"API_HOST" default:"0.0.0.0"`
+	Host string `envconfig:"API_HOST" default:"0.0.0.0"`
 	Port string `envconfig:"API_PORT" default:"5000"`
 }
 
@@ -25,7 +25,7 @@ type postgresConfig struct {
 	DatabasePort     string `envconfig:"DB_PORT" default:"5432"`
 }
 
-func loadConfig() (*config, error) {
+func LoadConfig() (*config, error) {
 	apiCfg, err := loadApiConfig()
 	if err != nil {
 		return nil, err
