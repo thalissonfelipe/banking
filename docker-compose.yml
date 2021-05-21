@@ -1,0 +1,32 @@
+version: '3'
+
+services:
+  db:
+    container_name: banking_pg
+    image: postgres:13.3-alpine
+    restart: always
+    environment:
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    ports:
+      - 5421:5432
+    volumes:
+      - postgres_data:/var/lib/postgres/data
+
+  api:
+    container_name: banking_api
+    build: .
+    ports:
+      - 5000:5000
+    restart: always
+    environment:
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_HOST=${DB_HOST}
+    depends_on:
+      - db
+
+volumes:
+  postgres_data:
