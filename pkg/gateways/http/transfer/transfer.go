@@ -22,20 +22,20 @@ func getTokenFromHeader(authHeader string) string {
 }
 
 type transferResponse struct {
-	AccountDestinationID string
-	Amount               int
-	CreatedAt            string
+	AccountDestinationID string `json:"account_destination_id"`
+	Amount               int    `json:"amount"`
+	CreatedAt            string `json:"created_at"`
 }
 
 type transferRequest struct {
-	AccountDestinationID string
-	Amount               int
+	AccountDestinationID string `json:"account_destination_id"`
+	Amount               int    `json:"amount"`
 }
 
 type transferCreatedResponse struct {
-	AccountOriginID      string
-	AccountDestinationID string
-	Amount               int
+	AccountOriginID      string `json:"account_origin_id"`
+	AccountDestinationID string `json:"account_destination_id"`
+	Amount               int    `json:"amount"`
 }
 
 func (t transferRequest) isValid() error {

@@ -17,27 +17,27 @@ var (
 )
 
 type accountResponse struct {
-	Id        string
-	Name      string
-	CPF       string
-	Balance   int
-	CreatedAt string
+	Id        string `json:"id"`
+	Name      string `json:"name"`
+	CPF       string `json:"cpf"`
+	Balance   int    `json:"balance"`
+	CreatedAt string `json:"created_at"`
 }
 
 type balanceResponse struct {
-	Balance int
+	Balance int `json:"balance"`
 }
 
 type requestBody struct {
-	Name   string
-	CPF    string
-	Secret string
+	Name   string `json:"name"`
+	CPF    string `json:"cpf"`
+	Secret string `json:"secret"`
 }
 
 type createdAccountResponse struct {
-	Name    string
-	CPF     string
-	Balance int
+	Name    string `json:"name"`
+	CPF     string `json:"cpf"`
+	Balance int    `json:"balance"`
 }
 
 func (r requestBody) isValid() error {
