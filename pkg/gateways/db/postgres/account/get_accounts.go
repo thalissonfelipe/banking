@@ -7,7 +7,15 @@ import (
 )
 
 func (r Repository) GetAccounts(ctx context.Context) ([]entities.Account, error) {
-	const query = "SELECT id, name, cpf, balance, created_at FROM account"
+	const query = `
+		SELECT
+			id,
+			name,
+			cpf,
+			balance,
+			created_at
+		FROM accounts
+	`
 
 	rows, err := r.db.Query(ctx, query)
 	if err != nil {

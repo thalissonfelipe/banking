@@ -28,11 +28,10 @@ var (
 
 func NewAccount(name string, cpf vos.CPF, secret vos.Secret) Account {
 	return Account{
-		ID:        vos.NewID(),
-		Name:      name,
-		CPF:       cpf,
-		Secret:    secret,
-		Balance:   DefaultBalance,
-		CreatedAt: time.Now(),
+		ID:      vos.NewID(),
+		Name:    name,
+		CPF:     cpf,
+		Secret:  secret,
+		Balance: DefaultBalance,
 	}
 }

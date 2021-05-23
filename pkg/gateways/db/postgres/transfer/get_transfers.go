@@ -15,7 +15,7 @@ func (r Repository) GetTransfers(ctx context.Context, id vos.ID) ([]entities.Tra
 			account_destination_id,
 			amount,
 			created_at
-		FROM transfer
+		FROM transfers
 		WHERE account_origin_id=$1
 	`
 

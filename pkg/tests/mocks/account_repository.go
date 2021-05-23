@@ -31,11 +31,11 @@ func (s StubAccountRepository) GetBalanceByID(ctx context.Context, id vos.ID) (i
 	return 0, entities.ErrAccountDoesNotExist
 }
 
-func (s *StubAccountRepository) PostAccount(ctx context.Context, account entities.Account) error {
+func (s *StubAccountRepository) PostAccount(ctx context.Context, account *entities.Account) error {
 	if s.Err != nil {
 		return entities.ErrInternalError
 	}
-	s.Accounts = append(s.Accounts, account)
+	s.Accounts = append(s.Accounts, *account)
 	return nil
 }
 

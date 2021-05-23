@@ -19,7 +19,7 @@ func (r Repository) GetAccountByCPF(ctx context.Context, cpf string) (*entities.
 			balance,
 			created_at
 		FROM
-			account
+			accounts
 		WHERE
 			cpf=$1`
 

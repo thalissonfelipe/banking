@@ -26,6 +26,5 @@ func NewTransfer(accOriginID, accDestID vos.ID, amount int) Transfer {
 		AccountOriginID:      accOriginID,
 		AccountDestinationID: accDestID,
 		Amount:               amount,
-		CreatedAt:            time.Now(),
 	}
 }

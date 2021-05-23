@@ -11,7 +11,12 @@ import (
 )
 
 func (r Repository) GetBalanceByID(ctx context.Context, id vos.ID) (int, error) {
-	query := "SELECT balance FROM account WHERE id=$1"
+	query := `
+		SELECT
+			balance
+		FROM accounts
+		WHERE id=$1
+	`
 
 	var balance int
 	err := r.db.QueryRow(ctx, query, id).Scan(&balance)

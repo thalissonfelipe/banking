@@ -27,10 +27,10 @@ func (s StubTransferRepository) GetTransfers(ctx context.Context, id vos.ID) ([]
 	return transfers, nil
 }
 
-func (s *StubTransferRepository) UpdateBalance(ctx context.Context, transfer entities.Transfer) error {
+func (s *StubTransferRepository) UpdateBalance(ctx context.Context, transfer *entities.Transfer) error {
 	if s.Err != nil {
 		return entities.ErrInternalError
 	}
-	s.Transfers = append(s.Transfers, transfer)
+	s.Transfers = append(s.Transfers, *transfer)
 	return nil
 }

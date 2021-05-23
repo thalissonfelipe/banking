@@ -20,7 +20,7 @@ func (r Repository) GetAccountByID(ctx context.Context, id vos.ID) (*entities.Ac
 			balance,
 			created_at
 		FROM
-			account
+			accounts
 		WHERE
 			id=$1`
 

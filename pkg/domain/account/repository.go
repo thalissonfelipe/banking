@@ -10,7 +10,7 @@ import (
 type Repository interface {
 	GetAccounts(ctx context.Context) ([]entities.Account, error)
 	GetBalanceByID(ctx context.Context, id vos.ID) (int, error)
-	PostAccount(ctx context.Context, account entities.Account) error
+	PostAccount(ctx context.Context, account *entities.Account) error
 	GetAccountByCPF(ctx context.Context, cpf string) (*entities.Account, error)
 	GetAccountByID(ctx context.Context, id vos.ID) (*entities.Account, error)
 }
