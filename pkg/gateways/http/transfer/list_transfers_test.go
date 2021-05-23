@@ -68,7 +68,7 @@ func TestListTransfers(t *testing.T) {
 			handler := NewHandler(r, trUsecase)
 
 			request := fakes.FakeRequest(http.MethodGet, "/transfers", nil)
-			token, _ := auth.NewToken(accOrigin.ID)
+			token, _ := auth.NewToken(accOrigin.ID.String())
 			bearerToken := fmt.Sprintf("Bearer %s", token)
 			request.Header.Add("Authorization", bearerToken)
 			response := httptest.NewRecorder()

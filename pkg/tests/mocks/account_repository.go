@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
+	"github.com/thalissonfelipe/banking/pkg/domain/vos"
 )
 
 type StubAccountRepository struct {
@@ -18,7 +19,7 @@ func (s StubAccountRepository) GetAccounts(ctx context.Context) ([]entities.Acco
 	return s.Accounts, nil
 }
 
-func (s StubAccountRepository) GetBalanceByID(ctx context.Context, id string) (int, error) {
+func (s StubAccountRepository) GetBalanceByID(ctx context.Context, id vos.ID) (int, error) {
 	if s.Err != nil {
 		return 0, s.Err
 	}
@@ -30,11 +31,11 @@ func (s StubAccountRepository) GetBalanceByID(ctx context.Context, id string) (i
 	return 0, entities.ErrAccountDoesNotExist
 }
 
-func (s *StubAccountRepository) PostAccount(ctx context.Context, account entities.Account) error {
+func (s *StubAccountRepository) PostAccount(ctx context.Context, account *entities.Account) error {
 	if s.Err != nil {
 		return entities.ErrInternalError
 	}
-	s.Accounts = append(s.Accounts, account)
+	s.Accounts = append(s.Accounts, *account)
 	return nil
 }
 
@@ -50,7 +51,7 @@ func (s StubAccountRepository) GetAccountByCPF(ctx context.Context, cpf string) 
 	return nil, entities.ErrAccountDoesNotExist
 }
 
-func (s StubAccountRepository) GetAccountByID(ctx context.Context, id string) (*entities.Account, error) {
+func (s StubAccountRepository) GetAccountByID(ctx context.Context, id vos.ID) (*entities.Account, error) {
 	if s.Err != nil {
 		return nil, s.Err
 	}

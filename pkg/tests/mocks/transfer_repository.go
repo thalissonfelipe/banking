@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
+	"github.com/thalissonfelipe/banking/pkg/domain/vos"
 )
 
 type StubTransferRepository struct {
@@ -11,7 +12,7 @@ type StubTransferRepository struct {
 	Err       error
 }
 
-func (s StubTransferRepository) GetTransfers(ctx context.Context, id string) ([]entities.Transfer, error) {
+func (s StubTransferRepository) GetTransfers(ctx context.Context, id vos.ID) ([]entities.Transfer, error) {
 	if s.Err != nil {
 		return nil, entities.ErrInternalError
 	}
@@ -26,10 +27,10 @@ func (s StubTransferRepository) GetTransfers(ctx context.Context, id string) ([]
 	return transfers, nil
 }
 
-func (s *StubTransferRepository) UpdateBalance(ctx context.Context, transfer entities.Transfer) error {
+func (s *StubTransferRepository) UpdateBalance(ctx context.Context, transfer *entities.Transfer) error {
 	if s.Err != nil {
 		return entities.ErrInternalError
 	}
-	s.Transfers = append(s.Transfers, transfer)
+	s.Transfers = append(s.Transfers, *transfer)
 	return nil
 }

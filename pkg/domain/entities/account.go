@@ -4,12 +4,11 @@ import (
 	"errors"
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/thalissonfelipe/banking/pkg/domain/vos"
 )
 
 type Account struct {
-	ID        string
+	ID        vos.ID
 	Name      string
 	CPF       vos.CPF
 	Secret    vos.Secret
@@ -27,17 +26,12 @@ var (
 	ErrInvalidCPF           error = errors.New("invalid cpf")
 )
 
-func NewAccountID() string {
-	return uuid.New().String()
-}
-
 func NewAccount(name string, cpf vos.CPF, secret vos.Secret) Account {
 	return Account{
-		ID:        NewAccountID(),
-		Name:      name,
-		CPF:       cpf,
-		Secret:    secret,
-		Balance:   DefaultBalance,
-		CreatedAt: time.Now(),
+		ID:      vos.NewID(),
+		Name:    name,
+		CPF:     cpf,
+		Secret:  secret,
+		Balance: DefaultBalance,
 	}
 }

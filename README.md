@@ -76,6 +76,6 @@ make test
 - [ ] Add Github Actions.
 - [x] Add prefix endpoint (must start with /api/v1/ or something like that).
 - [ ] Add common pkg to centralize some functions, errors, constants...
-- [ ] Change id saved in the bank to be a UUID type (currently the id is being saved as a string).
-- [ ] Move creation datetime do PostgreSQL.
+- [x] Change id saved in the bank to be a UUID type (currently the id is being saved as a string).
+- [x] Move created_at timestamp to PostgreSQL responsability.
 - [ ] Add CORS middleware.

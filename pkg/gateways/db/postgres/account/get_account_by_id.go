@@ -7,9 +7,10 @@ import (
 	"github.com/jackc/pgx/v4"
 
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
+	"github.com/thalissonfelipe/banking/pkg/domain/vos"
 )
 
-func (r Repository) GetAccountByID(ctx context.Context, id string) (*entities.Account, error) {
+func (r Repository) GetAccountByID(ctx context.Context, id vos.ID) (*entities.Account, error) {
 	const query = `
 		SELECT
 			id,
@@ -19,7 +20,7 @@ func (r Repository) GetAccountByID(ctx context.Context, id string) (*entities.Ac
 			balance,
 			created_at
 		FROM
-			account
+			accounts
 		WHERE
 			id=$1`
 

@@ -6,9 +6,10 @@ import (
 	"github.com/jackc/pgx/v4"
 
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
+	"github.com/thalissonfelipe/banking/pkg/domain/vos"
 )
 
-func (r Repository) UpdateBalance(ctx context.Context, transfer entities.Transfer) error {
+func (r Repository) UpdateBalance(ctx context.Context, transfer *entities.Transfer) error {
 	// First experience with rollback.
 	// Tutorial: https://www.sohamkamani.com/golang/sql-transactions/
 	tx, err := r.db.Begin(ctx)
@@ -38,33 +39,40 @@ func (r Repository) UpdateBalance(ctx context.Context, transfer entities.Transfe
 	return nil
 }
 
-func (r Repository) updateBalance(ctx context.Context, tx pgx.Tx, balance int, id string) error {
-	const query = `UPDATE account SET balance=balance+$1 WHERE id=$2`
+func (r Repository) updateBalance(ctx context.Context, tx pgx.Tx, balance int, id vos.ID) error {
+	const query = `
+		UPDATE accounts
+		SET balance=balance+$1
+		WHERE id=$2
+	`
 
 	_, err := tx.Exec(ctx, query, balance, id)
 	return err
 }
 
-func (r Repository) saveTransfer(ctx context.Context, tx pgx.Tx, transfer entities.Transfer) error {
+func (r Repository) saveTransfer(ctx context.Context, tx pgx.Tx, transfer *entities.Transfer) error {
 	const query = `
-		INSERT INTO transfer (
+		INSERT INTO transfers (
 			id,
 			account_origin_id,
 			account_destination_id,
-			amount,
-			created_at
+			amount
 		) VALUES (
-			$1, $2, $3, $4, $5
-		)
+			$1, $2, $3, $4
+		) RETURNING created_at
 	`
 
-	_, err := tx.Exec(ctx, query,
+	err := tx.QueryRow(ctx, query,
 		transfer.ID,
 		transfer.AccountOriginID,
 		transfer.AccountDestinationID,
 		transfer.Amount,
-		transfer.CreatedAt,
+	).Scan(
+		&transfer.CreatedAt,
 	)
+	if err != nil {
+		return err
+	}
 
-	return err
+	return nil
 }

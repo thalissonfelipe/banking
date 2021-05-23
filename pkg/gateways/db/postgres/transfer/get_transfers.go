@@ -4,9 +4,10 @@ import (
 	"context"
 
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
+	"github.com/thalissonfelipe/banking/pkg/domain/vos"
 )
 
-func (r Repository) GetTransfers(ctx context.Context, id string) ([]entities.Transfer, error) {
+func (r Repository) GetTransfers(ctx context.Context, id vos.ID) ([]entities.Transfer, error) {
 	const query = `
 		SELECT
 			id,
@@ -14,7 +15,7 @@ func (r Repository) GetTransfers(ctx context.Context, id string) ([]entities.Tra
 			account_destination_id,
 			amount,
 			created_at
-		FROM transfer
+		FROM transfers
 		WHERE account_origin_id=$1
 	`
 

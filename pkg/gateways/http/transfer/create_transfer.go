@@ -7,6 +7,7 @@ import (
 
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
 	"github.com/thalissonfelipe/banking/pkg/domain/transfer"
+	"github.com/thalissonfelipe/banking/pkg/domain/vos"
 	"github.com/thalissonfelipe/banking/pkg/gateways/http/responses"
 	"github.com/thalissonfelipe/banking/pkg/services/auth"
 )
@@ -25,14 +26,15 @@ func (h Handler) CreateTransfer(w http.ResponseWriter, r *http.Request) {
 	}
 
 	token := getTokenFromHeader(r.Header.Get("Authorization"))
-	accountID := auth.GetIDFromToken(token)
+	accountID := vos.ConvertStringToID(auth.GetIDFromToken(token))
+	accountDestinationID := vos.ConvertStringToID(body.AccountDestinationID)
 
-	if accountID == body.AccountDestinationID {
+	if accountID == accountDestinationID {
 		responses.SendError(w, http.StatusBadRequest, errDestIDEqualCurrentID.Error())
 		return
 	}
 
-	input := transfer.NewTransferInput(accountID, body.AccountDestinationID, body.Amount)
+	input := transfer.NewTransferInput(accountID, accountDestinationID, body.Amount)
 	err = h.usecase.CreateTransfer(r.Context(), input)
 	if err != nil {
 		if errors.Is(err, entities.ErrAccountDoesNotExist) {
@@ -53,7 +55,7 @@ func (h Handler) CreateTransfer(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response := transferCreatedResponse{
-		AccountOriginID:      accountID,
+		AccountOriginID:      accountID.String(),
 		AccountDestinationID: body.AccountDestinationID,
 		Amount:               body.Amount,
 	}

@@ -56,7 +56,7 @@ func (r requestBody) isValid() error {
 
 func convertAccountToAccountResponse(account entities.Account) accountResponse {
 	return accountResponse{
-		Id:        account.ID,
+		Id:        account.ID.String(),
 		Name:      account.Name,
 		CPF:       account.CPF.String(),
 		Balance:   account.Balance,
