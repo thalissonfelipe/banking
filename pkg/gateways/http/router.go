@@ -28,6 +28,8 @@ func NewRouter(db *pgx.Conn) http.Handler {
 
 	// Register endpoints
 	router := mux.NewRouter()
+	router = router.PathPrefix("/api/v1").Subrouter()
+
 	acc_handler.NewHandler(router, accountUsecase)
 	auth_handler.NewHandler(router, authService)
 	tr_handler.NewHandler(router, transferUsecase)

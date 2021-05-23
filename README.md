@@ -74,7 +74,7 @@ make test
 - [x] Fix json responses (the names are capitalized).
 - [ ] Add endpoint to deposit money (the default balance is 0, so it's not possible to perform transaction since the user does not have funds).
 - [ ] Add Github Actions.
-- [ ] Add prefix endpoint (must start with /api/v1/ or something like that).
+- [x] Add prefix endpoint (must start with /api/v1/ or something like that).
 - [ ] Add common pkg to centralize some functions, errors, constants...
 - [ ] Change id saved in the bank to be a UUID type (currently the id is being saved as a string).
 - [ ] Move creation datetime do PostgreSQL.
