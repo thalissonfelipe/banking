@@ -88,7 +88,7 @@ func TestGetAccountBalance(t *testing.T) {
 
 			request := fakes.FakeRequest(http.MethodGet, tt.requestURI, nil)
 			request = mux.SetURLVars(request, map[string]string{
-				"id": acc.ID,
+				"id": acc.ID.String(),
 			})
 			response := httptest.NewRecorder()
 

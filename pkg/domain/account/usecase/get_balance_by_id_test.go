@@ -18,7 +18,7 @@ func TestGetBalanceByAccountID(t *testing.T) {
 	testCases := []struct {
 		name        string
 		repoSetup   *mocks.StubAccountRepository
-		accountId   string
+		accountId   vos.ID
 		expected    int
 		errExpected error
 	}{
@@ -38,7 +38,7 @@ func TestGetBalanceByAccountID(t *testing.T) {
 				Accounts: nil,
 				Err:      nil,
 			},
-			accountId:   "unknown-id",
+			accountId:   vos.NewID(),
 			expected:    entities.DefaultBalance,
 			errExpected: entities.ErrAccountDoesNotExist,
 		},

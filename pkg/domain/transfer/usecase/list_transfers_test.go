@@ -8,16 +8,17 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
+	"github.com/thalissonfelipe/banking/pkg/domain/vos"
 	"github.com/thalissonfelipe/banking/pkg/tests/mocks"
 )
 
 func TestListTransfers(t *testing.T) {
-	accountOriginID := entities.NewAccountID()
+	accountOriginID := vos.NewID()
 
 	testCases := []struct {
 		name        string
 		repoSetup   func() *mocks.StubTransferRepository
-		accountId   string
+		accountId   vos.ID
 		errExpected error
 	}{
 		{
@@ -25,7 +26,7 @@ func TestListTransfers(t *testing.T) {
 			repoSetup: func() *mocks.StubTransferRepository {
 				transfer := entities.NewTransfer(
 					accountOriginID,
-					entities.NewAccountID(),
+					vos.NewID(),
 					100,
 				)
 				return &mocks.StubTransferRepository{

@@ -18,7 +18,7 @@ func (a Auth) Autheticate(ctx context.Context, input AuthenticateInput) (string,
 		return "", ErrSecretDoesNotMatch
 	}
 
-	token, err := NewToken(acc.ID)
+	token, err := NewToken(acc.ID.String())
 
 	return token, err
 }

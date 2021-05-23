@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
+	"github.com/thalissonfelipe/banking/pkg/domain/vos"
 )
 
 type StubTransferRepository struct {
@@ -11,7 +12,7 @@ type StubTransferRepository struct {
 	Err       error
 }
 
-func (s StubTransferRepository) GetTransfers(ctx context.Context, id string) ([]entities.Transfer, error) {
+func (s StubTransferRepository) GetTransfers(ctx context.Context, id vos.ID) ([]entities.Transfer, error) {
 	if s.Err != nil {
 		return nil, entities.ErrInternalError
 	}

@@ -51,7 +51,7 @@ func (t transferRequest) isValid() error {
 
 func convertTransferToTransferResponse(transfer entities.Transfer) transferResponse {
 	return transferResponse{
-		AccountDestinationID: transfer.AccountDestinationID,
+		AccountDestinationID: transfer.AccountDestinationID.String(),
 		Amount:               transfer.Amount,
 		CreatedAt:            formatTime(transfer.CreatedAt),
 	}

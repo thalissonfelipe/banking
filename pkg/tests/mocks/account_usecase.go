@@ -5,6 +5,7 @@ import (
 
 	"github.com/thalissonfelipe/banking/pkg/domain/account"
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
+	"github.com/thalissonfelipe/banking/pkg/domain/vos"
 )
 
 type StubAccountUseCase struct {
@@ -12,7 +13,7 @@ type StubAccountUseCase struct {
 	Err      error
 }
 
-func (s StubAccountUseCase) GetAccountBalanceByID(ctx context.Context, accountID string) (int, error) {
+func (s StubAccountUseCase) GetAccountBalanceByID(ctx context.Context, accountID vos.ID) (int, error) {
 	if s.Err != nil {
 		return 0, entities.ErrInternalError
 	}
@@ -33,7 +34,7 @@ func (s StubAccountUseCase) CreateAccount(ctx context.Context, input account.Cre
 	return nil, nil
 }
 
-func (s StubAccountUseCase) GetAccountByID(ctx context.Context, accountID string) (*entities.Account, error) {
+func (s StubAccountUseCase) GetAccountByID(ctx context.Context, accountID vos.ID) (*entities.Account, error) {
 	if s.Err != nil {
 		return nil, entities.ErrInternalError
 	}

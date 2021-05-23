@@ -6,6 +6,7 @@ import (
 	"github.com/jackc/pgx/v4"
 
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
+	"github.com/thalissonfelipe/banking/pkg/domain/vos"
 )
 
 func (r Repository) UpdateBalance(ctx context.Context, transfer entities.Transfer) error {
@@ -38,7 +39,7 @@ func (r Repository) UpdateBalance(ctx context.Context, transfer entities.Transfe
 	return nil
 }
 
-func (r Repository) updateBalance(ctx context.Context, tx pgx.Tx, balance int, id string) error {
+func (r Repository) updateBalance(ctx context.Context, tx pgx.Tx, balance int, id vos.ID) error {
 	const query = `UPDATE account SET balance=balance+$1 WHERE id=$2`
 
 	_, err := tx.Exec(ctx, query, balance, id)

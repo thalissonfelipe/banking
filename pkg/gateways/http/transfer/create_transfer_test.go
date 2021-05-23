@@ -32,7 +32,7 @@ func TestCreateTransfer(t *testing.T) {
 		repo         *mocks.StubTransferRepository
 		accUsecase   *mocks.StubAccountUseCase
 		decoder      tests.Decoder
-		accOriginID  string
+		accOriginID  vos.ID
 		body         interface{}
 		expectedBody interface{}
 		expectedCode int
@@ -55,7 +55,7 @@ func TestCreateTransfer(t *testing.T) {
 			accUsecase:   &mocks.StubAccountUseCase{},
 			decoder:      tests.ErrorMessageDecoder{},
 			accOriginID:  accOrigin.ID,
-			body:         transferRequest{AccountDestinationID: accDest.ID},
+			body:         transferRequest{AccountDestinationID: accDest.ID.String()},
 			expectedBody: responses.ErrorResponse{Message: "missing amount parameter"},
 			expectedCode: http.StatusBadRequest,
 		},
@@ -78,7 +78,7 @@ func TestCreateTransfer(t *testing.T) {
 			decoder:     tests.ErrorMessageDecoder{},
 			accOriginID: accOrigin.ID,
 			body: transferRequest{
-				AccountDestinationID: accDest.ID,
+				AccountDestinationID: accDest.ID.String(),
 				Amount:               100,
 			},
 			expectedBody: responses.ErrorResponse{Message: "account origin does not exist"},
@@ -93,7 +93,7 @@ func TestCreateTransfer(t *testing.T) {
 			decoder:     tests.ErrorMessageDecoder{},
 			accOriginID: accOrigin.ID,
 			body: transferRequest{
-				AccountDestinationID: accDest.ID,
+				AccountDestinationID: accDest.ID.String(),
 				Amount:               100,
 			},
 			expectedBody: responses.ErrorResponse{Message: "account destination does not exist"},
@@ -108,7 +108,7 @@ func TestCreateTransfer(t *testing.T) {
 			decoder:     tests.ErrorMessageDecoder{},
 			accOriginID: accOrigin.ID,
 			body: transferRequest{
-				AccountDestinationID: accDest.ID,
+				AccountDestinationID: accDest.ID.String(),
 				Amount:               100,
 			},
 			expectedBody: responses.ErrorResponse{Message: "insufficient funds"},
@@ -123,7 +123,7 @@ func TestCreateTransfer(t *testing.T) {
 			decoder:     tests.ErrorMessageDecoder{},
 			accOriginID: accOrigin.ID,
 			body: transferRequest{
-				AccountDestinationID: accDest.ID,
+				AccountDestinationID: accDest.ID.String(),
 				Amount:               100,
 			},
 			expectedBody: responses.ErrorResponse{Message: "internal server error"},
@@ -136,7 +136,7 @@ func TestCreateTransfer(t *testing.T) {
 			decoder:     tests.ErrorMessageDecoder{},
 			accOriginID: accOrigin.ID,
 			body: transferRequest{
-				AccountDestinationID: accOrigin.ID,
+				AccountDestinationID: accOrigin.ID.String(),
 				Amount:               100,
 			},
 			expectedBody: responses.ErrorResponse{
@@ -153,12 +153,12 @@ func TestCreateTransfer(t *testing.T) {
 			decoder:     createdTransferDecoder{},
 			accOriginID: accOriginWithBalance.ID,
 			body: transferRequest{
-				AccountDestinationID: accDest.ID,
+				AccountDestinationID: accDest.ID.String(),
 				Amount:               100,
 			},
 			expectedBody: transferCreatedResponse{
-				AccountOriginID:      accOriginWithBalance.ID,
-				AccountDestinationID: accDest.ID,
+				AccountOriginID:      accOriginWithBalance.ID.String(),
+				AccountDestinationID: accDest.ID.String(),
 				Amount:               100,
 			},
 			expectedCode: http.StatusOK,
@@ -172,7 +172,7 @@ func TestCreateTransfer(t *testing.T) {
 			handler := NewHandler(r, usecase)
 
 			request := fakes.FakeRequest(http.MethodPost, "/transfers", tt.body)
-			token, _ := auth.NewToken(tt.accOriginID)
+			token, _ := auth.NewToken(tt.accOriginID.String())
 			bearerToken := fmt.Sprintf("Bearer %s", token)
 			request.Header.Add("Authorization", bearerToken)
 			response := httptest.NewRecorder()
