@@ -5,6 +5,8 @@ import (
 	"errors"
 	"net/http"
 
+	log "github.com/sirupsen/logrus"
+
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
 	"github.com/thalissonfelipe/banking/pkg/domain/transfer"
 	"github.com/thalissonfelipe/banking/pkg/domain/vos"
@@ -60,4 +62,6 @@ func (h Handler) CreateTransfer(w http.ResponseWriter, r *http.Request) {
 		Amount:               body.Amount,
 	}
 	responses.SendJSON(w, http.StatusOK, response)
+
+	log.Info("sucessful transfer")
 }

@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"github.com/jackc/pgx/v4"
+	log "github.com/sirupsen/logrus"
 
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
 	"github.com/thalissonfelipe/banking/pkg/domain/vos"
@@ -34,6 +35,7 @@ func (r Repository) GetAccountByID(ctx context.Context, id vos.ID) (*entities.Ac
 		&account.CreatedAt,
 	)
 	if err != nil {
+		log.WithError(err).Error("unable to get account by id")
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, entities.ErrAccountDoesNotExist
 		}

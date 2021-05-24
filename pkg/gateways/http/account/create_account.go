@@ -5,6 +5,8 @@ import (
 	"errors"
 	"net/http"
 
+	log "github.com/sirupsen/logrus"
+
 	"github.com/thalissonfelipe/banking/pkg/domain/account"
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
 	"github.com/thalissonfelipe/banking/pkg/domain/vos"
@@ -50,4 +52,6 @@ func (h Handler) CreateAccount(w http.ResponseWriter, r *http.Request) {
 
 	accResponse := convertAccountToCreatedAccountResponse(acc)
 	responses.SendJSON(w, http.StatusCreated, accResponse)
+
+	log.Info("account successfully created")
 }
