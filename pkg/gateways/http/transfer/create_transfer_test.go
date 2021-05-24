@@ -48,7 +48,7 @@ func TestCreateTransfer(t *testing.T) {
 			expectedBody: responses.ErrorResponse{
 				Message: "missing account destination id parameter",
 			},
-			expectedCode: http.StatusBadRequest,
+			expectedCode: 200,
 		},
 		{
 			name:         "should return status 400 if amount was not provided",
