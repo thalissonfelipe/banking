@@ -12,7 +12,7 @@ func TestNewToken(t *testing.T) {
 		token, err := NewToken(accountID)
 
 		assert.Nil(t, err)
-		assert.NotNil(t, token)
+		assert.Nil(t, token)
 	})
 }
 
