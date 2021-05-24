@@ -3,6 +3,7 @@ package account
 import (
 	"context"
 
+	log "github.com/sirupsen/logrus"
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
 )
 
@@ -29,6 +30,7 @@ func (r Repository) PostAccount(ctx context.Context, account *entities.Account) 
 		&account.CreatedAt,
 	)
 	if err != nil {
+		log.WithError(err).Error("unable to create a new account")
 		return err
 	}
 

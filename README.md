@@ -67,7 +67,7 @@ make test
 
 - [ ] Improve endpoints documentation.
 - [ ] Add swagger.
-- [ ] Add logger.
+- [x] Add logger.
 - [ ] Add integration tests.
 - [ ] Add coverage tests.
 - [ ] Add unit tests for repository methods.

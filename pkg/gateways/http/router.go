@@ -13,6 +13,7 @@ import (
 	"github.com/thalissonfelipe/banking/pkg/gateways/hash"
 	acc_handler "github.com/thalissonfelipe/banking/pkg/gateways/http/account"
 	auth_handler "github.com/thalissonfelipe/banking/pkg/gateways/http/auth"
+	"github.com/thalissonfelipe/banking/pkg/gateways/http/middlewares"
 	tr_handler "github.com/thalissonfelipe/banking/pkg/gateways/http/transfer"
 	"github.com/thalissonfelipe/banking/pkg/services/auth"
 )
@@ -33,6 +34,8 @@ func NewRouter(db *pgx.Conn) http.Handler {
 	acc_handler.NewHandler(router, accountUsecase)
 	auth_handler.NewHandler(router, authService)
 	tr_handler.NewHandler(router, transferUsecase)
+
+	router.Use(middlewares.LogMiddleware)
 
 	return router
 }

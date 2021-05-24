@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"github.com/jackc/pgx/v4"
+	log "github.com/sirupsen/logrus"
 
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
 )
@@ -33,6 +34,7 @@ func (r Repository) GetAccountByCPF(ctx context.Context, cpf string) (*entities.
 		&account.CreatedAt,
 	)
 	if err != nil {
+		log.WithError(err).Error("unable to get account by cpf")
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, entities.ErrAccountDoesNotExist
 		}

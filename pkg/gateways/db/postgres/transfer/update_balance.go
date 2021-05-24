@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/jackc/pgx/v4"
+	log "github.com/sirupsen/logrus"
 
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
 	"github.com/thalissonfelipe/banking/pkg/domain/vos"
@@ -14,6 +15,7 @@ func (r Repository) UpdateBalance(ctx context.Context, transfer *entities.Transf
 	// Tutorial: https://www.sohamkamani.com/golang/sql-transactions/
 	tx, err := r.db.Begin(ctx)
 	if err != nil {
+		log.WithError(err).Error("unexpected error ocurred on begin starting transaction")
 		return err
 	}
 
@@ -21,15 +23,18 @@ func (r Repository) UpdateBalance(ctx context.Context, transfer *entities.Transf
 
 	err = r.updateBalance(ctx, tx, -transfer.Amount, transfer.AccountOriginID)
 	if err != nil {
+		log.WithError(err).Error("unexpected error ocurred while updating account origin balance: doing a rollback")
 		return err
 	}
 
 	err = r.updateBalance(ctx, tx, transfer.Amount, transfer.AccountDestinationID)
+	log.WithError(err).Error("unexpected error ocurred while updating account destination balance: doing a rollback")
 	if err != nil {
 		return err
 	}
 
 	err = r.saveTransfer(ctx, tx, transfer)
+	log.WithError(err).Error("unable to save transfer: doing a rollback")
 	if err != nil {
 		return err
 	}

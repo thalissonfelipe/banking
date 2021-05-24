@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 
+	log "github.com/sirupsen/logrus"
+
 	"github.com/thalissonfelipe/banking/pkg/domain/account"
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
 	"github.com/thalissonfelipe/banking/pkg/domain/vos"
@@ -20,6 +22,7 @@ func (a Account) CreateAccount(ctx context.Context, input account.CreateAccountI
 
 	hashedSecret, err := a.encrypter.Hash(input.Secret.String())
 	if err != nil {
+		log.WithError(err).Error("unable to hash the password")
 		return nil, entities.ErrInternalError
 	}
 
