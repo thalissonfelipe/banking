@@ -79,3 +79,4 @@ make test
 - [x] Change id saved in the bank to be a UUID type (currently the id is being saved as a string).
 - [x] Move created_at timestamp to PostgreSQL responsability.
 - [ ] Add CORS middleware.
+- [ ] Change the error response of the login route (return only one http status and one message to avoid enumeration attacks, an ideia is to use http status 400 and something like "Invalid cpf and/or secret.").
