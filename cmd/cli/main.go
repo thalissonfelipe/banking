@@ -4,9 +4,10 @@ import (
 	"log"
 	"os"
 
+	"github.com/urfave/cli/v2"
+
 	"github.com/thalissonfelipe/banking/pkg/config"
 	"github.com/thalissonfelipe/banking/pkg/gateways/db/postgres"
-	"github.com/urfave/cli/v2"
 )
 
 func main() {

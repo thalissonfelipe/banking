@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
+
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
 )
 

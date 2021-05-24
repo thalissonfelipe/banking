@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+
 	"github.com/thalissonfelipe/banking/pkg/domain/account"
 )
 
