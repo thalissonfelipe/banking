@@ -4,6 +4,8 @@ import (
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
+	log "github.com/sirupsen/logrus"
+
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
 )
 
@@ -36,7 +38,11 @@ func IsValidToken(tokenString string) error {
 	token, err := jwt.Parse(tokenString, func(t *jwt.Token) (interface{}, error) {
 		return jwtKey, nil
 	})
-	if err != nil || !token.Valid {
+	if err != nil {
+		log.WithError(err).Error("unexpected error ocurred during parse jwt")
+		return ErrUnauthorized
+	}
+	if !token.Valid {
 		return ErrUnauthorized
 	}
 

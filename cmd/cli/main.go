@@ -1,13 +1,19 @@
 package main
 
 import (
-	"log"
 	"os"
+
+	log "github.com/sirupsen/logrus"
 
 	"github.com/thalissonfelipe/banking/pkg/config"
 	"github.com/thalissonfelipe/banking/pkg/gateways/db/postgres"
 	"github.com/urfave/cli/v2"
 )
+
+func init() {
+	log.SetOutput(os.Stdout)
+	log.SetFormatter(&log.JSONFormatter{})
+}
 
 func main() {
 	app := &cli.App{
@@ -23,11 +29,11 @@ func main() {
 						Action: func(c *cli.Context) error {
 							cfg, err := config.LoadConfig()
 							if err != nil {
-								log.Fatalf("unable to load config: %s", err.Error())
+								log.WithError(err).Fatal("unable to load config from cli")
 							}
 							m, err := postgres.GetMigrationHandler(cfg.Postgres.DSN())
 							if err != nil {
-								log.Fatal(err)
+								log.WithError(err).Fatal("unable to run migrations from cli")
 							}
 							return m.Up()
 						},
@@ -38,11 +44,11 @@ func main() {
 						Action: func(c *cli.Context) error {
 							cfg, err := config.LoadConfig()
 							if err != nil {
-								log.Fatalf("unable to load config: %s", err.Error())
+								log.WithError(err).Fatal("unable to load config cli")
 							}
 							m, err := postgres.GetMigrationHandler(cfg.Postgres.DSN())
 							if err != nil {
-								log.Fatal(err)
+								log.WithError(err).Fatal("unable to run migrations from cli")
 							}
 							return m.Down()
 						},
@@ -54,6 +60,6 @@ func main() {
 
 	err := app.Run(os.Args)
 	if err != nil {
-		log.Fatal(err)
+		log.WithError(err).Fatal("unable to run app")
 	}
 }

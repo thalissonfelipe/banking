@@ -2,6 +2,8 @@ package auth
 
 import (
 	"context"
+
+	log "github.com/sirupsen/logrus"
 )
 
 func (a Auth) Autheticate(ctx context.Context, input AuthenticateInput) (string, error) {
@@ -15,10 +17,15 @@ func (a Auth) Autheticate(ctx context.Context, input AuthenticateInput) (string,
 
 	err = a.encrypter.CompareHashAndSecret(hashedSecret, secret)
 	if err != nil {
+		log.WithError(err).Error("unable to compare hashed password with input password")
 		return "", ErrSecretDoesNotMatch
 	}
 
 	token, err := NewToken(acc.ID.String())
+	if err != nil {
+		log.WithError(err).Error("unable to create a new token")
+		return "", err
+	}
 
-	return token, err
+	return token, nil
 }
