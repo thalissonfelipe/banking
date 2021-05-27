@@ -6,18 +6,12 @@ import (
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
 )
 
-func (r Repository) GetAccounts(ctx context.Context) ([]entities.Account, error) {
-	const query = `
-		SELECT
-			id,
-			name,
-			cpf,
-			balance,
-			created_at
-		FROM accounts
-	`
+const getAccountsQuery = `
+select id, name, cpf, balance, created_at from accounts
+`
 
-	rows, err := r.db.Query(ctx, query)
+func (r Repository) GetAccounts(ctx context.Context) ([]entities.Account, error) {
+	rows, err := r.db.Query(ctx, getAccountsQuery)
 	if err != nil {
 		return nil, err
 	}
