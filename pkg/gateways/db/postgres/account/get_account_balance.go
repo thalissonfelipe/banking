@@ -10,16 +10,14 @@ import (
 	"github.com/thalissonfelipe/banking/pkg/domain/vos"
 )
 
-func (r Repository) GetBalanceByID(ctx context.Context, id vos.ID) (int, error) {
-	query := `
-		SELECT
-			balance
-		FROM accounts
-		WHERE id=$1
-	`
+const getBalanceQuery = `
+select balance from accounts where id=$1
+`
 
+func (r Repository) GetBalanceByID(ctx context.Context, id vos.ID) (int, error) {
 	var balance int
-	err := r.db.QueryRow(ctx, query, id).Scan(&balance)
+
+	err := r.db.QueryRow(ctx, getBalanceQuery, id).Scan(&balance)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return 0, entities.ErrAccountDoesNotExist
