@@ -27,7 +27,7 @@ func TestLogin(t *testing.T) {
 
 	testCases := []struct {
 		name         string
-		usecase      account.UseCase
+		usecase      account.Usecase
 		enc          account.Encrypter
 		body         interface{}
 		decoder      tests.Decoder

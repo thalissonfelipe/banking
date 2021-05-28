@@ -7,12 +7,12 @@ import (
 
 type Transfer struct {
 	repository     transfer.Repository
-	accountUseCase account.UseCase
+	accountUsecase account.Usecase
 }
 
-func NewTransferUsecase(repo transfer.Repository, accUseCase account.UseCase) *Transfer {
+func NewTransferUsecase(repo transfer.Repository, accUsecase account.Usecase) *Transfer {
 	return &Transfer{
 		repository:     repo,
-		accountUseCase: accUseCase,
+		accountUsecase: accUsecase,
 	}
 }

@@ -9,7 +9,7 @@ import (
 )
 
 func (t Transfer) CreateTransfer(ctx context.Context, input transfer.CreateTransferInput) error {
-	accOrigin, err := t.accountUseCase.GetAccountByID(ctx, input.AccountOriginID)
+	accOrigin, err := t.accountUsecase.GetAccountByID(ctx, input.AccountOriginID)
 	if err != nil {
 		if errors.Is(err, entities.ErrAccountDoesNotExist) {
 			return err
@@ -17,7 +17,7 @@ func (t Transfer) CreateTransfer(ctx context.Context, input transfer.CreateTrans
 		return entities.ErrInternalError
 	}
 
-	_, err = t.accountUseCase.GetAccountByID(ctx, input.AccountDestinationID)
+	_, err = t.accountUsecase.GetAccountByID(ctx, input.AccountDestinationID)
 	if err != nil {
 		if errors.Is(err, entities.ErrAccountDoesNotExist) {
 			return entities.ErrAccountDestinationDoesNotExist
