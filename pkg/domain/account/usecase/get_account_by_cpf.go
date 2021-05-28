@@ -5,9 +5,10 @@ import (
 	"errors"
 
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
+	"github.com/thalissonfelipe/banking/pkg/domain/vos"
 )
 
-func (a Account) GetAccountByCPF(ctx context.Context, cpf string) (*entities.Account, error) {
+func (a Account) GetAccountByCPF(ctx context.Context, cpf vos.CPF) (*entities.Account, error) {
 	acc, err := a.repository.GetAccountByCPF(ctx, cpf)
 	if err != nil {
 		if !errors.Is(err, entities.ErrAccountDoesNotExist) {

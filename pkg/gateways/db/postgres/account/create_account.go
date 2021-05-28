@@ -6,20 +6,14 @@ import (
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
 )
 
-func (r Repository) PostAccount(ctx context.Context, account *entities.Account) error {
-	const query = `
-		INSERT INTO accounts (
-			id,
-			name,
-			cpf,
-			secret,
-			balance
-		) VALUES (
-			$1, $2, $3, $4, $5
-		) RETURNING created_at
-	`
+const createAccountQuery = `
+insert into accounts (id, name, cpf, secret, balance)
+values ($1, $2, $3, $4, $5)
+returning created_at
+`
 
-	err := r.db.QueryRow(ctx, query,
+func (r Repository) CreateAccount(ctx context.Context, account *entities.Account) error {
+	err := r.db.QueryRow(ctx, createAccountQuery,
 		account.ID,
 		account.Name,
 		account.CPF.String(),

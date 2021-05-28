@@ -10,7 +10,7 @@ import (
 )
 
 func (a Account) CreateAccount(ctx context.Context, input account.CreateAccountInput) (*entities.Account, error) {
-	_, err := a.repository.GetAccountByCPF(ctx, input.CPF.String())
+	_, err := a.repository.GetAccountByCPF(ctx, input.CPF)
 	if errors.Is(err, nil) {
 		return nil, entities.ErrAccountAlreadyExists
 	}
@@ -24,7 +24,7 @@ func (a Account) CreateAccount(ctx context.Context, input account.CreateAccountI
 	}
 
 	acc := entities.NewAccount(input.Name, input.CPF, vos.NewSecret(string(hashedSecret)))
-	err = a.repository.PostAccount(ctx, &acc)
+	err = a.repository.CreateAccount(ctx, &acc)
 	if err != nil {
 		return nil, entities.ErrInternalError
 	}

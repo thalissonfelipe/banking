@@ -9,5 +9,5 @@ import (
 
 type Repository interface {
 	GetTransfers(ctx context.Context, id vos.ID) ([]entities.Transfer, error)
-	UpdateBalance(ctx context.Context, transfer *entities.Transfer) error
+	CreateTransfer(ctx context.Context, transfer *entities.Transfer) error
 }

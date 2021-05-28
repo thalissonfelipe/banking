@@ -10,22 +10,16 @@ import (
 	"github.com/thalissonfelipe/banking/pkg/domain/vos"
 )
 
-func (r Repository) GetAccountByID(ctx context.Context, id vos.ID) (*entities.Account, error) {
-	const query = `
-		SELECT
-			id,
-			name,
-			cpf,
-			secret,
-			balance,
-			created_at
-		FROM
-			accounts
-		WHERE
-			id=$1`
+const getAccountByIDQuery = `
+select id, name, cpf, secret, balance, created_at
+from accounts
+where id=$1
+`
 
+func (r Repository) GetAccountByID(ctx context.Context, id vos.ID) (*entities.Account, error) {
 	var account entities.Account
-	err := r.db.QueryRow(ctx, query, id).Scan(
+
+	err := r.db.QueryRow(ctx, getAccountByIDQuery, id).Scan(
 		&account.ID,
 		&account.Name,
 		&account.CPF,

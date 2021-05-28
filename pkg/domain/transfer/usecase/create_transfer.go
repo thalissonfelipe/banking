@@ -34,7 +34,7 @@ func (t Transfer) CreateTransfer(ctx context.Context, input transfer.CreateTrans
 		input.AccountDestinationID,
 		input.Amount,
 	)
-	err = t.repository.UpdateBalance(ctx, &transfer)
+	err = t.repository.CreateTransfer(ctx, &transfer)
 	if err != nil {
 		return entities.ErrInternalError
 	}
