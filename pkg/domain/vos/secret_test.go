@@ -6,26 +6,27 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestSecretIsValid(t *testing.T) {
+func TestNewSecret(t *testing.T) {
 	testCases := []struct {
-		name     string
-		secret   string
-		expected bool
+		name           string
+		secret         string
+		expectedSecret string
+		expectedErr    error
 	}{
-		{"secret must be valid", "aZ1234Ds", true},
-		{"secret without uppercase characters", "az1234ds", false},
-		{"secret without lowercase characters", "AZ1234DS", false},
-		{"secret without numbers", "azHJKLds", false},
-		{"secret less than 8 characters", "aZ1234D", false},
-		{"secret with more than 20 characters", "aZ1234DsaZ1234DsERty0", false},
+		{"secret must be valid", "aZ1234Ds", "aZ1234Ds", nil},
+		{"secret without uppercase characters", "az1234ds", "", ErrInvalidSecret},
+		{"secret without lowercase characters", "AZ1234DS", "", ErrInvalidSecret},
+		{"secret without numbers", "azHJKLds", "", ErrInvalidSecret},
+		{"secret less than 8 characters", "aZ1234D", "", ErrInvalidSecret},
+		{"secret with more than 20 characters", "aZ1234DsaZ1234DsERty0", "", ErrInvalidSecret},
 	}
 
 	for _, tt := range testCases {
 		t.Run(tt.name, func(t *testing.T) {
-			secret := NewSecret(tt.secret)
-			result := secret.IsValid()
+			secret, err := NewSecret(tt.secret)
 
-			assert.Equal(t, tt.expected, result)
+			assert.Equal(t, tt.expectedSecret, secret.String())
+			assert.Equal(t, tt.expectedErr, err)
 		})
 	}
 }

@@ -28,7 +28,7 @@ func TestRepository_GetAccountByID(t *testing.T) {
 	acc := entities.NewAccount(
 		"Maria",
 		testdata.GetValidCPF(),
-		vos.NewSecret("12345678"),
+		testdata.GetValidSecret(),
 	)
 
 	err = r.CreateAccount(ctx, &acc)

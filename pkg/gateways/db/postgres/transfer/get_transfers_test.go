@@ -24,9 +24,18 @@ func TestRepository_GetTransfers(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Len(t, transfers, 0)
 
-	acc1 := entities.NewAccount("Maria", testdata.GetValidCPF(), vos.NewSecret("12345678"))
+	acc1 := entities.NewAccount(
+		"Maria",
+		testdata.GetValidCPF(),
+		testdata.GetValidSecret(),
+	)
 	acc1.Balance = 100
-	acc2 := entities.NewAccount("Pedro", testdata.GetValidCPF(), vos.NewSecret("12345678"))
+
+	acc2 := entities.NewAccount(
+		"Pedro",
+		testdata.GetValidCPF(),
+		testdata.GetValidSecret(),
+	)
 
 	err = accRepository.CreateAccount(ctx, &acc1)
 	assert.NoError(t, err)

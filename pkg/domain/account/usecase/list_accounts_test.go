@@ -8,13 +8,13 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
-	"github.com/thalissonfelipe/banking/pkg/domain/vos"
 	"github.com/thalissonfelipe/banking/pkg/tests/mocks"
 	"github.com/thalissonfelipe/banking/pkg/tests/testdata"
 )
 
 func TestUsecase_ListAccounts(t *testing.T) {
-	acc := entities.NewAccount("Piter", testdata.GetValidCPF(), vos.NewSecret("12345678"))
+	acc := entities.NewAccount("Piter", testdata.GetValidCPF(), testdata.GetValidSecret())
+
 	testCases := []struct {
 		name        string
 		repoSetup   *mocks.StubAccountRepository

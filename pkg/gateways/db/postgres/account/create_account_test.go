@@ -7,7 +7,6 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
-	"github.com/thalissonfelipe/banking/pkg/domain/vos"
 	"github.com/thalissonfelipe/banking/pkg/tests/testdata"
 )
 
@@ -19,7 +18,7 @@ func TestRepository_CreateAccount(t *testing.T) {
 	acc := entities.NewAccount(
 		"Maria",
 		testdata.GetValidCPF(),
-		vos.NewSecret("12345678"),
+		testdata.GetValidSecret(),
 	)
 
 	assert.Empty(t, acc.CreatedAt)

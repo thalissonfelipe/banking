@@ -12,8 +12,8 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/thalissonfelipe/banking/pkg/domain/account"
+	"github.com/thalissonfelipe/banking/pkg/domain/encrypter"
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
-	"github.com/thalissonfelipe/banking/pkg/domain/vos"
 	"github.com/thalissonfelipe/banking/pkg/gateways/http/responses"
 	"github.com/thalissonfelipe/banking/pkg/services/auth"
 	"github.com/thalissonfelipe/banking/pkg/tests"
@@ -24,11 +24,12 @@ import (
 
 func TestLogin(t *testing.T) {
 	cpf := testdata.GetValidCPF()
+	secret := testdata.GetValidSecret()
 
 	testCases := []struct {
 		name         string
 		usecase      account.UseCase
-		enc          account.Encrypter
+		enc          encrypter.Encrypter
 		body         interface{}
 		decoder      tests.Decoder
 		expectedBody interface{}
@@ -38,7 +39,7 @@ func TestLogin(t *testing.T) {
 			name:         "should return status code 400 if cpf was not provided",
 			usecase:      mocks.StubAccountUsecase{},
 			enc:          mocks.StubHash{},
-			body:         requestBody{Secret: "12345678"},
+			body:         requestBody{Secret: secret.String()},
 			decoder:      tests.ErrorMessageDecoder{},
 			expectedBody: responses.ErrorResponse{Message: "missing cpf parameter"},
 			expectedCode: http.StatusBadRequest,
@@ -53,7 +54,7 @@ func TestLogin(t *testing.T) {
 			expectedCode: http.StatusBadRequest,
 		},
 		{
-			name:    "should return status code 400 if secret was not provided",
+			name:    "should return status code 400 if json provided was not valid",
 			usecase: mocks.StubAccountUsecase{},
 			enc:     mocks.StubHash{},
 			body: map[string]interface{}{
@@ -69,7 +70,7 @@ func TestLogin(t *testing.T) {
 				Err: errors.New("usecase fails"),
 			},
 			enc:          mocks.StubHash{},
-			body:         requestBody{CPF: cpf.String(), Secret: "12345678"},
+			body:         requestBody{CPF: cpf.String(), Secret: secret.String()},
 			decoder:      tests.ErrorMessageDecoder{},
 			expectedBody: responses.ErrorResponse{Message: "internal server error"},
 			expectedCode: http.StatusInternalServerError,
@@ -78,7 +79,7 @@ func TestLogin(t *testing.T) {
 			name:         "should return status code 404 if account does not exist",
 			usecase:      mocks.StubAccountUsecase{},
 			enc:          mocks.StubHash{},
-			body:         requestBody{CPF: cpf.String(), Secret: "12345678"},
+			body:         requestBody{CPF: cpf.String(), Secret: secret.String()},
 			decoder:      tests.ErrorMessageDecoder{},
 			expectedBody: responses.ErrorResponse{Message: "account does not exist"},
 			expectedCode: http.StatusNotFound,
@@ -87,7 +88,7 @@ func TestLogin(t *testing.T) {
 			name: "should return status code 400 if secret was not correct",
 			usecase: mocks.StubAccountUsecase{
 				Accounts: []entities.Account{
-					entities.NewAccount("Pedro", cpf, vos.NewSecret("87654321")),
+					entities.NewAccount("Pedro", cpf, secret),
 				},
 			},
 			enc:          mocks.StubHash{Err: auth.ErrSecretDoesNotMatch},
@@ -100,11 +101,11 @@ func TestLogin(t *testing.T) {
 			name: "should authenticate successfully and return a token",
 			usecase: mocks.StubAccountUsecase{
 				Accounts: []entities.Account{
-					entities.NewAccount("Pedro", cpf, vos.NewSecret("12345678")),
+					entities.NewAccount("Pedro", cpf, secret),
 				},
 			},
 			enc:          mocks.StubHash{},
-			body:         requestBody{CPF: cpf.String(), Secret: "12345678"},
+			body:         requestBody{CPF: cpf.String(), Secret: secret.String()},
 			decoder:      responseBodyDecoder{},
 			expectedBody: responseBody{},
 			expectedCode: http.StatusOK,
