@@ -9,11 +9,12 @@ import (
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
 	"github.com/thalissonfelipe/banking/pkg/domain/vos"
 	"github.com/thalissonfelipe/banking/pkg/tests/mocks"
+	"github.com/thalissonfelipe/banking/pkg/tests/testdata"
 )
 
 func TestUsecase_GetBalanceByAccountID(t *testing.T) {
-	accBalanceDefault := entities.NewAccount("Piter", vos.NewCPF("123.456.789-00"), vos.NewSecret("12345678"))
-	accBalance100 := entities.NewAccount("Piter", vos.NewCPF("123.456.789-00"), vos.NewSecret("12345678"))
+	accBalanceDefault := entities.NewAccount("Piter", testdata.GetValidCPF(), vos.NewSecret("12345678"))
+	accBalance100 := entities.NewAccount("Piter", testdata.GetValidCPF(), vos.NewSecret("12345678"))
 	accBalance100.Balance = 100
 
 	testCases := []struct {

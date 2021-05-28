@@ -9,6 +9,7 @@ import (
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
 	"github.com/thalissonfelipe/banking/pkg/domain/vos"
 	"github.com/thalissonfelipe/banking/pkg/tests/dockertest"
+	"github.com/thalissonfelipe/banking/pkg/tests/testdata"
 )
 
 func TestRepository_GetAccountByCPF(t *testing.T) {
@@ -18,15 +19,14 @@ func TestRepository_GetAccountByCPF(t *testing.T) {
 
 	defer dockertest.TruncateTables(ctx, db)
 
-	randomCPF := vos.NewCPF("123-456-789-00")
-	a, err := r.GetAccountByCPF(ctx, randomCPF)
+	a, err := r.GetAccountByCPF(ctx, testdata.GetValidCPF())
 
 	assert.Equal(t, entities.ErrAccountDoesNotExist, err)
 	assert.Nil(t, a)
 
 	acc := entities.NewAccount(
 		"Maria",
-		vos.NewCPF("123.456.789-00"),
+		testdata.GetValidCPF(),
 		vos.NewSecret("12345678"),
 	)
 

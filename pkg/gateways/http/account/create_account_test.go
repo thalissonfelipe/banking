@@ -18,9 +18,12 @@ import (
 	"github.com/thalissonfelipe/banking/pkg/tests"
 	"github.com/thalissonfelipe/banking/pkg/tests/fakes"
 	"github.com/thalissonfelipe/banking/pkg/tests/mocks"
+	"github.com/thalissonfelipe/banking/pkg/tests/testdata"
 )
 
 func TestHandler_CreateAccount(t *testing.T) {
+	cpf := testdata.GetValidCPF()
+
 	testCases := []struct {
 		name         string
 		repo         *mocks.StubAccountRepository
@@ -35,7 +38,7 @@ func TestHandler_CreateAccount(t *testing.T) {
 			repo:         &mocks.StubAccountRepository{},
 			enc:          &mocks.StubHash{},
 			decoder:      tests.ErrorMessageDecoder{},
-			body:         requestBody{CPF: "123.456.789-00", Secret: "12345678"},
+			body:         requestBody{CPF: cpf.String(), Secret: "12345678"},
 			expectedBody: responses.ErrorResponse{Message: "missing name parameter"},
 			expectedCode: http.StatusBadRequest,
 		},
@@ -53,7 +56,7 @@ func TestHandler_CreateAccount(t *testing.T) {
 			repo:         &mocks.StubAccountRepository{},
 			enc:          &mocks.StubHash{},
 			decoder:      tests.ErrorMessageDecoder{},
-			body:         requestBody{Name: "Pedro", CPF: "123.456.789-00"},
+			body:         requestBody{Name: "Pedro", CPF: cpf.String()},
 			expectedBody: responses.ErrorResponse{Message: "missing secret parameter"},
 			expectedCode: http.StatusBadRequest,
 		},
@@ -80,7 +83,7 @@ func TestHandler_CreateAccount(t *testing.T) {
 			repo:         &mocks.StubAccountRepository{},
 			enc:          &mocks.StubHash{},
 			decoder:      tests.ErrorMessageDecoder{},
-			body:         requestBody{Name: "Pedro", CPF: "648.446.967-93", Secret: "12345678"},
+			body:         requestBody{Name: "Pedro", CPF: cpf.String(), Secret: "12345678"},
 			expectedBody: responses.ErrorResponse{Message: "invalid secret"},
 			expectedCode: http.StatusBadRequest,
 		},
@@ -88,12 +91,12 @@ func TestHandler_CreateAccount(t *testing.T) {
 			name: "should return status code 409 if cpf already exists",
 			repo: &mocks.StubAccountRepository{
 				Accounts: []entities.Account{entities.NewAccount(
-					"Junior", vos.NewCPF("648.446.967-93"), vos.NewSecret("aS1234Dz"),
+					"Junior", cpf, vos.NewSecret("aS1234Dz"),
 				)},
 			},
 			enc:          &mocks.StubHash{},
 			decoder:      tests.ErrorMessageDecoder{},
-			body:         requestBody{Name: "Pedro", CPF: "648.446.967-93", Secret: "As1234dZ"},
+			body:         requestBody{Name: "Pedro", CPF: cpf.String(), Secret: "As1234dZ"},
 			expectedBody: responses.ErrorResponse{Message: "account already exists"},
 			expectedCode: http.StatusConflict,
 		},
@@ -104,7 +107,7 @@ func TestHandler_CreateAccount(t *testing.T) {
 			},
 			enc:          &mocks.StubHash{},
 			decoder:      tests.ErrorMessageDecoder{},
-			body:         requestBody{Name: "Pedro", CPF: "648.446.967-93", Secret: "As1234dZ"},
+			body:         requestBody{Name: "Pedro", CPF: cpf.String(), Secret: "As1234dZ"},
 			expectedBody: responses.ErrorResponse{Message: "internal server error"},
 			expectedCode: http.StatusInternalServerError,
 		},
@@ -115,7 +118,7 @@ func TestHandler_CreateAccount(t *testing.T) {
 			},
 			enc:          &mocks.StubHash{Err: errors.New("hash error")},
 			decoder:      tests.ErrorMessageDecoder{},
-			body:         requestBody{Name: "Pedro", CPF: "648.446.967-93", Secret: "As1234dZ"},
+			body:         requestBody{Name: "Pedro", CPF: cpf.String(), Secret: "As1234dZ"},
 			expectedBody: responses.ErrorResponse{Message: "internal server error"},
 			expectedCode: http.StatusInternalServerError,
 		},
@@ -124,8 +127,8 @@ func TestHandler_CreateAccount(t *testing.T) {
 			repo:         &mocks.StubAccountRepository{},
 			enc:          &mocks.StubHash{},
 			decoder:      createdAccountDecoder{},
-			body:         requestBody{Name: "Pedro", CPF: "648.446.967-93", Secret: "As1234dZ"},
-			expectedBody: createdAccountResponse{Name: "Pedro", CPF: "648.446.967-93", Balance: 0},
+			body:         requestBody{Name: "Pedro", CPF: cpf.String(), Secret: "As1234dZ"},
+			expectedBody: createdAccountResponse{Name: "Pedro", CPF: cpf.String(), Balance: 0},
 			expectedCode: http.StatusCreated,
 		},
 	}

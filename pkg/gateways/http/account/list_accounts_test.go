@@ -18,10 +18,12 @@ import (
 	"github.com/thalissonfelipe/banking/pkg/tests"
 	"github.com/thalissonfelipe/banking/pkg/tests/fakes"
 	"github.com/thalissonfelipe/banking/pkg/tests/mocks"
+	"github.com/thalissonfelipe/banking/pkg/tests/testdata"
 )
 
 func TestHandler_ListAccounts(t *testing.T) {
-	acc := entities.NewAccount("Pedro", vos.NewCPF("123.456.789-00"), vos.NewSecret("12345678"))
+	acc := entities.NewAccount("Pedro", testdata.GetValidCPF(), vos.NewSecret("12345678"))
+
 	testCases := []struct {
 		name         string
 		repoSetup    *mocks.StubAccountRepository

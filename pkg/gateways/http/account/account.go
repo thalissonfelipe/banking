@@ -12,7 +12,6 @@ var (
 	errMissingCPFParameter    = errors.New("missing cpf parameter")
 	errMissingSecretParameter = errors.New("missing secret parameter")
 	errInvalidJSON            = errors.New("invalid json")
-	errInvalidCPF             = errors.New("invalid cpf")
 	errInvalidSecret          = errors.New("invalid secret")
 )
 

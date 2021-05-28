@@ -7,6 +7,8 @@ import (
 	"github.com/Nhanderu/brdoc"
 )
 
+var ErrInvalidCPF = errors.New("invalid cpf")
+
 type CPF struct {
 	value string
 }
@@ -22,8 +24,13 @@ func (c CPF) String() string {
 	return c.value
 }
 
-func NewCPF(cpf string) CPF {
-	return CPF{value: cpf}
+func NewCPF(cpf string) (CPF, error) {
+	c := CPF{value: cpf}
+	if !c.IsValid() {
+		return CPF{}, ErrInvalidCPF
+	}
+
+	return c, nil
 }
 
 func (c CPF) Value() (driver.Value, error) {

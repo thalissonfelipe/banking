@@ -9,6 +9,7 @@ import (
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
 	"github.com/thalissonfelipe/banking/pkg/domain/vos"
 	"github.com/thalissonfelipe/banking/pkg/gateways/db/postgres/account"
+	"github.com/thalissonfelipe/banking/pkg/tests/testdata"
 )
 
 func TestRepository_CreateTransfer(t *testing.T) {
@@ -17,9 +18,9 @@ func TestRepository_CreateTransfer(t *testing.T) {
 	r := NewRepository(db)
 	ctx := context.Background()
 
-	acc1 := entities.NewAccount("Maria", vos.NewCPF("123.456.789-00"), vos.NewSecret("12345678"))
+	acc1 := entities.NewAccount("Maria", testdata.GetValidCPF(), vos.NewSecret("12345678"))
 	acc1.Balance = 0
-	acc2 := entities.NewAccount("Pedro", vos.NewCPF("123.456.789-11"), vos.NewSecret("12345678"))
+	acc2 := entities.NewAccount("Pedro", testdata.GetValidCPF(), vos.NewSecret("12345678"))
 
 	err := accRepository.CreateAccount(ctx, &acc1)
 	assert.NoError(t, err)
