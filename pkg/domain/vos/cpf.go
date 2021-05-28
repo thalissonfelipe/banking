@@ -7,7 +7,7 @@ import (
 	"github.com/Nhanderu/brdoc"
 )
 
-var errInvalidCPF = errors.New("invalid cpf")
+var ErrInvalidCPF = errors.New("invalid cpf")
 
 type CPF struct {
 	value string
@@ -27,7 +27,7 @@ func (c CPF) String() string {
 func NewCPF(cpf string) (CPF, error) {
 	c := CPF{value: cpf}
 	if !c.IsValid() {
-		return CPF{}, errInvalidCPF
+		return CPF{}, ErrInvalidCPF
 	}
 
 	return c, nil

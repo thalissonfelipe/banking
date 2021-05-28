@@ -18,11 +18,11 @@ func TestNewCPF(t *testing.T) {
 		{"cpf must be valid #3", "871.957.260-37", "871.957.260-37", nil},
 		{"cpf must be valid #4", "64844696793", "64844696793", nil},
 		{"cpf must be valid #5", "62641322846", "62641322846", nil},
-		{"cpf must be invalid #2", "000.000.000-00", "", errInvalidCPF},
-		{"cpf must be invalid #1", "111.111.111-11", "", errInvalidCPF},
-		{"cpf must be invalid #3", "222.222.222-33", "", errInvalidCPF},
-		{"cpf must be invalid #4", "123.456.789-01", "", errInvalidCPF},
-		{"cpf must be invalid #4", "00000000000", "", errInvalidCPF},
+		{"cpf must be invalid #2", "000.000.000-00", "", ErrInvalidCPF},
+		{"cpf must be invalid #1", "111.111.111-11", "", ErrInvalidCPF},
+		{"cpf must be invalid #3", "222.222.222-33", "", ErrInvalidCPF},
+		{"cpf must be invalid #4", "123.456.789-01", "", ErrInvalidCPF},
+		{"cpf must be invalid #4", "00000000000", "", ErrInvalidCPF},
 	}
 
 	for _, tt := range testCases {

@@ -37,7 +37,7 @@ func TestAuthenticate(t *testing.T) {
 			repo:  &mocks.StubAccountRepository{},
 			enc:   &mocks.StubHash{},
 			input: AuthenticateInput{CPF: "123.456.789-00", Secret: "12345678"},
-			err:   entities.ErrInvalidCPF,
+			err:   vos.ErrInvalidCPF,
 		},
 		{
 			name: "should return an error if usecase fails to fetch account",
