@@ -1,9 +1,14 @@
 package auth
 
-import "context"
+import (
+	"context"
+
+	"github.com/thalissonfelipe/banking/pkg/domain/vos"
+)
 
 func (a Auth) Autheticate(ctx context.Context, input AuthenticateInput) (string, error) {
-	acc, err := a.accountUsecase.GetAccountByCPF(ctx, input.CPF)
+	cpf := vos.NewCPF(input.CPF)
+	acc, err := a.accountUsecase.GetAccountByCPF(ctx, cpf)
 	if err != nil {
 		return "", err
 	}

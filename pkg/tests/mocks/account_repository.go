@@ -39,12 +39,12 @@ func (s *StubAccountRepository) PostAccount(ctx context.Context, account *entiti
 	return nil
 }
 
-func (s StubAccountRepository) GetAccountByCPF(ctx context.Context, cpf string) (*entities.Account, error) {
+func (s StubAccountRepository) GetAccountByCPF(ctx context.Context, cpf vos.CPF) (*entities.Account, error) {
 	if s.Err != nil {
 		return nil, s.Err
 	}
 	for _, acc := range s.Accounts {
-		if acc.CPF.String() == cpf {
+		if acc.CPF == cpf {
 			return &acc, nil
 		}
 	}
