@@ -20,7 +20,7 @@ import (
 	"github.com/thalissonfelipe/banking/pkg/tests/mocks"
 )
 
-func TestGetAccountBalance(t *testing.T) {
+func TestHandler_GetAccountBalance(t *testing.T) {
 	acc := entities.NewAccount("Pedro", vos.NewCPF("123.456.789-00"), vos.NewSecret("12345678"))
 
 	testCases := []struct {
@@ -84,7 +84,7 @@ func TestGetAccountBalance(t *testing.T) {
 	for _, tt := range testCases {
 		t.Run(tt.name, func(t *testing.T) {
 			r := mux.NewRouter()
-			usecase := usecase.NewAccountUseCase(tt.repo(), nil)
+			usecase := usecase.NewAccountUsecase(tt.repo(), nil)
 			handler := NewHandler(r, usecase)
 
 			request := fakes.FakeRequest(http.MethodGet, tt.requestURI, nil)

@@ -11,7 +11,7 @@ import (
 	"github.com/thalissonfelipe/banking/pkg/tests/mocks"
 )
 
-func TestGetBalanceByAccountID(t *testing.T) {
+func TestUsecase_GetBalanceByAccountID(t *testing.T) {
 	accBalanceDefault := entities.NewAccount("Piter", vos.NewCPF("123.456.789-00"), vos.NewSecret("12345678"))
 	accBalance100 := entities.NewAccount("Piter", vos.NewCPF("123.456.789-00"), vos.NewSecret("12345678"))
 	accBalance100.Balance = 100
@@ -58,7 +58,7 @@ func TestGetBalanceByAccountID(t *testing.T) {
 	for _, tt := range testCases {
 		t.Run(tt.name, func(t *testing.T) {
 			ctx := context.Background()
-			usecase := NewAccountUseCase(tt.repoSetup, nil)
+			usecase := NewAccountUsecase(tt.repoSetup, nil)
 			result, err := usecase.GetAccountBalanceByID(ctx, tt.accountId)
 
 			assert.Equal(t, tt.expected, result)

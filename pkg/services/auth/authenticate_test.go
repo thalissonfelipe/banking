@@ -67,7 +67,7 @@ func TestAuthenticate(t *testing.T) {
 	for _, tt := range testCases {
 		t.Run(tt.name, func(t *testing.T) {
 			ctx := context.Background()
-			accUsecase := usecase.NewAccountUseCase(tt.repo, nil)
+			accUsecase := usecase.NewAccountUsecase(tt.repo, nil)
 			service := NewAuth(accUsecase, tt.enc)
 
 			_, err := service.Autheticate(ctx, tt.input)

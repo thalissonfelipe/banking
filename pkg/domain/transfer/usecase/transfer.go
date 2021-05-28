@@ -10,7 +10,7 @@ type Transfer struct {
 	accountUseCase account.UseCase
 }
 
-func NewTransfer(repo transfer.Repository, accUseCase account.UseCase) *Transfer {
+func NewTransferUsecase(repo transfer.Repository, accUseCase account.UseCase) *Transfer {
 	return &Transfer{
 		repository:     repo,
 		accountUseCase: accUseCase,

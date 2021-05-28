@@ -21,10 +21,10 @@ func NewRouter(db *pgx.Conn) http.Handler {
 	// Set dependencies
 	hash := hash.Hash{}
 	accountRepo := acc_repo.NewRepository(db)
-	accountUsecase := acc_usecase.NewAccountUseCase(accountRepo, hash)
+	accountUsecase := acc_usecase.NewAccountUsecase(accountRepo, hash)
 	authService := auth.NewAuth(accountUsecase, hash)
 	transferRepo := tr_repo.NewRepository(db)
-	transferUsecase := tr_usecase.NewTransfer(transferRepo, accountUsecase)
+	transferUsecase := tr_usecase.NewTransferUsecase(transferRepo, accountUsecase)
 
 	// Register endpoints
 	router := mux.NewRouter()

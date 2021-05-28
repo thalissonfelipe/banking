@@ -20,7 +20,7 @@ import (
 	"github.com/thalissonfelipe/banking/pkg/tests/mocks"
 )
 
-func TestListAccounts(t *testing.T) {
+func TestHandler_ListAccounts(t *testing.T) {
 	acc := entities.NewAccount("Pedro", vos.NewCPF("123.456.789-00"), vos.NewSecret("12345678"))
 	testCases := []struct {
 		name         string
@@ -56,7 +56,7 @@ func TestListAccounts(t *testing.T) {
 
 	for _, tt := range testCases {
 		t.Run(tt.name, func(t *testing.T) {
-			accUseCase := usecase.NewAccountUseCase(tt.repoSetup, nil)
+			accUseCase := usecase.NewAccountUsecase(tt.repoSetup, nil)
 			r := mux.NewRouter()
 			handler := NewHandler(r, accUseCase)
 

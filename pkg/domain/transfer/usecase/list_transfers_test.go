@@ -12,7 +12,7 @@ import (
 	"github.com/thalissonfelipe/banking/pkg/tests/mocks"
 )
 
-func TestListTransfers(t *testing.T) {
+func TestUsecase_ListTransfers(t *testing.T) {
 	accountOriginID := vos.NewID()
 
 	testCases := []struct {
@@ -51,7 +51,7 @@ func TestListTransfers(t *testing.T) {
 	for _, tt := range testCases {
 		t.Run(tt.name, func(t *testing.T) {
 			ctx := context.Background()
-			usecase := NewTransfer(tt.repoSetup(), nil)
+			usecase := NewTransferUsecase(tt.repoSetup(), nil)
 			_, err := usecase.ListTransfers(ctx, tt.accountId)
 
 			// TODO: add result validation

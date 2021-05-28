@@ -13,7 +13,7 @@ import (
 	"github.com/thalissonfelipe/banking/pkg/tests/mocks"
 )
 
-func TestCreateAccount(t *testing.T) {
+func TestUsecase_CreateAccount(t *testing.T) {
 	validInput := account.NewCreateAccountInput(
 		"Pedro",
 		vos.NewCPF("648.446.967-93"),
@@ -73,7 +73,7 @@ func TestCreateAccount(t *testing.T) {
 	for _, tt := range testCases {
 		t.Run(tt.name, func(t *testing.T) {
 			ctx := context.Background()
-			usecase := NewAccountUseCase(tt.repoSetup(), tt.encSetup)
+			usecase := NewAccountUsecase(tt.repoSetup(), tt.encSetup)
 			_, err := usecase.CreateAccount(ctx, tt.input)
 
 			// TODO: add result validation

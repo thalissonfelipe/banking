@@ -22,7 +22,7 @@ import (
 	"github.com/thalissonfelipe/banking/pkg/tests/mocks"
 )
 
-func TestCreateTransfer(t *testing.T) {
+func TestHandler_CreateTransfer(t *testing.T) {
 	accOrigin := entities.NewAccount("Pedro", vos.NewCPF("123.456.789-00"), vos.NewSecret("12345678"))
 	accDest := entities.NewAccount("Maria", vos.NewCPF("123.456.789-11"), vos.NewSecret("12345678"))
 	accOriginWithBalance := entities.NewAccount("João", vos.NewCPF("123.456.789-22"), vos.NewSecret("12345678"))
@@ -31,7 +31,7 @@ func TestCreateTransfer(t *testing.T) {
 	testCases := []struct {
 		name         string
 		repo         *mocks.StubTransferRepository
-		accUsecase   *mocks.StubAccountUseCase
+		accUsecase   *mocks.StubAccountUsecase
 		decoder      tests.Decoder
 		accOriginID  vos.ID
 		body         interface{}
@@ -41,7 +41,7 @@ func TestCreateTransfer(t *testing.T) {
 		{
 			name:        "should return status 400 if account dest id was not provided",
 			repo:        &mocks.StubTransferRepository{},
-			accUsecase:  &mocks.StubAccountUseCase{},
+			accUsecase:  &mocks.StubAccountUsecase{},
 			decoder:     tests.ErrorMessageDecoder{},
 			accOriginID: accOrigin.ID,
 			body:        transferRequest{Amount: 100},
@@ -53,7 +53,7 @@ func TestCreateTransfer(t *testing.T) {
 		{
 			name:         "should return status 400 if amount was not provided",
 			repo:         &mocks.StubTransferRepository{},
-			accUsecase:   &mocks.StubAccountUseCase{},
+			accUsecase:   &mocks.StubAccountUsecase{},
 			decoder:      tests.ErrorMessageDecoder{},
 			accOriginID:  accOrigin.ID,
 			body:         transferRequest{AccountDestinationID: accDest.ID.String()},
@@ -63,7 +63,7 @@ func TestCreateTransfer(t *testing.T) {
 		{
 			name:        "should return status 400 an invalid json was provided",
 			repo:        &mocks.StubTransferRepository{},
-			accUsecase:  &mocks.StubAccountUseCase{},
+			accUsecase:  &mocks.StubAccountUsecase{},
 			decoder:     tests.ErrorMessageDecoder{},
 			accOriginID: accOrigin.ID,
 			body: map[string]interface{}{
@@ -75,7 +75,7 @@ func TestCreateTransfer(t *testing.T) {
 		{
 			name:        "should return status 404 if acc origin does not exist",
 			repo:        &mocks.StubTransferRepository{},
-			accUsecase:  &mocks.StubAccountUseCase{},
+			accUsecase:  &mocks.StubAccountUsecase{},
 			decoder:     tests.ErrorMessageDecoder{},
 			accOriginID: accOrigin.ID,
 			body: transferRequest{
@@ -88,7 +88,7 @@ func TestCreateTransfer(t *testing.T) {
 		{
 			name: "should return status 404 if acc dest does not exist",
 			repo: &mocks.StubTransferRepository{},
-			accUsecase: &mocks.StubAccountUseCase{
+			accUsecase: &mocks.StubAccountUsecase{
 				Accounts: []entities.Account{accOrigin},
 			},
 			decoder:     tests.ErrorMessageDecoder{},
@@ -103,7 +103,7 @@ func TestCreateTransfer(t *testing.T) {
 		{
 			name: "should return status 400 if acc origin has insufficient funds",
 			repo: &mocks.StubTransferRepository{},
-			accUsecase: &mocks.StubAccountUseCase{
+			accUsecase: &mocks.StubAccountUsecase{
 				Accounts: []entities.Account{accOrigin, accDest},
 			},
 			decoder:     tests.ErrorMessageDecoder{},
@@ -118,7 +118,7 @@ func TestCreateTransfer(t *testing.T) {
 		{
 			name: "should return status 500 if usecase fails",
 			repo: &mocks.StubTransferRepository{},
-			accUsecase: &mocks.StubAccountUseCase{
+			accUsecase: &mocks.StubAccountUsecase{
 				Err: errors.New("usecase fails to fetch"),
 			},
 			decoder:     tests.ErrorMessageDecoder{},
@@ -133,7 +133,7 @@ func TestCreateTransfer(t *testing.T) {
 		{
 			name:        "should return status 400 if accDestID is the account origin id",
 			repo:        &mocks.StubTransferRepository{},
-			accUsecase:  &mocks.StubAccountUseCase{},
+			accUsecase:  &mocks.StubAccountUsecase{},
 			decoder:     tests.ErrorMessageDecoder{},
 			accOriginID: accOrigin.ID,
 			body: transferRequest{
@@ -148,7 +148,7 @@ func TestCreateTransfer(t *testing.T) {
 		{
 			name: "should transfer successfully",
 			repo: &mocks.StubTransferRepository{},
-			accUsecase: &mocks.StubAccountUseCase{
+			accUsecase: &mocks.StubAccountUsecase{
 				Accounts: []entities.Account{accOriginWithBalance, accDest},
 			},
 			decoder:     createdTransferDecoder{},
@@ -169,7 +169,7 @@ func TestCreateTransfer(t *testing.T) {
 	for _, tt := range testCases {
 		t.Run(tt.name, func(t *testing.T) {
 			r := mux.NewRouter()
-			usecase := usecase.NewTransfer(tt.repo, tt.accUsecase)
+			usecase := usecase.NewTransferUsecase(tt.repo, tt.accUsecase)
 			handler := NewHandler(r, usecase)
 
 			request := fakes.FakeRequest(http.MethodPost, "/transfers", tt.body)

@@ -22,7 +22,7 @@ import (
 	"github.com/thalissonfelipe/banking/pkg/tests/mocks"
 )
 
-func TestListTransfers(t *testing.T) {
+func TestHandler_ListTransfers(t *testing.T) {
 	accOrigin := entities.NewAccount("Pedro", vos.NewCPF("123.456.789-00"), vos.NewSecret("12345678"))
 	accDest := entities.NewAccount("Maria", vos.NewCPF("123.456.789-11"), vos.NewSecret("12345678"))
 	transfer := entities.NewTransfer(accOrigin.ID, accDest.ID, 100)
@@ -64,8 +64,8 @@ func TestListTransfers(t *testing.T) {
 	for _, tt := range testCases {
 		t.Run(tt.name, func(t *testing.T) {
 			r := mux.NewRouter()
-			accUsecase := &mocks.StubAccountUseCase{}
-			trUsecase := usecase.NewTransfer(tt.repo, accUsecase)
+			accUsecase := &mocks.StubAccountUsecase{}
+			trUsecase := usecase.NewTransferUsecase(tt.repo, accUsecase)
 			handler := NewHandler(r, trUsecase)
 
 			request := fakes.FakeRequest(http.MethodGet, "/transfers", nil)

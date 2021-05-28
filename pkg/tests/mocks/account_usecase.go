@@ -8,12 +8,12 @@ import (
 	"github.com/thalissonfelipe/banking/pkg/domain/vos"
 )
 
-type StubAccountUseCase struct {
+type StubAccountUsecase struct {
 	Accounts []entities.Account
 	Err      error
 }
 
-func (s StubAccountUseCase) GetAccountBalanceByID(ctx context.Context, accountID vos.ID) (int, error) {
+func (s StubAccountUsecase) GetAccountBalanceByID(ctx context.Context, accountID vos.ID) (int, error) {
 	if s.Err != nil {
 		return 0, entities.ErrInternalError
 	}
@@ -26,11 +26,11 @@ func (s StubAccountUseCase) GetAccountBalanceByID(ctx context.Context, accountID
 	return 0, nil
 }
 
-func (s StubAccountUseCase) ListAccounts(ctx context.Context) ([]entities.Account, error) {
+func (s StubAccountUsecase) ListAccounts(ctx context.Context) ([]entities.Account, error) {
 	return nil, nil
 }
 
-func (s StubAccountUseCase) CreateAccount(ctx context.Context, input account.CreateAccountInput) (*entities.Account, error) {
+func (s StubAccountUsecase) CreateAccount(ctx context.Context, input account.CreateAccountInput) (*entities.Account, error) {
 	if s.Err != nil {
 		return nil, entities.ErrInternalError
 	}
@@ -52,7 +52,7 @@ func (s StubAccountUseCase) CreateAccount(ctx context.Context, input account.Cre
 	return &acc, nil
 }
 
-func (s StubAccountUseCase) GetAccountByID(ctx context.Context, accountID vos.ID) (*entities.Account, error) {
+func (s StubAccountUsecase) GetAccountByID(ctx context.Context, accountID vos.ID) (*entities.Account, error) {
 	if s.Err != nil {
 		return nil, entities.ErrInternalError
 	}
@@ -65,7 +65,7 @@ func (s StubAccountUseCase) GetAccountByID(ctx context.Context, accountID vos.ID
 	return nil, entities.ErrAccountDoesNotExist
 }
 
-func (s StubAccountUseCase) GetAccountByCPF(ctx context.Context, cpf vos.CPF) (*entities.Account, error) {
+func (s StubAccountUsecase) GetAccountByCPF(ctx context.Context, cpf vos.CPF) (*entities.Account, error) {
 	if s.Err != nil {
 		return nil, entities.ErrInternalError
 	}

@@ -7,7 +7,7 @@ type Account struct {
 	encrypter  account.Encrypter
 }
 
-func NewAccountUseCase(repo account.Repository, enc account.Encrypter) *Account {
+func NewAccountUsecase(repo account.Repository, enc account.Encrypter) *Account {
 	return &Account{
 		repository: repo,
 		encrypter:  enc,

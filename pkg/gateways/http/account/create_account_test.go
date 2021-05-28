@@ -20,7 +20,7 @@ import (
 	"github.com/thalissonfelipe/banking/pkg/tests/mocks"
 )
 
-func TestCreateAccount(t *testing.T) {
+func TestHandler_CreateAccount(t *testing.T) {
 	testCases := []struct {
 		name         string
 		repo         *mocks.StubAccountRepository
@@ -133,7 +133,7 @@ func TestCreateAccount(t *testing.T) {
 	for _, tt := range testCases {
 		t.Run(tt.name, func(t *testing.T) {
 			r := mux.NewRouter()
-			usecase := usecase.NewAccountUseCase(tt.repo, tt.enc)
+			usecase := usecase.NewAccountUsecase(tt.repo, tt.enc)
 			handler := NewHandler(r, usecase)
 
 			request := fakes.FakeRequest(http.MethodPost, "/accounts", tt.body)
