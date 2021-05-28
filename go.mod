@@ -12,6 +12,8 @@ require (
 	github.com/google/uuid v1.2.0
 	github.com/gorilla/mux v1.8.0
 	github.com/gotestyourself/gotestyourself v1.3.0 // indirect
+	github.com/jackc/pgconn v1.8.1
+	github.com/jackc/pgerrcode v0.0.0-20201024163028-a0d42d470451
 	github.com/jackc/pgx/v4 v4.11.0
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/lib/pq v1.10.2 // indirect

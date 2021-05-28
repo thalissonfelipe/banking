@@ -14,7 +14,11 @@ import (
 )
 
 func TestCreateAccount(t *testing.T) {
-	validInput := account.NewCreateAccountInput("Pedro", vos.NewCPF("648.446.967-93"), vos.NewSecret("aZ1234Ds"))
+	validInput := account.NewCreateAccountInput(
+		"Pedro",
+		vos.NewCPF("648.446.967-93"),
+		vos.NewSecret("aZ1234Ds"),
+	)
 
 	testCases := []struct {
 		name        string
@@ -33,7 +37,7 @@ func TestCreateAccount(t *testing.T) {
 			errExpected: nil,
 		},
 		{
-			name: "should return an error if repository fails to fetch or save",
+			name: "should return an error if repository fails to save account",
 			repoSetup: func() *mocks.StubAccountRepository {
 				return &mocks.StubAccountRepository{
 					Err: errors.New("failed to save account"),

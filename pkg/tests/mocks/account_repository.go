@@ -35,7 +35,15 @@ func (s *StubAccountRepository) CreateAccount(ctx context.Context, account *enti
 	if s.Err != nil {
 		return entities.ErrInternalError
 	}
+
+	for _, acc := range s.Accounts {
+		if acc.CPF == account.CPF {
+			return entities.ErrAccountAlreadyExists
+		}
+	}
+
 	s.Accounts = append(s.Accounts, *account)
+
 	return nil
 }
 
