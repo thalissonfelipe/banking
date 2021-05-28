@@ -2,6 +2,10 @@ package account
 
 import (
 	"context"
+	"errors"
+
+	"github.com/jackc/pgconn"
+	"github.com/jackc/pgerrcode"
 
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
 )
@@ -19,12 +23,19 @@ func (r Repository) CreateAccount(ctx context.Context, account *entities.Account
 		account.CPF.String(),
 		account.Secret.String(),
 		account.Balance,
-	).Scan(
-		&account.CreatedAt,
-	)
-	if err != nil {
+	).Scan(&account.CreatedAt)
+	if err == nil {
+		return nil
+	}
+
+	var pgErr *pgconn.PgError
+	if !errors.As(err, &pgErr) {
 		return err
 	}
 
-	return nil
+	if pgErr.Code == pgerrcode.UniqueViolation {
+		return entities.ErrAccountAlreadyExists
+	}
+
+	return err
 }

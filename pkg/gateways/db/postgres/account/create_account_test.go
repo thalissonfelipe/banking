@@ -27,6 +27,10 @@ func TestRepository_CreateAccount(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotEmpty(t, acc.CreatedAt)
 
+	// Should return an error if cpf already exists
+	err = r.CreateAccount(ctx, &acc)
+	assert.Equal(t, err, entities.ErrAccountAlreadyExists)
+
 	account, err := r.GetAccountByID(ctx, acc.ID)
 
 	assert.NoError(t, err)

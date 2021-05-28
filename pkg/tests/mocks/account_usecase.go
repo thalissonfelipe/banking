@@ -31,7 +31,25 @@ func (s StubAccountUseCase) ListAccounts(ctx context.Context) ([]entities.Accoun
 }
 
 func (s StubAccountUseCase) CreateAccount(ctx context.Context, input account.CreateAccountInput) (*entities.Account, error) {
-	return nil, nil
+	if s.Err != nil {
+		return nil, entities.ErrInternalError
+	}
+
+	for _, acc := range s.Accounts {
+		if acc.CPF == input.CPF {
+			return nil, entities.ErrAccountAlreadyExists
+		}
+	}
+
+	acc := entities.NewAccount(
+		input.Name,
+		input.CPF,
+		input.Secret,
+	)
+
+	s.Accounts = append(s.Accounts, acc)
+
+	return &acc, nil
 }
 
 func (s StubAccountUseCase) GetAccountByID(ctx context.Context, accountID vos.ID) (*entities.Account, error) {

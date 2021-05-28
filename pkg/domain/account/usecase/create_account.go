@@ -10,22 +10,18 @@ import (
 )
 
 func (a Account) CreateAccount(ctx context.Context, input account.CreateAccountInput) (*entities.Account, error) {
-	_, err := a.repository.GetAccountByCPF(ctx, input.CPF)
-	if errors.Is(err, nil) {
-		return nil, entities.ErrAccountAlreadyExists
-	}
-	if !errors.Is(err, entities.ErrAccountDoesNotExist) {
-		return nil, entities.ErrInternalError
-	}
-
 	hashedSecret, err := a.encrypter.Hash(input.Secret.String())
 	if err != nil {
 		return nil, entities.ErrInternalError
 	}
 
 	acc := entities.NewAccount(input.Name, input.CPF, vos.NewSecret(string(hashedSecret)))
+
 	err = a.repository.CreateAccount(ctx, &acc)
 	if err != nil {
+		if errors.Is(err, entities.ErrAccountAlreadyExists) {
+			return nil, err
+		}
 		return nil, entities.ErrInternalError
 	}
 
