@@ -8,7 +8,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/gorilla/mux"
+	"github.com/go-chi/chi/v5"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/thalissonfelipe/banking/pkg/domain/account/usecase"
@@ -135,7 +135,7 @@ func TestHandler_CreateAccount(t *testing.T) {
 
 	for _, tt := range testCases {
 		t.Run(tt.name, func(t *testing.T) {
-			r := mux.NewRouter()
+			r := chi.NewRouter()
 			usecase := usecase.NewAccountUsecase(tt.repo, tt.enc)
 			handler := NewHandler(r, usecase)
 

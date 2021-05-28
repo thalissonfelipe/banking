@@ -8,7 +8,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/gorilla/mux"
+	"github.com/go-chi/chi/v5"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/thalissonfelipe/banking/pkg/domain/account"
@@ -113,7 +113,7 @@ func TestLogin(t *testing.T) {
 
 	for _, tt := range testCases {
 		t.Run(tt.name, func(t *testing.T) {
-			r := mux.NewRouter()
+			r := chi.NewRouter()
 			authService := auth.NewAuth(tt.usecase, tt.enc)
 			handler := NewHandler(r, authService)
 

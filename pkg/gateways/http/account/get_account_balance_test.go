@@ -2,13 +2,14 @@ package account
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
-	"github.com/gorilla/mux"
+	"github.com/go-chi/chi/v5"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/thalissonfelipe/banking/pkg/domain/account/usecase"
@@ -84,14 +85,17 @@ func TestHandler_GetAccountBalance(t *testing.T) {
 
 	for _, tt := range testCases {
 		t.Run(tt.name, func(t *testing.T) {
-			r := mux.NewRouter()
+			r := chi.NewRouter()
+
 			usecase := usecase.NewAccountUsecase(tt.repo(), nil)
 			handler := NewHandler(r, usecase)
 
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("accountID", acc.ID.String())
+
 			request := fakes.FakeRequest(http.MethodGet, tt.requestURI, nil)
-			request = mux.SetURLVars(request, map[string]string{
-				"id": acc.ID.String(),
-			})
+			request = request.WithContext(context.WithValue(request.Context(), chi.RouteCtxKey, rctx))
+
 			response := httptest.NewRecorder()
 
 			http.HandlerFunc(handler.GetAccountBalance).ServeHTTP(response, request)

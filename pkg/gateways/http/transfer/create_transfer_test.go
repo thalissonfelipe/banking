@@ -9,7 +9,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/gorilla/mux"
+	"github.com/go-chi/chi/v5"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
@@ -169,7 +169,7 @@ func TestHandler_CreateTransfer(t *testing.T) {
 
 	for _, tt := range testCases {
 		t.Run(tt.name, func(t *testing.T) {
-			r := mux.NewRouter()
+			r := chi.NewRouter()
 			usecase := usecase.NewTransferUsecase(tt.repo, tt.accUsecase)
 			handler := NewHandler(r, usecase)
 

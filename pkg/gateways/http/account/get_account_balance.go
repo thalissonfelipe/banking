@@ -3,7 +3,7 @@ package account
 import (
 	"net/http"
 
-	"github.com/gorilla/mux"
+	"github.com/go-chi/chi/v5"
 
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
 	"github.com/thalissonfelipe/banking/pkg/domain/vos"
@@ -11,7 +11,7 @@ import (
 )
 
 func (h Handler) GetAccountBalance(w http.ResponseWriter, r *http.Request) {
-	accountID := vos.ConvertStringToID(mux.Vars(r)["id"])
+	accountID := vos.ConvertStringToID(chi.URLParam(r, "accountID"))
 	balance, err := h.usecase.GetAccountBalanceByID(r.Context(), accountID)
 	if err != nil {
 		switch err {
