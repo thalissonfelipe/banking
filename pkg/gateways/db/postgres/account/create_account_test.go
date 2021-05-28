@@ -8,21 +8,12 @@ import (
 
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
 	"github.com/thalissonfelipe/banking/pkg/domain/vos"
-	"github.com/thalissonfelipe/banking/pkg/tests/dockertest"
 )
 
-func TestRepository_GetBalanceByID(t *testing.T) {
+func TestRepository_CreateAccount(t *testing.T) {
 	db := pgDocker.DB
 	r := NewRepository(db)
 	ctx := context.Background()
-
-	defer dockertest.TruncateTables(ctx, db)
-
-	randomID := vos.NewID()
-	balance, err := r.GetBalanceByID(ctx, randomID)
-
-	assert.Equal(t, entities.ErrAccountDoesNotExist, err)
-	assert.Equal(t, 0, balance)
 
 	acc := entities.NewAccount(
 		"Maria",
@@ -30,11 +21,16 @@ func TestRepository_GetBalanceByID(t *testing.T) {
 		vos.NewSecret("12345678"),
 	)
 
-	err = r.CreateAccount(ctx, &acc)
-	assert.NoError(t, err)
+	assert.Empty(t, acc.CreatedAt)
 
-	balance, err = r.GetBalanceByID(ctx, acc.ID)
+	err := r.CreateAccount(ctx, &acc)
+	assert.NoError(t, err)
+	assert.NotEmpty(t, acc.CreatedAt)
+
+	account, err := r.GetAccountByID(ctx, acc.ID)
 
 	assert.NoError(t, err)
-	assert.Equal(t, acc.Balance, balance)
+	assert.Equal(t, acc.Name, account.Name)
+	assert.Equal(t, acc.CPF, account.CPF)
+	assert.Equal(t, acc.Balance, account.Balance)
 }

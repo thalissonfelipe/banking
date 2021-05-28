@@ -28,7 +28,7 @@ func TestRepository_GetAccounts(t *testing.T) {
 		vos.NewSecret("12345678"),
 	)
 
-	err = r.PostAccount(ctx, &acc)
+	err = r.CreateAccount(ctx, &acc)
 	assert.NoError(t, err)
 
 	accounts, err = r.GetAccounts(ctx)

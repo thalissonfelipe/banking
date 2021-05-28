@@ -30,7 +30,7 @@ func TestRepository_GetAccountByCPF(t *testing.T) {
 		vos.NewSecret("12345678"),
 	)
 
-	err = r.PostAccount(ctx, &acc)
+	err = r.CreateAccount(ctx, &acc)
 	assert.NoError(t, err)
 
 	a, err = r.GetAccountByCPF(ctx, acc.CPF)
