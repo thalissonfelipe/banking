@@ -10,13 +10,13 @@ import (
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
 	"github.com/thalissonfelipe/banking/pkg/domain/transfer"
 	"github.com/thalissonfelipe/banking/pkg/domain/vos"
-	"github.com/thalissonfelipe/banking/pkg/tests"
 	"github.com/thalissonfelipe/banking/pkg/tests/mocks"
+	"github.com/thalissonfelipe/banking/pkg/tests/testdata"
 )
 
 func TestUsecase_CreateTransfer(t *testing.T) {
-	accOrigin := entities.NewAccount("Pedro", tests.TestCPF1, vos.NewSecret("12345678"))
-	accDest := entities.NewAccount("Maria", tests.TestCPF2, vos.NewSecret("12345678"))
+	accOrigin := entities.NewAccount("Pedro", testdata.GetValidCPF(), vos.NewSecret("12345678"))
+	accDest := entities.NewAccount("Maria", testdata.GetValidCPF(), vos.NewSecret("12345678"))
 
 	testCases := []struct {
 		name       string

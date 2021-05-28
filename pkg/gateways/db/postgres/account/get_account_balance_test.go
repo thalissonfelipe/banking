@@ -8,8 +8,8 @@ import (
 
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
 	"github.com/thalissonfelipe/banking/pkg/domain/vos"
-	"github.com/thalissonfelipe/banking/pkg/tests"
 	"github.com/thalissonfelipe/banking/pkg/tests/dockertest"
+	"github.com/thalissonfelipe/banking/pkg/tests/testdata"
 )
 
 func TestRepository_GetBalanceByID(t *testing.T) {
@@ -27,7 +27,7 @@ func TestRepository_GetBalanceByID(t *testing.T) {
 
 	acc := entities.NewAccount(
 		"Maria",
-		tests.TestCPF1,
+		testdata.GetValidCPF(),
 		vos.NewSecret("12345678"),
 	)
 

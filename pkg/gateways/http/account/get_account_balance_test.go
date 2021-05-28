@@ -18,10 +18,11 @@ import (
 	"github.com/thalissonfelipe/banking/pkg/tests"
 	"github.com/thalissonfelipe/banking/pkg/tests/fakes"
 	"github.com/thalissonfelipe/banking/pkg/tests/mocks"
+	"github.com/thalissonfelipe/banking/pkg/tests/testdata"
 )
 
 func TestHandler_GetAccountBalance(t *testing.T) {
-	acc := entities.NewAccount("Pedro", tests.TestCPF1, vos.NewSecret("12345678"))
+	acc := entities.NewAccount("Pedro", testdata.GetValidCPF(), vos.NewSecret("12345678"))
 
 	testCases := []struct {
 		name         string

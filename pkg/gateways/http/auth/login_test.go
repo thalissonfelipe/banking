@@ -19,9 +19,12 @@ import (
 	"github.com/thalissonfelipe/banking/pkg/tests"
 	"github.com/thalissonfelipe/banking/pkg/tests/fakes"
 	"github.com/thalissonfelipe/banking/pkg/tests/mocks"
+	"github.com/thalissonfelipe/banking/pkg/tests/testdata"
 )
 
 func TestLogin(t *testing.T) {
+	cpf := testdata.GetValidCPF()
+
 	testCases := []struct {
 		name         string
 		usecase      account.UseCase
@@ -44,7 +47,7 @@ func TestLogin(t *testing.T) {
 			name:         "should return status code 400 if secret was not provided",
 			usecase:      mocks.StubAccountUsecase{},
 			enc:          mocks.StubHash{},
-			body:         requestBody{CPF: tests.TestCPF1.String()},
+			body:         requestBody{CPF: cpf.String()},
 			decoder:      tests.ErrorMessageDecoder{},
 			expectedBody: responses.ErrorResponse{Message: "missing secret parameter"},
 			expectedCode: http.StatusBadRequest,
@@ -66,7 +69,7 @@ func TestLogin(t *testing.T) {
 				Err: errors.New("usecase fails"),
 			},
 			enc:          mocks.StubHash{},
-			body:         requestBody{CPF: tests.TestCPF1.String(), Secret: "12345678"},
+			body:         requestBody{CPF: cpf.String(), Secret: "12345678"},
 			decoder:      tests.ErrorMessageDecoder{},
 			expectedBody: responses.ErrorResponse{Message: "internal server error"},
 			expectedCode: http.StatusInternalServerError,
@@ -75,7 +78,7 @@ func TestLogin(t *testing.T) {
 			name:         "should return status code 404 if account does not exist",
 			usecase:      mocks.StubAccountUsecase{},
 			enc:          mocks.StubHash{},
-			body:         requestBody{CPF: tests.TestCPF1.String(), Secret: "12345678"},
+			body:         requestBody{CPF: cpf.String(), Secret: "12345678"},
 			decoder:      tests.ErrorMessageDecoder{},
 			expectedBody: responses.ErrorResponse{Message: "account does not exist"},
 			expectedCode: http.StatusNotFound,
@@ -84,11 +87,11 @@ func TestLogin(t *testing.T) {
 			name: "should return status code 400 if secret was not correct",
 			usecase: mocks.StubAccountUsecase{
 				Accounts: []entities.Account{
-					entities.NewAccount("Pedro", tests.TestCPF1, vos.NewSecret("87654321")),
+					entities.NewAccount("Pedro", cpf, vos.NewSecret("87654321")),
 				},
 			},
 			enc:          mocks.StubHash{Err: auth.ErrSecretDoesNotMatch},
-			body:         requestBody{CPF: tests.TestCPF1.String(), Secret: "12345678"},
+			body:         requestBody{CPF: cpf.String(), Secret: "12345678"},
 			decoder:      tests.ErrorMessageDecoder{},
 			expectedBody: responses.ErrorResponse{Message: "secret does not match"},
 			expectedCode: http.StatusBadRequest,
@@ -97,11 +100,11 @@ func TestLogin(t *testing.T) {
 			name: "should authenticate successfully and return a token",
 			usecase: mocks.StubAccountUsecase{
 				Accounts: []entities.Account{
-					entities.NewAccount("Pedro", tests.TestCPF1, vos.NewSecret("12345678")),
+					entities.NewAccount("Pedro", cpf, vos.NewSecret("12345678")),
 				},
 			},
 			enc:          mocks.StubHash{},
-			body:         requestBody{CPF: tests.TestCPF1.String(), Secret: "12345678"},
+			body:         requestBody{CPF: cpf.String(), Secret: "12345678"},
 			decoder:      responseBodyDecoder{},
 			expectedBody: responseBody{},
 			expectedCode: http.StatusOK,

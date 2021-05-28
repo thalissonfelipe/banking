@@ -20,12 +20,13 @@ import (
 	"github.com/thalissonfelipe/banking/pkg/tests"
 	"github.com/thalissonfelipe/banking/pkg/tests/fakes"
 	"github.com/thalissonfelipe/banking/pkg/tests/mocks"
+	"github.com/thalissonfelipe/banking/pkg/tests/testdata"
 )
 
 func TestHandler_CreateTransfer(t *testing.T) {
-	accOrigin := entities.NewAccount("Pedro", tests.TestCPF1, vos.NewSecret("12345678"))
-	accDest := entities.NewAccount("Maria", tests.TestCPF2, vos.NewSecret("12345678"))
-	accOriginWithBalance := entities.NewAccount("João", tests.TestCPF3, vos.NewSecret("12345678"))
+	accOrigin := entities.NewAccount("Pedro", testdata.GetValidCPF(), vos.NewSecret("12345678"))
+	accDest := entities.NewAccount("Maria", testdata.GetValidCPF(), vos.NewSecret("12345678"))
+	accOriginWithBalance := entities.NewAccount("João", testdata.GetValidCPF(), vos.NewSecret("12345678"))
 	accOriginWithBalance.Balance = 200
 
 	testCases := []struct {
