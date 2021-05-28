@@ -8,6 +8,7 @@ import (
 
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
 	"github.com/thalissonfelipe/banking/pkg/domain/vos"
+	"github.com/thalissonfelipe/banking/pkg/tests"
 	"github.com/thalissonfelipe/banking/pkg/tests/dockertest"
 )
 
@@ -26,7 +27,7 @@ func TestRepository_GetAccountByID(t *testing.T) {
 
 	acc := entities.NewAccount(
 		"Maria",
-		vos.NewCPF("123.456.789-00"),
+		tests.TestCPF1,
 		vos.NewSecret("12345678"),
 	)
 

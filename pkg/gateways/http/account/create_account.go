@@ -24,9 +24,9 @@ func (h Handler) CreateAccount(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cpf := vos.NewCPF(body.CPF)
-	if ok := cpf.IsValid(); !ok {
-		responses.SendError(w, http.StatusBadRequest, errInvalidCPF.Error())
+	cpf, err := vos.NewCPF(body.CPF)
+	if err != nil {
+		responses.SendError(w, http.StatusBadRequest, err.Error())
 		return
 	}
 

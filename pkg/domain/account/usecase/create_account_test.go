@@ -10,13 +10,14 @@ import (
 	"github.com/thalissonfelipe/banking/pkg/domain/account"
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
 	"github.com/thalissonfelipe/banking/pkg/domain/vos"
+	"github.com/thalissonfelipe/banking/pkg/tests"
 	"github.com/thalissonfelipe/banking/pkg/tests/mocks"
 )
 
 func TestUsecase_CreateAccount(t *testing.T) {
 	validInput := account.NewCreateAccountInput(
 		"Pedro",
-		vos.NewCPF("648.446.967-93"),
+		tests.TestCPF1,
 		vos.NewSecret("aZ1234Ds"),
 	)
 

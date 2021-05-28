@@ -21,7 +21,7 @@ import (
 )
 
 func TestHandler_GetAccountBalance(t *testing.T) {
-	acc := entities.NewAccount("Pedro", vos.NewCPF("123.456.789-00"), vos.NewSecret("12345678"))
+	acc := entities.NewAccount("Pedro", tests.TestCPF1, vos.NewSecret("12345678"))
 
 	testCases := []struct {
 		name         string

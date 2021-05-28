@@ -23,9 +23,9 @@ import (
 )
 
 func TestHandler_CreateTransfer(t *testing.T) {
-	accOrigin := entities.NewAccount("Pedro", vos.NewCPF("123.456.789-00"), vos.NewSecret("12345678"))
-	accDest := entities.NewAccount("Maria", vos.NewCPF("123.456.789-11"), vos.NewSecret("12345678"))
-	accOriginWithBalance := entities.NewAccount("João", vos.NewCPF("123.456.789-22"), vos.NewSecret("12345678"))
+	accOrigin := entities.NewAccount("Pedro", tests.TestCPF1, vos.NewSecret("12345678"))
+	accDest := entities.NewAccount("Maria", tests.TestCPF2, vos.NewSecret("12345678"))
+	accOriginWithBalance := entities.NewAccount("João", tests.TestCPF3, vos.NewSecret("12345678"))
 	accOriginWithBalance.Balance = 200
 
 	testCases := []struct {

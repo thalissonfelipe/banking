@@ -7,7 +7,11 @@ import (
 )
 
 func (a Auth) Autheticate(ctx context.Context, input AuthenticateInput) (string, error) {
-	cpf := vos.NewCPF(input.CPF)
+	cpf, err := vos.NewCPF(input.CPF)
+	if err != nil {
+		return "", err
+	}
+
 	acc, err := a.accountUsecase.GetAccountByCPF(ctx, cpf)
 	if err != nil {
 		return "", err
