@@ -14,7 +14,7 @@ func TestMain(m *testing.M) {
 
 	exitCode := m.Run()
 
-	defer dockertest.RemoveContainer(pgDocker)
+	dockertest.RemoveContainer(pgDocker)
 
 	os.Exit(exitCode)
 }
