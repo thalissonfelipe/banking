@@ -17,25 +17,25 @@ returning created_at
 `
 
 func (r Repository) CreateAccount(ctx context.Context, account *entities.Account) error {
-	if err := r.db.QueryRow(ctx, createAccountQuery,
+	err := r.db.QueryRow(ctx, createAccountQuery,
 		account.ID,
 		account.Name,
 		account.CPF.String(),
 		account.Secret.String(),
 		account.Balance,
-	).Scan(
-		&account.CreatedAt,
-	); err != nil {
-		var pgErr *pgconn.PgError
+	).Scan(&account.CreatedAt)
+	if err == nil {
+		return nil
+	}
 
-		if errors.As(err, &pgErr) {
-			if pgErr.Code == pgerrcode.UniqueViolation {
-				return entities.ErrAccountAlreadyExists
-			}
-		}
-
+	var pgErr *pgconn.PgError
+	if !errors.As(err, &pgErr) {
 		return err
 	}
 
-	return nil
+	if pgErr.Code == pgerrcode.UniqueViolation {
+		return entities.ErrAccountAlreadyExists
+	}
+
+	return err
 }
