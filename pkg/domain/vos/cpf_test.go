@@ -13,9 +13,9 @@ func TestNewCPF(t *testing.T) {
 		expectedCPF string
 		expectedErr error
 	}{
-		{"cpf must be valid #1", "648.446.967-93", "648.446.967-93", nil},
-		{"cpf must be valid #2", "626.413.228-46", "626.413.228-46", nil},
-		{"cpf must be valid #3", "871.957.260-37", "871.957.260-37", nil},
+		{"cpf must be valid #1", "648.446.967-93", "64844696793", nil},
+		{"cpf must be valid #2", "626.413.228-46", "62641322846", nil},
+		{"cpf must be valid #3", "871.957.260-37", "87195726037", nil},
 		{"cpf must be valid #4", "64844696793", "64844696793", nil},
 		{"cpf must be valid #5", "62641322846", "62641322846", nil},
 		{"cpf must be invalid #2", "000.000.000-00", "", ErrInvalidCPF},
