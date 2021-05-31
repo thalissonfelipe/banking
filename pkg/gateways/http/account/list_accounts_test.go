@@ -13,7 +13,6 @@ import (
 
 	"github.com/thalissonfelipe/banking/pkg/domain/account/usecase"
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
-	"github.com/thalissonfelipe/banking/pkg/domain/vos"
 	"github.com/thalissonfelipe/banking/pkg/gateways/http/responses"
 	"github.com/thalissonfelipe/banking/pkg/tests"
 	"github.com/thalissonfelipe/banking/pkg/tests/fakes"
@@ -22,7 +21,7 @@ import (
 )
 
 func TestHandler_ListAccounts(t *testing.T) {
-	acc := entities.NewAccount("Pedro", testdata.GetValidCPF(), vos.NewSecret("12345678"))
+	acc := entities.NewAccount("Pedro", testdata.GetValidCPF(), testdata.GetValidSecret())
 
 	testCases := []struct {
 		name         string

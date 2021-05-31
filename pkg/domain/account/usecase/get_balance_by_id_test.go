@@ -13,8 +13,8 @@ import (
 )
 
 func TestUsecase_GetBalanceByAccountID(t *testing.T) {
-	accBalanceDefault := entities.NewAccount("Piter", testdata.GetValidCPF(), vos.NewSecret("12345678"))
-	accBalance100 := entities.NewAccount("Piter", testdata.GetValidCPF(), vos.NewSecret("12345678"))
+	accBalanceDefault := entities.NewAccount("Piter", testdata.GetValidCPF(), testdata.GetValidSecret())
+	accBalance100 := entities.NewAccount("Piter", testdata.GetValidCPF(), testdata.GetValidSecret())
 	accBalance100.Balance = 100
 
 	testCases := []struct {
