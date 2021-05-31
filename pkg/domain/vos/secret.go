@@ -4,7 +4,11 @@ import (
 	"database/sql/driver"
 	"errors"
 	"regexp"
+
+	"github.com/thalissonfelipe/banking/pkg/domain/encrypter"
 )
+
+var ErrInvalidSecret = errors.New("invalid secret")
 
 const (
 	secretMaxSize = 20
@@ -25,15 +29,19 @@ func (s Secret) IsValid() bool {
 	if s.Size() < secretMinSize {
 		return false
 	}
+
 	if s.Size() > secretMaxSize {
 		return false
 	}
+
 	if hasUpper := regexUpper.MatchString(s.value); !hasUpper {
 		return false
 	}
+
 	if hasLower := regexLower.MatchString(s.value); !hasLower {
 		return false
 	}
+
 	if hasNumber := regexNumber.MatchString(s.value); !hasNumber {
 		return false
 	}
@@ -49,25 +57,41 @@ func (s Secret) Size() int {
 	return len(s.value)
 }
 
-func NewSecret(secret string) Secret {
-	return Secret{value: secret}
+func (s Secret) Value() (driver.Value, error) {
+	return s.String(), nil
 }
 
-func (c Secret) Value() (driver.Value, error) {
-	return c.String(), nil
-}
-
-func (c *Secret) Scan(value interface{}) error {
+func (s *Secret) Scan(value interface{}) error {
 	if value == nil {
-		*c = Secret(Secret{})
+		*s = Secret(Secret{})
 		return nil
 	}
 	if bv, err := driver.String.ConvertValue(value); err == nil {
 		if v, ok := bv.(string); ok {
-			*c = Secret(Secret{v})
+			*s = Secret(Secret{v})
 			return nil
 		}
 	}
 
 	return errors.New("failed to scan Secret")
+}
+
+func (s *Secret) Hash(encrypter encrypter.Encrypter) error {
+	hashedSecret, err := encrypter.Hash(s.value)
+	if err != nil {
+		return err
+	}
+
+	s.value = string(hashedSecret)
+
+	return nil
+}
+
+func NewSecret(secret string) (Secret, error) {
+	s := Secret{value: secret}
+	if !s.IsValid() {
+		return Secret{}, ErrInvalidSecret
+	}
+
+	return s, nil
 }

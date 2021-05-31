@@ -1,13 +1,16 @@
 package auth
 
-import "github.com/thalissonfelipe/banking/pkg/domain/account"
+import (
+	"github.com/thalissonfelipe/banking/pkg/domain/account"
+	"github.com/thalissonfelipe/banking/pkg/domain/encrypter"
+)
 
 type Auth struct {
 	accountUsecase account.Usecase
-	encrypter      account.Encrypter
+	encrypter      encrypter.Encrypter
 }
 
-func NewAuth(accUsecase account.Usecase, encrypter account.Encrypter) *Auth {
+func NewAuth(accUsecase account.Usecase, encrypter encrypter.Encrypter) *Auth {
 	return &Auth{
 		accountUsecase: accUsecase,
 		encrypter:      encrypter,

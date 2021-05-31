@@ -30,9 +30,9 @@ func (h Handler) CreateAccount(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	secret := vos.NewSecret(body.Secret)
-	if ok := secret.IsValid(); !ok {
-		responses.SendError(w, http.StatusBadRequest, errInvalidSecret.Error())
+	secret, err := vos.NewSecret(body.Secret)
+	if err != nil {
+		responses.SendError(w, http.StatusBadRequest, err.Error())
 		return
 	}
 

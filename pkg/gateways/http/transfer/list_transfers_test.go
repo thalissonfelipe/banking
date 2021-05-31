@@ -14,7 +14,6 @@ import (
 
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
 	"github.com/thalissonfelipe/banking/pkg/domain/transfer/usecase"
-	"github.com/thalissonfelipe/banking/pkg/domain/vos"
 	"github.com/thalissonfelipe/banking/pkg/gateways/http/responses"
 	"github.com/thalissonfelipe/banking/pkg/services/auth"
 	"github.com/thalissonfelipe/banking/pkg/tests"
@@ -24,8 +23,8 @@ import (
 )
 
 func TestHandler_ListTransfers(t *testing.T) {
-	accOrigin := entities.NewAccount("Pedro", testdata.GetValidCPF(), vos.NewSecret("12345678"))
-	accDest := entities.NewAccount("Maria", testdata.GetValidCPF(), vos.NewSecret("12345678"))
+	accOrigin := entities.NewAccount("Pedro", testdata.GetValidCPF(), testdata.GetValidSecret())
+	accDest := entities.NewAccount("Maria", testdata.GetValidCPF(), testdata.GetValidSecret())
 	transfer := entities.NewTransfer(accOrigin.ID, accDest.ID, 100)
 
 	testCases := []struct {

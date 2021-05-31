@@ -17,7 +17,7 @@ type apiConfig struct {
 }
 
 type postgresConfig struct {
-	DatabaseName     string `envconfig:"DB_NAME" default:"banking_db"`
+	DatabaseName     string `envconfig:"DB_NAME" default:"postgres"`
 	DatabaseUser     string `envconfig:"DB_USER" default:"postgres"`
 	DatabasePassword string `envconfig:"DB_PASSWORD" default:"postgres"`
 	DatabaseHost     string `envconfig:"DB_HOST" default:"localhost"`

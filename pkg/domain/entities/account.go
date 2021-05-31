@@ -22,7 +22,6 @@ var (
 	ErrAccountDoesNotExist  error = errors.New("account does not exist")
 	ErrAccountAlreadyExists error = errors.New("account already exists")
 	ErrInternalError        error = errors.New("internal server error")
-	ErrInvalidSecret        error = errors.New("invalid secret")
 )
 
 func NewAccount(name string, cpf vos.CPF, secret vos.Secret) Account {

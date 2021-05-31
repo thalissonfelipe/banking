@@ -1,4 +1,4 @@
-package account
+package encrypter
 
 type Encrypter interface {
 	Hash(secret string) ([]byte, error)

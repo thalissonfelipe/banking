@@ -16,6 +16,7 @@ import (
 
 func TestAuthenticate(t *testing.T) {
 	cpf := testdata.GetValidCPF()
+	secret := testdata.GetValidSecret()
 
 	testCases := []struct {
 		name  string
@@ -29,14 +30,14 @@ func TestAuthenticate(t *testing.T) {
 			name:  "should return an error if account does not exist",
 			repo:  &mocks.StubAccountRepository{},
 			enc:   &mocks.StubHash{},
-			input: AuthenticateInput{CPF: cpf.String(), Secret: "12345678"},
+			input: AuthenticateInput{CPF: cpf.String(), Secret: secret.String()},
 			err:   entities.ErrAccountDoesNotExist,
 		},
 		{
 			name:  "should return an error if cpf provided is invalid",
 			repo:  &mocks.StubAccountRepository{},
 			enc:   &mocks.StubHash{},
-			input: AuthenticateInput{CPF: "123.456.789-00", Secret: "12345678"},
+			input: AuthenticateInput{CPF: "123.456.789-00", Secret: secret.String()},
 			err:   vos.ErrInvalidCPF,
 		},
 		{
@@ -45,31 +46,31 @@ func TestAuthenticate(t *testing.T) {
 				Err: errors.New("usecase fails to fetch account"),
 			},
 			enc:   &mocks.StubHash{},
-			input: AuthenticateInput{CPF: cpf.String(), Secret: "12345678"},
+			input: AuthenticateInput{CPF: cpf.String(), Secret: secret.String()},
 			err:   entities.ErrInternalError,
 		},
 		{
 			name: "should return an error if secret does not match",
 			repo: &mocks.StubAccountRepository{
 				Accounts: []entities.Account{
-					entities.NewAccount("Pedro", cpf, vos.NewSecret("12345678")),
+					entities.NewAccount("Pedro", cpf, secret),
 				},
 			},
 			enc: &mocks.StubHash{
 				Err: ErrSecretDoesNotMatch,
 			},
-			input: AuthenticateInput{CPF: cpf.String(), Secret: "12345678"},
+			input: AuthenticateInput{CPF: cpf.String(), Secret: secret.String()},
 			err:   ErrSecretDoesNotMatch,
 		},
 		{
 			name: "should return nil if authenticated succeeds",
 			repo: &mocks.StubAccountRepository{
 				Accounts: []entities.Account{
-					entities.NewAccount("Pedro", cpf, vos.NewSecret("12345678")),
+					entities.NewAccount("Pedro", cpf, secret),
 				},
 			},
 			enc:   &mocks.StubHash{},
-			input: AuthenticateInput{CPF: cpf.String(), Secret: "12345678"},
+			input: AuthenticateInput{CPF: cpf.String(), Secret: secret.String()},
 			err:   nil,
 		},
 	}
