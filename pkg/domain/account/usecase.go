@@ -7,7 +7,7 @@ import (
 	"github.com/thalissonfelipe/banking/pkg/domain/vos"
 )
 
-type UseCase interface {
+type Usecase interface {
 	ListAccounts(ctx context.Context) ([]entities.Account, error)
 	GetAccountBalanceByID(ctx context.Context, accountID vos.ID) (int, error)
 	CreateAccount(ctx context.Context, input CreateAccountInput) (*entities.Account, error)

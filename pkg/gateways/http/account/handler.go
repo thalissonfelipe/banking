@@ -9,10 +9,10 @@ import (
 )
 
 type Handler struct {
-	usecase account.UseCase
+	usecase account.Usecase
 }
 
-func NewHandler(r *mux.Router, usecase account.UseCase) *Handler {
+func NewHandler(r *mux.Router, usecase account.Usecase) *Handler {
 	handler := Handler{usecase: usecase}
 
 	r.HandleFunc("/accounts", handler.ListAccounts).Methods(http.MethodGet)

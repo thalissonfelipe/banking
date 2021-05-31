@@ -6,11 +6,11 @@ import (
 )
 
 type Auth struct {
-	accountUsecase account.UseCase
+	accountUsecase account.Usecase
 	encrypter      encrypter.Encrypter
 }
 
-func NewAuth(accUsecase account.UseCase, encrypter encrypter.Encrypter) *Auth {
+func NewAuth(accUsecase account.Usecase, encrypter encrypter.Encrypter) *Auth {
 	return &Auth{
 		accountUsecase: accUsecase,
 		encrypter:      encrypter,

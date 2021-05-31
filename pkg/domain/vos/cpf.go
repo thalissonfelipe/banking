@@ -3,9 +3,13 @@ package vos
 import (
 	"database/sql/driver"
 	"errors"
+	"log"
+	"regexp"
 
 	"github.com/Nhanderu/brdoc"
 )
+
+var regexOnlyDigitsCPF = regexp.MustCompile(`^(\d{3})(\d{3})(\d{3})(\d{2})$`)
 
 var ErrInvalidCPF = errors.New("invalid cpf")
 
@@ -16,8 +20,24 @@ type CPF struct {
 // IsValid checks if the CPF is valid.
 // For now, I decided to use a third-party library and, later on,
 // create my own cpf validation implementation.
-func (c CPF) IsValid() bool {
-	return brdoc.IsCPF(c.value)
+func (c *CPF) IsValid() bool {
+	if ok := brdoc.IsCPF(c.value); !ok {
+		return false
+	}
+
+	// If the CPF is valid, it means that it's formatted as XXX.XXX.XXX-XX
+	// or XXXXXXXXXXX. The condition below guarantees that the cpf will be saved
+	// without any pontcuation.
+	if onlyDigits := regexOnlyDigitsCPF.MatchString(c.value); !onlyDigits {
+		reg, err := regexp.Compile("[^0-9]+")
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		c.value = reg.ReplaceAllString(c.value, "")
+	}
+
+	return true
 }
 
 func (c CPF) String() string {
