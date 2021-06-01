@@ -12,6 +12,19 @@ import (
 	"github.com/thalissonfelipe/banking/pkg/services/auth"
 )
 
+// CreateTransfer creates a new transfer between two accounts
+// @Tags transfers
+// @Summary Create a new transfer
+// @Description Creates a new transfer between two accounts.
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Bearer Authorization Token"
+// @Param Body body transferRequest true "Body"
+// @Success 200 {array} transferCreatedResponse
+// @Failure 401 {string} string "No token provided"
+// @Failure 404 {string} string "Account not found"
+// @Failure 500 {string} string "Internal server error"
+// @Router /transfers [POST]
 func (h Handler) CreateTransfer(w http.ResponseWriter, r *http.Request) {
 	var body transferRequest
 	err := json.NewDecoder(r.Body).Decode(&body)

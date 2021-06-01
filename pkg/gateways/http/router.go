@@ -7,6 +7,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/jackc/pgx/v4"
+	httpSwagger "github.com/swaggo/http-swagger"
 
 	acc_usecase "github.com/thalissonfelipe/banking/pkg/domain/account/usecase"
 	tr_usecase "github.com/thalissonfelipe/banking/pkg/domain/transfer/usecase"
@@ -44,6 +45,10 @@ func NewRouter(db *pgx.Conn) http.Handler {
 	acc_handler.NewHandler(router, accountUsecase)
 	auth_handler.NewHandler(router, authService)
 	tr_handler.NewHandler(router, transferUsecase)
+
+	router.Get("/swagger/*", httpSwagger.Handler(
+		httpSwagger.URL("http://localhost:5000/swagger/doc.json"),
+	))
 
 	return router
 }

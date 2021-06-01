@@ -8,6 +8,17 @@ import (
 	"github.com/thalissonfelipe/banking/pkg/services/auth"
 )
 
+// ListTransfers returns all transfers
+// @Tags transfers
+// @Summary List transfers
+// @Description List all transfers.
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Bearer Authorization Token"
+// @Success 200 {array} transferResponse
+// @Failure 401 {string} string "No token provided"
+// @Failure 500 {string} string "Internal server error"
+// @Router /transfers [GET]
 func (h Handler) ListTransfers(w http.ResponseWriter, r *http.Request) {
 	token := getTokenFromHeader(r.Header.Get("Authorization"))
 	accountID := vos.ConvertStringToID(auth.GetIDFromToken(token))

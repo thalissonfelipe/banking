@@ -10,6 +10,16 @@ import (
 	"github.com/thalissonfelipe/banking/pkg/gateways/http/responses"
 )
 
+// GetAccountBalance returns a balance by accountID
+// @Tags accounts
+// @Summary Get account balance
+// @Description Get account balance by accountID, if exists.
+// @Accept json
+// @Produce json
+// @Success 200 {object} balanceResponse
+// @Failure 400 {string} string "Account does not exist"
+// @Failure 500 {string} string "Internal server error"
+// @Router /accounts/{accountID}/balance [GET]
 func (h Handler) GetAccountBalance(w http.ResponseWriter, r *http.Request) {
 	accountID := vos.ConvertStringToID(chi.URLParam(r, "accountID"))
 	balance, err := h.usecase.GetAccountBalanceByID(r.Context(), accountID)

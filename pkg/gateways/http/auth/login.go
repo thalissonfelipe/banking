@@ -10,6 +10,18 @@ import (
 	"github.com/thalissonfelipe/banking/pkg/services/auth"
 )
 
+// Login logs in :D
+// @Tags login
+// @Summary Log in
+// @Description Returns a JWT to be used on /transfers endpoints.
+// @Accept json
+// @Produce json
+// @Param Body body requestBody true "Body"
+// @Success 200 {object} responseBody
+// @Failure 400 {string} string "Bad request"
+// @Failure 404 {string} string "Account does not exist"
+// @Failure 500 {string} string "Internal server error"
+// @Router /login [POST]
 func (h Handler) Login(w http.ResponseWriter, r *http.Request) {
 	var body requestBody
 	err := json.NewDecoder(r.Body).Decode(&body)
