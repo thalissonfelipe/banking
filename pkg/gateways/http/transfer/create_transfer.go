@@ -21,9 +21,9 @@ import (
 // @Param Authorization header string true "Bearer Authorization Token"
 // @Param Body body transferRequest true "Body"
 // @Success 200 {array} transferCreatedResponse
-// @Failure 401 {string} string "No token provided"
-// @Failure 404 {string} string "Account not found"
-// @Failure 500 {string} string "Internal server error"
+// @Failure 401 {object} responses.ErrorResponse
+// @Failure 404 {object} responses.ErrorResponse
+// @Failure 500 {object} responses.ErrorResponse
 // @Router /transfers [POST]
 func (h Handler) CreateTransfer(w http.ResponseWriter, r *http.Request) {
 	var body transferRequest

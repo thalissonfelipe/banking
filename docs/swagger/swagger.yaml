@@ -48,6 +48,11 @@ definitions:
       token:
         type: string
     type: object
+  responses.ErrorResponse:
+    properties:
+      message:
+        type: string
+    type: object
   transfer.transferCreatedResponse:
     properties:
       account_destination_id:
@@ -102,9 +107,9 @@ paths:
               $ref: '#/definitions/account.accountResponse'
             type: array
         "500":
-          description: Internal server error
+          description: Internal Server Error
           schema:
-            type: string
+            $ref: '#/definitions/responses.ErrorResponse'
       summary: List accounts
       tags:
       - accounts
@@ -131,17 +136,17 @@ paths:
           schema:
             $ref: '#/definitions/account.createdAccountResponse'
         "400":
-          description: Bad request
+          description: Bad Request
           schema:
-            type: string
+            $ref: '#/definitions/responses.ErrorResponse'
         "409":
-          description: Account already exists
+          description: Conflict
           schema:
-            type: string
+            $ref: '#/definitions/responses.ErrorResponse'
         "500":
-          description: Internal server error
+          description: Internal Server Error
           schema:
-            type: string
+            $ref: '#/definitions/responses.ErrorResponse'
       summary: Creates a new account
       tags:
       - accounts
@@ -158,13 +163,13 @@ paths:
           schema:
             $ref: '#/definitions/account.balanceResponse'
         "400":
-          description: Account does not exist
+          description: Bad Request
           schema:
-            type: string
+            $ref: '#/definitions/responses.ErrorResponse'
         "500":
-          description: Internal server error
+          description: Internal Server Error
           schema:
-            type: string
+            $ref: '#/definitions/responses.ErrorResponse'
       summary: Get account balance
       tags:
       - accounts
@@ -188,17 +193,17 @@ paths:
           schema:
             $ref: '#/definitions/auth.responseBody'
         "400":
-          description: Bad request
+          description: Bad Request
           schema:
-            type: string
+            $ref: '#/definitions/responses.ErrorResponse'
         "404":
-          description: Account does not exist
+          description: Not Found
           schema:
-            type: string
+            $ref: '#/definitions/responses.ErrorResponse'
         "500":
-          description: Internal server error
+          description: Internal Server Error
           schema:
-            type: string
+            $ref: '#/definitions/responses.ErrorResponse'
       summary: Log in
       tags:
       - login
@@ -223,13 +228,13 @@ paths:
               $ref: '#/definitions/transfer.transferResponse'
             type: array
         "401":
-          description: No token provided
+          description: Unauthorized
           schema:
-            type: string
+            $ref: '#/definitions/responses.ErrorResponse'
         "500":
-          description: Internal server error
+          description: Internal Server Error
           schema:
-            type: string
+            $ref: '#/definitions/responses.ErrorResponse'
       summary: List transfers
       tags:
       - transfers
@@ -238,17 +243,17 @@ paths:
       - application/json
       description: Creates a new transfer between two accounts.
       parameters:
+      - description: Bearer Authorization Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: Body
         in: body
         name: Body
         required: true
         schema:
           $ref: '#/definitions/transfer.transferRequest'
-      - description: Bearer Authorization Token
-        in: header
-        name: Authorization
-        required: true
-        type: string
       produces:
       - application/json
       responses:
@@ -259,13 +264,17 @@ paths:
               $ref: '#/definitions/transfer.transferCreatedResponse'
             type: array
         "401":
-          description: No token provided
+          description: Unauthorized
           schema:
-            type: string
+            $ref: '#/definitions/responses.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
         "500":
-          description: Internal server error
+          description: Internal Server Error
           schema:
-            type: string
+            $ref: '#/definitions/responses.ErrorResponse'
       summary: Create a new transfer
       tags:
       - transfers

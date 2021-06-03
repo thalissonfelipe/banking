@@ -22,9 +22,9 @@ import (
 // @Produce json
 // @Param Body body requestBody true "Body"
 // @Success 201 {object} createdAccountResponse
-// @Failure 400 {string} string "Bad request"
-// @Failure 409 {string} string "Account already exists"
-// @Failure 500 {string} string "Internal server error"
+// @Failure 400 {object} responses.ErrorResponse
+// @Failure 409 {object} responses.ErrorResponse
+// @Failure 500 {object} responses.ErrorResponse
 // @Router /accounts [POST]
 func (h Handler) CreateAccount(w http.ResponseWriter, r *http.Request) {
 	var body requestBody

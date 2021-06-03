@@ -13,7 +13,7 @@ import (
 // @Accept json
 // @Produce json
 // @Success 200 {array} accountResponse
-// @Failure 500 {string} string "Internal server error"
+// @Failure 500 {object} responses.ErrorResponse
 // @Router /accounts [GET]
 func (h Handler) ListAccounts(w http.ResponseWriter, r *http.Request) {
 	accounts, err := h.usecase.ListAccounts(r.Context())

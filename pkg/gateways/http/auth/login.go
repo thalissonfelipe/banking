@@ -18,9 +18,9 @@ import (
 // @Produce json
 // @Param Body body requestBody true "Body"
 // @Success 200 {object} responseBody
-// @Failure 400 {string} string "Bad request"
-// @Failure 404 {string} string "Account does not exist"
-// @Failure 500 {string} string "Internal server error"
+// @Failure 400 {object} responses.ErrorResponse
+// @Failure 404 {object} responses.ErrorResponse
+// @Failure 500 {object} responses.ErrorResponse
 // @Router /login [POST]
 func (h Handler) Login(w http.ResponseWriter, r *http.Request) {
 	var body requestBody

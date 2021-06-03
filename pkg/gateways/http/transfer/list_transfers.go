@@ -16,8 +16,8 @@ import (
 // @Produce json
 // @Param Authorization header string true "Bearer Authorization Token"
 // @Success 200 {array} transferResponse
-// @Failure 401 {string} string "No token provided"
-// @Failure 500 {string} string "Internal server error"
+// @Failure 401 {object} responses.ErrorResponse
+// @Failure 500 {object} responses.ErrorResponse
 // @Router /transfers [GET]
 func (h Handler) ListTransfers(w http.ResponseWriter, r *http.Request) {
 	token := getTokenFromHeader(r.Header.Get("Authorization"))
