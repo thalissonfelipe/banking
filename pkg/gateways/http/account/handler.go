@@ -1,9 +1,7 @@
 package account
 
 import (
-	"net/http"
-
-	"github.com/gorilla/mux"
+	"github.com/go-chi/chi/v5"
 
 	"github.com/thalissonfelipe/banking/pkg/domain/account"
 )
@@ -12,12 +10,14 @@ type Handler struct {
 	usecase account.Usecase
 }
 
-func NewHandler(r *mux.Router, usecase account.Usecase) *Handler {
+func NewHandler(r *chi.Mux, usecase account.Usecase) *Handler {
 	handler := Handler{usecase: usecase}
 
-	r.HandleFunc("/accounts", handler.ListAccounts).Methods(http.MethodGet)
-	r.HandleFunc("/accounts", handler.CreateAccount).Methods(http.MethodPost)
-	r.HandleFunc("/accounts/{id}/balance", handler.GetAccountBalance).Methods(http.MethodGet)
+	r.Route("/api/v1/accounts", func(r chi.Router) {
+		r.Get("/", handler.ListAccounts)
+		r.Post("/", handler.CreateAccount)
+		r.Get("/{accountID}/balance", handler.GetAccountBalance)
+	})
 
 	return &handler
 }

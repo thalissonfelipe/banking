@@ -8,7 +8,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/gorilla/mux"
+	"github.com/go-chi/chi/v5"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/thalissonfelipe/banking/pkg/domain/account/usecase"
@@ -58,7 +58,7 @@ func TestHandler_ListAccounts(t *testing.T) {
 	for _, tt := range testCases {
 		t.Run(tt.name, func(t *testing.T) {
 			accUseCase := usecase.NewAccountUsecase(tt.repoSetup, nil)
-			r := mux.NewRouter()
+			r := chi.NewRouter()
 			handler := NewHandler(r, accUseCase)
 
 			request := fakes.FakeRequest(http.MethodGet, "/accounts", nil)

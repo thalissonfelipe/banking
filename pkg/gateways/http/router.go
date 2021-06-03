@@ -2,8 +2,10 @@ package http
 
 import (
 	"net/http"
+	"time"
 
-	"github.com/gorilla/mux"
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 	"github.com/jackc/pgx/v4"
 
 	acc_usecase "github.com/thalissonfelipe/banking/pkg/domain/account/usecase"
@@ -26,9 +28,18 @@ func NewRouter(db *pgx.Conn) http.Handler {
 	transferRepo := tr_repo.NewRepository(db)
 	transferUsecase := tr_usecase.NewTransferUsecase(transferRepo, accountUsecase)
 
-	// Register endpoints
-	router := mux.NewRouter()
-	router = router.PathPrefix("/api/v1").Subrouter()
+	router := chi.NewRouter()
+
+	// middlewares
+	router.Use(middleware.RequestID)
+	router.Use(middleware.RealIP)
+	router.Use(middleware.Logger)
+	router.Use(middleware.Recoverer)
+
+	// Set a timeout value on the request context (ctx), that will signal
+	// through ctx.Done() that the request has timed out and further
+	// processing should be stopped.
+	router.Use(middleware.Timeout(60 * time.Second))
 
 	acc_handler.NewHandler(router, accountUsecase)
 	auth_handler.NewHandler(router, authService)
