@@ -2,10 +2,8 @@ package transfer
 
 import (
 	"encoding/json"
-	"errors"
 	"net/http"
 
-	"github.com/thalissonfelipe/banking/pkg/domain/entities"
 	"github.com/thalissonfelipe/banking/pkg/domain/transfer"
 	"github.com/thalissonfelipe/banking/pkg/domain/vos"
 	"github.com/thalissonfelipe/banking/pkg/gateways/http/responses"
@@ -20,21 +18,24 @@ import (
 // @Produce json
 // @Param Authorization header string true "Bearer Authorization Token"
 // @Param Body body transferRequest true "Body"
-// @Success 200 {array} transferCreatedResponse
+// @Success 201 {array} transferCreatedResponse
 // @Failure 401 {object} responses.ErrorResponse
 // @Failure 404 {object} responses.ErrorResponse
 // @Failure 500 {object} responses.ErrorResponse
 // @Router /transfers [POST]
 func (h Handler) CreateTransfer(w http.ResponseWriter, r *http.Request) {
 	var body transferRequest
+
 	err := json.NewDecoder(r.Body).Decode(&body)
 	if err != nil {
-		responses.SendError(w, http.StatusBadRequest, errInvalidJSON.Error())
+		responses.SendError(w, http.StatusBadRequest, responses.ErrInvalidJSON)
+
 		return
 	}
 
 	if err := body.isValid(); err != nil {
-		responses.SendError(w, http.StatusBadRequest, err.Error())
+		responses.SendError(w, http.StatusBadRequest, err)
+
 		return
 	}
 
@@ -43,27 +44,17 @@ func (h Handler) CreateTransfer(w http.ResponseWriter, r *http.Request) {
 	accountDestinationID := vos.ConvertStringToID(body.AccountDestinationID)
 
 	if accountID == accountDestinationID {
-		responses.SendError(w, http.StatusBadRequest, errDestIDEqualCurrentID.Error())
+		responses.SendError(w, http.StatusBadRequest, errDestIDEqualCurrentID)
+
 		return
 	}
 
 	input := transfer.NewTransferInput(accountID, accountDestinationID, body.Amount)
+
 	err = h.usecase.CreateTransfer(r.Context(), input)
 	if err != nil {
-		if errors.Is(err, entities.ErrAccountDoesNotExist) {
-			responses.SendError(w, http.StatusNotFound, errAccountOriginDoesNotExist.Error())
-			return
-		}
-		if errors.Is(err, entities.ErrAccountDestinationDoesNotExist) {
-			responses.SendError(w, http.StatusNotFound, err.Error())
-			return
-		}
-		if errors.Is(err, entities.ErrInsufficientFunds) {
-			responses.SendError(w, http.StatusBadRequest, err.Error())
-			return
-		}
+		responses.HandleError(w, err)
 
-		responses.SendError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
@@ -72,5 +63,5 @@ func (h Handler) CreateTransfer(w http.ResponseWriter, r *http.Request) {
 		AccountDestinationID: body.AccountDestinationID,
 		Amount:               body.Amount,
 	}
-	responses.SendJSON(w, http.StatusOK, response)
+	responses.SendJSON(w, http.StatusCreated, response)
 }
