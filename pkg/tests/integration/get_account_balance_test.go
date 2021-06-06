@@ -26,7 +26,7 @@ func TestIntegration_GetAccountBalance(t *testing.T) {
 		{
 			name: "should return status code 200 if account exists",
 			uriSetup: func(t *testing.T) string {
-				acc := createAccount(t, testdata.GetValidCPF(), testdata.GetValidSecret())
+				acc := createAccount(t, testdata.GetValidCPF(), testdata.GetValidSecret(), 0)
 
 				return fmt.Sprintf("%s/api/v1/accounts/%s/balance", server.URL, acc.ID.String())
 			},

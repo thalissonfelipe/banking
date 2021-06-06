@@ -3,8 +3,6 @@ package integration
 import (
 	"bytes"
 	"context"
-	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"testing"
@@ -18,6 +16,8 @@ import (
 )
 
 func TestIntegration_GetTransfers(t *testing.T) {
+	uri := server.URL + "/api/v1/transfers"
+
 	testCases := []struct {
 		name           string
 		requestSetup   func() *http.Request
@@ -26,30 +26,10 @@ func TestIntegration_GetTransfers(t *testing.T) {
 		{
 			name: "should return list of transfers sucessfully",
 			requestSetup: func() *http.Request {
-				// TODO: refactor login to avoid duplicated code
-				type requestBody struct {
-					CPF    string `json:"cpf"`
-					Secret string `json:"secret"`
-				}
-
-				type responseBody struct {
-					Token string `json:"token"`
-				}
-
 				secret := testdata.GetValidSecret()
-				acc := createAccount(t, testdata.GetValidCPF(), secret)
+				acc := createAccount(t, testdata.GetValidCPF(), secret, 0)
 
-				reqBody := requestBody{CPF: acc.CPF.String(), Secret: secret.String()}
-				request := fakes.FakeRequest(http.MethodPost, server.URL+"/api/v1/login", reqBody)
-				resp, err := http.DefaultClient.Do(request)
-				require.NoError(t, err)
-
-				var respBody responseBody
-				err = json.NewDecoder(resp.Body).Decode(&respBody)
-				require.NoError(t, err)
-
-				request = fakes.FakeRequest(http.MethodGet, server.URL+"/api/v1/transfers", nil)
-				request.Header.Add("Authorization", fmt.Sprintf("Bearer %s", respBody.Token))
+				request := fakes.FakeAuthorizedRequest(t, server.URL, http.MethodGet, uri, acc.CPF.String(), secret.String(), nil)
 
 				return request
 			},

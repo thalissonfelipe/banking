@@ -25,7 +25,7 @@ func TestIntegration_Login(t *testing.T) {
 	}
 
 	secret := testdata.GetValidSecret()
-	acc := createAccount(t, testdata.GetValidCPF(), secret)
+	acc := createAccount(t, testdata.GetValidCPF(), secret, 0)
 
 	reqBody := requestBody{CPF: acc.CPF.String(), Secret: secret.String()}
 

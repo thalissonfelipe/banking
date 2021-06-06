@@ -33,8 +33,9 @@ func TestMain(m *testing.M) {
 	os.Exit(exitCode)
 }
 
-func createAccount(t *testing.T, cpf vos.CPF, secret vos.Secret) entities.Account {
+func createAccount(t *testing.T, cpf vos.CPF, secret vos.Secret, balance int) entities.Account {
 	acc := entities.NewAccount("Felipe", cpf, secret)
+	acc.Balance = balance
 
 	encrypter := hash.Hash{}
 

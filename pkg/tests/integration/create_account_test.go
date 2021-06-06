@@ -107,7 +107,7 @@ func TestIntegration_CreateAccount(t *testing.T) {
 		{
 			name: "should return status code 409 if account already exists",
 			bodySetup: func() requestBody {
-				acc := createAccount(t, testdata.GetValidCPF(), testdata.GetValidSecret())
+				acc := createAccount(t, testdata.GetValidCPF(), testdata.GetValidSecret(), 0)
 
 				body := requestBody{
 					Name:   "Felipe",
