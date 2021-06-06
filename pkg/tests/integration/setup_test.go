@@ -1,10 +1,15 @@
 package integration
 
 import (
+	"context"
 	"net/http/httptest"
 	"os"
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
+	"github.com/thalissonfelipe/banking/pkg/domain/entities"
+	"github.com/thalissonfelipe/banking/pkg/domain/vos"
 	h "github.com/thalissonfelipe/banking/pkg/gateways/http"
 	"github.com/thalissonfelipe/banking/pkg/tests/dockertest"
 )
@@ -25,4 +30,15 @@ func TestMain(m *testing.M) {
 	server.Close()
 
 	os.Exit(exitCode)
+}
+
+func createAccount(t *testing.T, cpf vos.CPF, secret vos.Secret) entities.Account {
+	acc := entities.NewAccount("Felipe", cpf, secret)
+
+	_, err := pgDocker.DB.Exec(context.Background(),
+		`insert into accounts (id, name, cpf, secret, balance) values ($1, $2, $3, $4, $5)`,
+		acc.ID, acc.Name, acc.CPF, acc.Secret, acc.Balance)
+	require.NoError(t, err)
+
+	return acc
 }
