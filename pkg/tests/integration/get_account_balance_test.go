@@ -15,6 +15,7 @@ import (
 	"github.com/thalissonfelipe/banking/pkg/tests/dockertest"
 	"github.com/thalissonfelipe/banking/pkg/tests/fakes"
 	"github.com/thalissonfelipe/banking/pkg/tests/testdata"
+	"github.com/thalissonfelipe/banking/pkg/tests/testenv"
 )
 
 func TestIntegration_GetAccountBalance(t *testing.T) {
@@ -28,14 +29,14 @@ func TestIntegration_GetAccountBalance(t *testing.T) {
 			uriSetup: func(t *testing.T) string {
 				acc := createAccount(t, testdata.GetValidCPF(), testdata.GetValidSecret(), 0)
 
-				return fmt.Sprintf("%s/api/v1/accounts/%s/balance", server.URL, acc.ID.String())
+				return fmt.Sprintf("%s/api/v1/accounts/%s/balance", testenv.ServerURL, acc.ID.String())
 			},
 			expectedStatus: http.StatusOK,
 		},
 		{
 			name: "should return status code 404 if account does not exist",
 			uriSetup: func(t *testing.T) string {
-				return fmt.Sprintf("%s/api/v1/accounts/%s/balance", server.URL, vos.NewID().String())
+				return fmt.Sprintf("%s/api/v1/accounts/%s/balance", testenv.ServerURL, vos.NewID().String())
 			},
 			expectedStatus: http.StatusNotFound,
 		},
@@ -56,7 +57,7 @@ func TestIntegration_GetAccountBalance(t *testing.T) {
 
 			assert.Equal(t, tt.expectedStatus, resp.StatusCode)
 
-			dockertest.TruncateTables(context.Background(), pgDocker.DB)
+			dockertest.TruncateTables(context.Background(), testenv.DB)
 		})
 	}
 }

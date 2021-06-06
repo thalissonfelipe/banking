@@ -14,10 +14,11 @@ import (
 	"github.com/thalissonfelipe/banking/pkg/tests/dockertest"
 	"github.com/thalissonfelipe/banking/pkg/tests/fakes"
 	"github.com/thalissonfelipe/banking/pkg/tests/testdata"
+	"github.com/thalissonfelipe/banking/pkg/tests/testenv"
 )
 
 func TestIntegration_CreateTransfer(t *testing.T) {
-	uri := server.URL + "/api/v1/transfers"
+	uri := testenv.ServerURL + "/api/v1/transfers"
 
 	type requestBody struct {
 		AccountDestinationID string `json:"account_destination_id"`
@@ -37,7 +38,7 @@ func TestIntegration_CreateTransfer(t *testing.T) {
 				acc2 := createAccount(t, testdata.GetValidCPF(), testdata.GetValidSecret(), 0)
 
 				reqBody := requestBody{AccountDestinationID: acc2.ID.String(), Amount: 100}
-				request := fakes.FakeAuthorizedRequest(t, server.URL, http.MethodPost, uri, acc1.CPF.String(), secret.String(), reqBody)
+				request := fakes.FakeAuthorizedRequest(t, http.MethodPost, uri, acc1.CPF.String(), secret.String(), reqBody)
 
 				return request
 			},
@@ -51,7 +52,7 @@ func TestIntegration_CreateTransfer(t *testing.T) {
 				acc2 := createAccount(t, testdata.GetValidCPF(), testdata.GetValidSecret(), 0)
 
 				reqBody := requestBody{AccountDestinationID: acc2.ID.String(), Amount: 200}
-				request := fakes.FakeAuthorizedRequest(t, server.URL, http.MethodPost, uri, acc1.CPF.String(), secret.String(), reqBody)
+				request := fakes.FakeAuthorizedRequest(t, http.MethodPost, uri, acc1.CPF.String(), secret.String(), reqBody)
 
 				return request
 			},
@@ -64,7 +65,7 @@ func TestIntegration_CreateTransfer(t *testing.T) {
 				accOrigin := createAccount(t, testdata.GetValidCPF(), secret, 100)
 
 				reqBody := requestBody{AccountDestinationID: accOrigin.ID.String(), Amount: 200}
-				request := fakes.FakeAuthorizedRequest(t, server.URL, http.MethodPost, uri, accOrigin.CPF.String(), secret.String(), reqBody)
+				request := fakes.FakeAuthorizedRequest(t, http.MethodPost, uri, accOrigin.CPF.String(), secret.String(), reqBody)
 
 				return request
 			},
@@ -77,7 +78,7 @@ func TestIntegration_CreateTransfer(t *testing.T) {
 				accOrigin := createAccount(t, testdata.GetValidCPF(), secret, 100)
 
 				reqBody := requestBody{AccountDestinationID: vos.NewID().String(), Amount: 200}
-				request := fakes.FakeAuthorizedRequest(t, server.URL, http.MethodPost, uri, accOrigin.CPF.String(), secret.String(), reqBody)
+				request := fakes.FakeAuthorizedRequest(t, http.MethodPost, uri, accOrigin.CPF.String(), secret.String(), reqBody)
 
 				return request
 			},
@@ -111,7 +112,7 @@ func TestIntegration_CreateTransfer(t *testing.T) {
 
 			assert.Equal(t, tt.expectedStatus, resp.StatusCode)
 
-			dockertest.TruncateTables(context.Background(), pgDocker.DB)
+			dockertest.TruncateTables(context.Background(), testenv.DB)
 		})
 	}
 }

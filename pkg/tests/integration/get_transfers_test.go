@@ -13,10 +13,11 @@ import (
 	"github.com/thalissonfelipe/banking/pkg/tests/dockertest"
 	"github.com/thalissonfelipe/banking/pkg/tests/fakes"
 	"github.com/thalissonfelipe/banking/pkg/tests/testdata"
+	"github.com/thalissonfelipe/banking/pkg/tests/testenv"
 )
 
 func TestIntegration_GetTransfers(t *testing.T) {
-	uri := server.URL + "/api/v1/transfers"
+	uri := testenv.ServerURL + "/api/v1/transfers"
 
 	testCases := []struct {
 		name           string
@@ -29,7 +30,7 @@ func TestIntegration_GetTransfers(t *testing.T) {
 				secret := testdata.GetValidSecret()
 				acc := createAccount(t, testdata.GetValidCPF(), secret, 0)
 
-				request := fakes.FakeAuthorizedRequest(t, server.URL, http.MethodGet, uri, acc.CPF.String(), secret.String(), nil)
+				request := fakes.FakeAuthorizedRequest(t, http.MethodGet, uri, acc.CPF.String(), secret.String(), nil)
 
 				return request
 			},
@@ -38,7 +39,7 @@ func TestIntegration_GetTransfers(t *testing.T) {
 		{
 			name: "should return status code 401 when user is not authorized",
 			requestSetup: func() *http.Request {
-				request := fakes.FakeRequest(http.MethodGet, server.URL+"/api/v1/transfers", nil)
+				request := fakes.FakeRequest(http.MethodGet, testenv.ServerURL+"/api/v1/transfers", nil)
 
 				return request
 			},
@@ -60,7 +61,7 @@ func TestIntegration_GetTransfers(t *testing.T) {
 
 			assert.Equal(t, tt.expectedStatus, resp.StatusCode)
 
-			dockertest.TruncateTables(context.Background(), pgDocker.DB)
+			dockertest.TruncateTables(context.Background(), testenv.DB)
 		})
 	}
 }

@@ -10,6 +10,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
+	"github.com/thalissonfelipe/banking/pkg/tests/testenv"
 )
 
 func FakeRequest(method string, path string, requestBody interface{}) *http.Request {
@@ -25,7 +26,7 @@ func FakeRequest(method string, path string, requestBody interface{}) *http.Requ
 	return req
 }
 
-func FakeAuthorizedRequest(t *testing.T, serverURl, method, path, cpf, secret string, requestBody interface{}) *http.Request {
+func FakeAuthorizedRequest(t *testing.T, method, path, cpf, secret string, requestBody interface{}) *http.Request {
 	type loginRequestBody struct {
 		CPF    string `json:"cpf"`
 		Secret string `json:"secret"`
@@ -36,7 +37,7 @@ func FakeAuthorizedRequest(t *testing.T, serverURl, method, path, cpf, secret st
 	}
 
 	loginBody := loginRequestBody{CPF: cpf, Secret: secret}
-	request := FakeRequest(http.MethodPost, serverURl+"/api/v1/login", loginBody)
+	request := FakeRequest(http.MethodPost, testenv.ServerURL+"/api/v1/login", loginBody)
 	resp, err := http.DefaultClient.Do(request)
 	require.NoError(t, err)
 

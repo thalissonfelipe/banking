@@ -12,6 +12,7 @@ import (
 	"github.com/thalissonfelipe/banking/pkg/tests/dockertest"
 	"github.com/thalissonfelipe/banking/pkg/tests/fakes"
 	"github.com/thalissonfelipe/banking/pkg/tests/testdata"
+	"github.com/thalissonfelipe/banking/pkg/tests/testenv"
 )
 
 func TestIntegration_Login(t *testing.T) {
@@ -29,7 +30,7 @@ func TestIntegration_Login(t *testing.T) {
 
 	reqBody := requestBody{CPF: acc.CPF.String(), Secret: secret.String()}
 
-	request := fakes.FakeRequest(http.MethodPost, server.URL+"/api/v1/login", reqBody)
+	request := fakes.FakeRequest(http.MethodPost, testenv.ServerURL+"/api/v1/login", reqBody)
 	resp, err := http.DefaultClient.Do(request)
 	require.NoError(t, err)
 
@@ -41,5 +42,5 @@ func TestIntegration_Login(t *testing.T) {
 
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
 
-	dockertest.TruncateTables(context.Background(), pgDocker.DB)
+	dockertest.TruncateTables(context.Background(), testenv.DB)
 }

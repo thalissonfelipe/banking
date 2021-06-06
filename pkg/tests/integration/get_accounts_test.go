@@ -12,12 +12,13 @@ import (
 
 	"github.com/thalissonfelipe/banking/pkg/tests/dockertest"
 	"github.com/thalissonfelipe/banking/pkg/tests/fakes"
+	"github.com/thalissonfelipe/banking/pkg/tests/testenv"
 )
 
 func TestIntegration_GetAccounts(t *testing.T) {
-	defer dockertest.TruncateTables(context.Background(), pgDocker.DB)
+	defer dockertest.TruncateTables(context.Background(), testenv.DB)
 
-	request := fakes.FakeRequest(http.MethodGet, server.URL+"/api/v1/accounts", nil)
+	request := fakes.FakeRequest(http.MethodGet, testenv.ServerURL+"/api/v1/accounts", nil)
 	resp, err := http.DefaultClient.Do(request)
 	require.NoError(t, err)
 

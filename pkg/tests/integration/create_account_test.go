@@ -13,6 +13,7 @@ import (
 	"github.com/thalissonfelipe/banking/pkg/tests/dockertest"
 	"github.com/thalissonfelipe/banking/pkg/tests/fakes"
 	"github.com/thalissonfelipe/banking/pkg/tests/testdata"
+	"github.com/thalissonfelipe/banking/pkg/tests/testenv"
 )
 
 func TestIntegration_CreateAccount(t *testing.T) {
@@ -123,7 +124,7 @@ func TestIntegration_CreateAccount(t *testing.T) {
 
 	for _, tt := range testCases {
 		t.Run(tt.name, func(t *testing.T) {
-			request := fakes.FakeRequest(http.MethodPost, server.URL+"/api/v1/accounts", tt.bodySetup())
+			request := fakes.FakeRequest(http.MethodPost, testenv.ServerURL+"/api/v1/accounts", tt.bodySetup())
 			resp, err := http.DefaultClient.Do(request)
 			require.NoError(t, err)
 
@@ -136,7 +137,7 @@ func TestIntegration_CreateAccount(t *testing.T) {
 
 			assert.Equal(t, tt.expectedStatus, resp.StatusCode)
 
-			dockertest.TruncateTables(context.Background(), pgDocker.DB)
+			dockertest.TruncateTables(context.Background(), testenv.DB)
 		})
 	}
 
