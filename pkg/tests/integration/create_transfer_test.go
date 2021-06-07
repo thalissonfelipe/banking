@@ -72,6 +72,21 @@ func TestIntegration_CreateTransfer(t *testing.T) {
 			expectedStatus: http.StatusBadRequest,
 		},
 		{
+			name: "should return 404 if account origin does not exist anymore",
+			requestSetup: func(t *testing.T) *http.Request {
+				secret := testdata.GetValidSecret()
+				accOrigin := createAccount(t, testdata.GetValidCPF(), secret, 100)
+
+				reqBody := requestBody{AccountDestinationID: vos.NewID().String(), Amount: 200}
+				request := fakes.FakeAuthorizedRequest(t, http.MethodPost, uri, accOrigin.CPF.String(), secret.String(), reqBody)
+
+				dockertest.TruncateTables(context.Background(), testenv.DB)
+
+				return request
+			},
+			expectedStatus: http.StatusNotFound,
+		},
+		{
 			name: "should return 404 if account destination does not exist",
 			requestSetup: func(t *testing.T) *http.Request {
 				secret := testdata.GetValidSecret()
