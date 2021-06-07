@@ -11,8 +11,6 @@ import (
 var (
 	errMissingAccDestIDParameter = errors.New("missing account destination id parameter")
 	errMissingAmountParameter    = errors.New("missing amount parameter")
-	errInvalidJSON               = errors.New("invalid json")
-	errAccountOriginDoesNotExist = errors.New("account origin does not exist")
 	errDestIDEqualCurrentID      = errors.New("account destination cannot be the account origin id")
 )
 

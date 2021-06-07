@@ -163,7 +163,7 @@ func TestHandler_CreateTransfer(t *testing.T) {
 				AccountDestinationID: accDest.ID.String(),
 				Amount:               100,
 			},
-			expectedCode: http.StatusOK,
+			expectedCode: http.StatusCreated,
 		},
 	}
 

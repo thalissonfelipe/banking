@@ -22,13 +22,16 @@ import (
 func (h Handler) ListTransfers(w http.ResponseWriter, r *http.Request) {
 	token := getTokenFromHeader(r.Header.Get("Authorization"))
 	accountID := vos.ConvertStringToID(auth.GetIDFromToken(token))
+
 	transfers, err := h.usecase.ListTransfers(r.Context(), accountID)
 	if err != nil {
-		responses.SendError(w, http.StatusInternalServerError, err.Error())
+		responses.SendError(w, http.StatusInternalServerError, responses.ErrInternalError)
+
 		return
 	}
 
 	transfersResponse := make([]transferResponse, 0)
+
 	for _, transfer := range transfers {
 		transfersResponse = append(transfersResponse, convertTransferToTransferResponse(transfer))
 	}
