@@ -2,7 +2,9 @@ package auth
 
 import (
 	"context"
+	"errors"
 
+	"github.com/thalissonfelipe/banking/pkg/domain/entities"
 	"github.com/thalissonfelipe/banking/pkg/domain/vos"
 )
 
@@ -14,7 +16,11 @@ func (a Auth) Autheticate(ctx context.Context, input AuthenticateInput) (string,
 
 	acc, err := a.accountUsecase.GetAccountByCPF(ctx, cpf)
 	if err != nil {
-		return "", err
+		if errors.Is(err, entities.ErrInternalError) {
+			return "", err
+		}
+
+		return "", ErrInvalidCredentials
 	}
 
 	hashedSecret := []byte(acc.Secret.String())
@@ -22,7 +28,7 @@ func (a Auth) Autheticate(ctx context.Context, input AuthenticateInput) (string,
 
 	err = a.encrypter.CompareHashAndSecret(hashedSecret, secret)
 	if err != nil {
-		return "", ErrSecretDoesNotMatch
+		return "", ErrInvalidCredentials
 	}
 
 	token, err := NewToken(acc.ID.String())

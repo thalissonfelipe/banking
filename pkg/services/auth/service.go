@@ -16,3 +16,8 @@ func NewAuth(accUsecase account.Usecase, encrypter encrypter.Encrypter) *Auth {
 		encrypter:      encrypter,
 	}
 }
+
+type AuthenticateInput struct {
+	CPF    string
+	Secret string
+}
