@@ -1,0 +1,70 @@
+run:
+  timeout: 5m
+  tests: true
+
+linters-settings:
+  govet:
+    enable-all: true
+    disable:
+      - fieldalignment
+  staticcheck:
+    go: "1.16"
+  gofmt:
+    simplify: true
+  gofumpt:
+    extra-rules: true
+  lll:
+    line-length: 120
+    tab-width: 4
+  misspell:
+    locale: US
+
+linters:
+  enable:
+    - deadcode
+    - errcheck
+    - gosimple
+    - govet
+    - ineffassign
+    - staticcheck
+    - structcheck
+    - typecheck
+    - unused
+    - varcheck
+    - bodyclose
+    - gofmt
+    - dogsled
+    - dupl
+    - durationcheck
+    - errorlint
+    - exhaustive
+    - exportloopref
+    - forcetypeassert
+    - gochecknoinits
+    - goconst
+    - gocritic
+    - gocyclo
+    - godot
+    - goerr113
+    - gofumpt
+    - goimports
+    - gomnd
+    - gosec
+    - ifshort
+    - lll
+    - makezero
+    - misspell
+    - nestif
+    - nilerr
+    - nlreturn
+    - noctx
+    - nolintlint
+    - prealloc
+    - predeclared
+    # - revive until I merge with main
+    - rowserrcheck
+    - unconvert
+    - wastedassign
+    - whitespace
+    - wrapcheck
+    - wsl

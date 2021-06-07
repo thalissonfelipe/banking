@@ -2,7 +2,6 @@ package usecase
 
 import (
 	"context"
-	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -19,25 +18,21 @@ func TestUsecase_ListAccounts(t *testing.T) {
 		name        string
 		repoSetup   *mocks.StubAccountRepository
 		expected    []entities.Account
-		errExpected error
+		expectedErr error
 	}{
 		{
 			name: "should return a list of accounts",
 			repoSetup: &mocks.StubAccountRepository{
 				Accounts: []entities.Account{acc},
-				Err:      nil,
 			},
 			expected:    []entities.Account{acc},
-			errExpected: nil,
+			expectedErr: nil,
 		},
 		{
-			name: "should return an error if something went wrong on repository",
-			repoSetup: &mocks.StubAccountRepository{
-				Accounts: nil,
-				Err:      errors.New("failed to fetch accounts"),
-			},
+			name:        "should return an error if something went wrong on repository",
+			repoSetup:   &mocks.StubAccountRepository{Err: testdata.ErrRepositoryFailsToFetch},
 			expected:    nil,
-			errExpected: entities.ErrInternalError,
+			expectedErr: entities.ErrInternalError,
 		},
 	}
 
@@ -48,7 +43,7 @@ func TestUsecase_ListAccounts(t *testing.T) {
 			result, err := usecase.ListAccounts(ctx)
 
 			assert.Equal(t, tt.expected, result)
-			assert.Equal(t, tt.errExpected, err)
+			assert.ErrorIs(t, err, tt.expectedErr)
 		})
 	}
 }

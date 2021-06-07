@@ -17,3 +17,10 @@ dev-local:
 test:
 	@echo "==> Running tests..."
 	go test -v ./...
+
+.PHONY: metalint
+metalint:
+	@echo "===> Installing golangci-lint..."
+	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.40.1
+	@echo "===> Running golangci-lint..."
+	$$(go env GOPATH)/bin/golangci-lint run -c ./.golangci.yml ./...

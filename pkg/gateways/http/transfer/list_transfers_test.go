@@ -3,7 +3,6 @@ package transfer
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -11,6 +10,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
 	"github.com/thalissonfelipe/banking/pkg/domain/transfer/usecase"
@@ -52,10 +52,8 @@ func TestHandler_ListTransfers(t *testing.T) {
 			expectedCode: http.StatusOK,
 		},
 		{
-			name: "should return an error if usecase fails",
-			repo: &mocks.StubTransferRepository{
-				Err: errors.New("usecase fails to fetch transfers"),
-			},
+			name:         "should return an error if usecase fails",
+			repo:         &mocks.StubTransferRepository{Err: testdata.ErrUsecaseFails},
 			decoder:      tests.ErrorMessageDecoder{},
 			expectedBody: responses.ErrorResponse{Message: "internal server error"},
 			expectedCode: http.StatusInternalServerError,
@@ -77,7 +75,7 @@ func TestHandler_ListTransfers(t *testing.T) {
 
 			http.HandlerFunc(handler.ListTransfers).ServeHTTP(response, request)
 
-			result := tt.decoder.Decode(response.Body)
+			result := tt.decoder.Decode(t, response.Body)
 
 			assert.Equal(t, tt.expectedBody, result)
 			assert.Equal(t, tt.expectedCode, response.Code)
@@ -88,8 +86,11 @@ func TestHandler_ListTransfers(t *testing.T) {
 
 type listTransfersDecoder struct{}
 
-func (listTransfersDecoder) Decode(body *bytes.Buffer) interface{} {
+func (listTransfersDecoder) Decode(t *testing.T, body *bytes.Buffer) interface{} {
 	var result []schemes.TransferListResponse
-	json.NewDecoder(body).Decode(&result)
+
+	err := json.NewDecoder(body).Decode(&result)
+	require.NoError(t, err)
+
 	return result
 }

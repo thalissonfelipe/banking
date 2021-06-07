@@ -3,11 +3,15 @@ package vos
 import (
 	"database/sql/driver"
 	"errors"
+	"fmt"
 	"regexp"
 
 	"github.com/thalissonfelipe/banking/pkg/domain/encrypter"
 )
 
+// ErrInvalidSecret occurs when the secret does meet the basic requirements. Also, the secret
+// must have a minimum size of 8 and a maximum size of 20 characters. Must have at least one
+// uppercase characterer, at least one lowercase character and at least one number.
 var ErrInvalidSecret = errors.New("invalid secret")
 
 const (
@@ -63,23 +67,27 @@ func (s Secret) Value() (driver.Value, error) {
 
 func (s *Secret) Scan(value interface{}) error {
 	if value == nil {
-		*s = Secret(Secret{})
+		*s = Secret{}
+
 		return nil
 	}
-	if bv, err := driver.String.ConvertValue(value); err == nil {
+
+	bv, err := driver.String.ConvertValue(value)
+	if err == nil {
 		if v, ok := bv.(string); ok {
-			*s = Secret(Secret{v})
+			*s = Secret{v}
+
 			return nil
 		}
 	}
 
-	return errors.New("failed to scan Secret")
+	return fmt.Errorf("could not scan secret: %w", err)
 }
 
 func (s *Secret) Hash(encrypter encrypter.Encrypter) error {
 	hashedSecret, err := encrypter.Hash(s.value)
 	if err != nil {
-		return err
+		return fmt.Errorf("could not encrypt secret: %w", err)
 	}
 
 	s.value = string(hashedSecret)

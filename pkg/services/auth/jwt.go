@@ -8,23 +8,26 @@ import (
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
 )
 
-var jwtKey = []byte("secret-key")
+var (
+	jwtKey         = []byte("secret-key")
+	expirationTime = 24 * time.Hour
+)
 
-type claims struct {
+type Claims struct {
 	AccountOriginID string `json:"account_origin_id"`
 	jwt.StandardClaims
 }
 
 func NewToken(accountOriginID string) (string, error) {
-	expirationTime := time.Now().Add(10 * time.Minute)
-	claims := &claims{
+	expirationTime := time.Now().Add(expirationTime)
+	claims := &Claims{
 		AccountOriginID: accountOriginID,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expirationTime.Unix(),
 		},
 	}
-
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+
 	tokenString, err := token.SignedString(jwtKey)
 	if err != nil {
 		return "", entities.ErrInternalError
@@ -45,10 +48,14 @@ func IsValidToken(tokenString string) error {
 }
 
 func GetIDFromToken(tokenString string) string {
-	claims := &claims{}
-	jwt.ParseWithClaims(tokenString, claims, func(t *jwt.Token) (interface{}, error) {
+	claims := &Claims{}
+
+	_, err := jwt.ParseWithClaims(tokenString, claims, func(t *jwt.Token) (interface{}, error) {
 		return jwtKey, nil
 	})
+	if err != nil {
+		return ""
+	}
 
 	return claims.AccountOriginID
 }

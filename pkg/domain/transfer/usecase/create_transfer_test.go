@@ -2,7 +2,6 @@ package usecase
 
 import (
 	"context"
-	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -18,11 +17,11 @@ func TestUsecase_CreateTransfer(t *testing.T) {
 	accDest := entities.NewAccount("Maria", testdata.GetValidCPF(), testdata.GetValidSecret())
 
 	testCases := []struct {
-		name       string
-		repoSetup  *mocks.StubTransferRepository
-		accUsecase func() *mocks.StubAccountUsecase
-		input      func() transfer.CreateTransferInput
-		expected   error
+		name        string
+		repoSetup   *mocks.StubTransferRepository
+		accUsecase  func() *mocks.StubAccountUsecase
+		input       func() transfer.CreateTransferInput
+		expectedErr error
 	}{
 		{
 			name:      "should perform a transfer successfully",
@@ -30,6 +29,7 @@ func TestUsecase_CreateTransfer(t *testing.T) {
 			accUsecase: func() *mocks.StubAccountUsecase {
 				accOriginWithBalance := accOrigin
 				accOriginWithBalance.Balance = 100
+
 				return &mocks.StubAccountUsecase{
 					Accounts: []entities.Account{accOriginWithBalance, accDest},
 				}
@@ -37,7 +37,7 @@ func TestUsecase_CreateTransfer(t *testing.T) {
 			input: func() transfer.CreateTransferInput {
 				return transfer.NewTransferInput(accOrigin.ID, accDest.ID, 100)
 			},
-			expected: nil,
+			expectedErr: nil,
 		},
 		{
 			name:      "should return an error if accOrigin does not have sufficient funds",
@@ -50,16 +50,15 @@ func TestUsecase_CreateTransfer(t *testing.T) {
 			input: func() transfer.CreateTransferInput {
 				return transfer.NewTransferInput(accOrigin.ID, accDest.ID, 100)
 			},
-			expected: entities.ErrInsufficientFunds,
+			expectedErr: entities.ErrInsufficientFunds,
 		},
 		{
-			name: "should return an error if transfer repository fails",
-			repoSetup: &mocks.StubTransferRepository{
-				Err: errors.New("failed to transfer amount"),
-			},
+			name:      "should return an error if transfer repository fails",
+			repoSetup: &mocks.StubTransferRepository{Err: testdata.ErrRepositoryFailsToSave},
 			accUsecase: func() *mocks.StubAccountUsecase {
 				accOriginWithBalance := accOrigin
 				accOriginWithBalance.Balance = 100
+
 				return &mocks.StubAccountUsecase{
 					Accounts: []entities.Account{accOriginWithBalance, accDest},
 				}
@@ -67,7 +66,7 @@ func TestUsecase_CreateTransfer(t *testing.T) {
 			input: func() transfer.CreateTransferInput {
 				return transfer.NewTransferInput(accOrigin.ID, accDest.ID, 100)
 			},
-			expected: entities.ErrInternalError,
+			expectedErr: entities.ErrInternalError,
 		},
 		{
 			name:      "should return an error if accUsecase fails",
@@ -75,15 +74,16 @@ func TestUsecase_CreateTransfer(t *testing.T) {
 			accUsecase: func() *mocks.StubAccountUsecase {
 				accOriginWithBalance := accOrigin
 				accOriginWithBalance.Balance = 100
+
 				return &mocks.StubAccountUsecase{
 					Accounts: []entities.Account{accOriginWithBalance, accDest},
-					Err:      errors.New("failed to get account origin balance"),
+					Err:      testdata.ErrUsecaseFails,
 				}
 			},
 			input: func() transfer.CreateTransferInput {
 				return transfer.NewTransferInput(accOrigin.ID, accDest.ID, 100)
 			},
-			expected: entities.ErrInternalError,
+			expectedErr: entities.ErrInternalError,
 		},
 		{
 			name:      "should return an error if account origin does not exist",
@@ -96,7 +96,7 @@ func TestUsecase_CreateTransfer(t *testing.T) {
 			input: func() transfer.CreateTransferInput {
 				return transfer.NewTransferInput(accOrigin.ID, accDest.ID, 100)
 			},
-			expected: entities.ErrAccountDoesNotExist,
+			expectedErr: entities.ErrAccountDoesNotExist,
 		},
 		{
 			name:      "should return an error if account destination does not exist",
@@ -104,6 +104,7 @@ func TestUsecase_CreateTransfer(t *testing.T) {
 			accUsecase: func() *mocks.StubAccountUsecase {
 				accOriginWithBalance := accOrigin
 				accOriginWithBalance.Balance = 100
+
 				return &mocks.StubAccountUsecase{
 					Accounts: []entities.Account{accOriginWithBalance},
 				}
@@ -111,7 +112,7 @@ func TestUsecase_CreateTransfer(t *testing.T) {
 			input: func() transfer.CreateTransferInput {
 				return transfer.NewTransferInput(accOrigin.ID, accDest.ID, 100)
 			},
-			expected: entities.ErrAccountDestinationDoesNotExist,
+			expectedErr: entities.ErrAccountDestinationDoesNotExist,
 		},
 	}
 
@@ -121,7 +122,7 @@ func TestUsecase_CreateTransfer(t *testing.T) {
 			usecase := NewTransferUsecase(tt.repoSetup, tt.accUsecase())
 			err := usecase.CreateTransfer(ctx, tt.input())
 
-			assert.Equal(t, tt.expected, err)
+			assert.ErrorIs(t, err, tt.expectedErr)
 		})
 	}
 }

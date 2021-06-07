@@ -19,9 +19,12 @@ type Account struct {
 const DefaultBalance = 0
 
 var (
-	ErrAccountDoesNotExist  error = errors.New("account does not exist")
-	ErrAccountAlreadyExists error = errors.New("account already exists")
-	ErrInternalError        error = errors.New("internal server error")
+	// ErrAccountDoesNotExist occurs when an account does not exist.
+	ErrAccountDoesNotExist = errors.New("account does not exist")
+	// ErrAccountAlreadyExists occurs when an account already exists.
+	ErrAccountAlreadyExists = errors.New("account already exists")
+	// ErrInternalError ocurrs when an unexpected error happens.
+	ErrInternalError = errors.New("internal server error")
 )
 
 func NewAccount(name string, cpf vos.CPF, secret vos.Secret) Account {

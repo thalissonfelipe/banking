@@ -3,6 +3,7 @@ package account
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"github.com/jackc/pgconn"
 	"github.com/jackc/pgerrcode"
@@ -30,12 +31,12 @@ func (r Repository) CreateAccount(ctx context.Context, account *entities.Account
 
 	var pgErr *pgconn.PgError
 	if !errors.As(err, &pgErr) {
-		return err
+		return fmt.Errorf("unexpected error occurred on insert account query: %w", err)
 	}
 
 	if pgErr.Code == pgerrcode.UniqueViolation {
 		return entities.ErrAccountAlreadyExists
 	}
 
-	return err
+	return fmt.Errorf("unexpected error occurred on insert account query: %w", err)
 }

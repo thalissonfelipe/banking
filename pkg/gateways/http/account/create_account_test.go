@@ -3,13 +3,13 @@ package account
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/thalissonfelipe/banking/pkg/domain/account/usecase"
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
@@ -102,10 +102,8 @@ func TestHandler_CreateAccount(t *testing.T) {
 			expectedCode: http.StatusConflict,
 		},
 		{
-			name: "should return status code 500 if usecase fails to create account",
-			repo: &mocks.StubAccountRepository{
-				Err: errors.New("usecase error"),
-			},
+			name:         "should return status code 500 if usecase fails to create account",
+			repo:         &mocks.StubAccountRepository{Err: testdata.ErrUsecaseFails},
 			enc:          &mocks.StubHash{},
 			decoder:      tests.ErrorMessageDecoder{},
 			body:         schemes.CreateAccountInput{Name: "Pedro", CPF: cpf.String(), Secret: secret.String()},
@@ -113,11 +111,9 @@ func TestHandler_CreateAccount(t *testing.T) {
 			expectedCode: http.StatusInternalServerError,
 		},
 		{
-			name: "should return status code 500 if hash fails to hash secret",
-			repo: &mocks.StubAccountRepository{
-				Err: errors.New("usecase error"),
-			},
-			enc:          &mocks.StubHash{Err: errors.New("hash error")},
+			name:         "should return status code 500 if hash fails to hash secret",
+			repo:         &mocks.StubAccountRepository{},
+			enc:          &mocks.StubHash{Err: testdata.ErrHashFails},
 			decoder:      tests.ErrorMessageDecoder{},
 			body:         schemes.CreateAccountInput{Name: "Pedro", CPF: cpf.String(), Secret: secret.String()},
 			expectedBody: responses.ErrorResponse{Message: "internal server error"},
@@ -145,7 +141,7 @@ func TestHandler_CreateAccount(t *testing.T) {
 
 			http.HandlerFunc(handler.CreateAccount).ServeHTTP(response, request)
 
-			result := tt.decoder.Decode(response.Body)
+			result := tt.decoder.Decode(t, response.Body)
 
 			assert.Equal(t, tt.expectedBody, result)
 			assert.Equal(t, tt.expectedCode, response.Code)
@@ -155,8 +151,11 @@ func TestHandler_CreateAccount(t *testing.T) {
 
 type createdAccountDecoder struct{}
 
-func (createdAccountDecoder) Decode(body *bytes.Buffer) interface{} {
+func (createdAccountDecoder) Decode(t *testing.T, body *bytes.Buffer) interface{} {
 	var result schemes.CreateAccountResponse
-	json.NewDecoder(body).Decode(&result)
+
+	err := json.NewDecoder(body).Decode(&result)
+	require.NoError(t, err)
+
 	return result
 }

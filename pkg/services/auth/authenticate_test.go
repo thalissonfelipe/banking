@@ -2,7 +2,6 @@ package auth
 
 import (
 	"context"
-	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -19,35 +18,33 @@ func TestAuthenticate(t *testing.T) {
 	secret := testdata.GetValidSecret()
 
 	testCases := []struct {
-		name  string
-		repo  *mocks.StubAccountRepository
-		enc   *mocks.StubHash
-		input AuthenticateInput
-		token string // TODO: validate created token
-		err   error
+		name        string
+		repo        *mocks.StubAccountRepository
+		enc         *mocks.StubHash
+		input       AuthenticateInput
+		token       string // TODO: validate created token
+		expectedErr error
 	}{
 		{
-			name:  "should return an error if account does not exist",
-			repo:  &mocks.StubAccountRepository{},
-			enc:   &mocks.StubHash{},
-			input: AuthenticateInput{CPF: cpf.String(), Secret: secret.String()},
-			err:   ErrInvalidCredentials,
+			name:        "should return an error if account does not exist",
+			repo:        &mocks.StubAccountRepository{},
+			enc:         &mocks.StubHash{},
+			input:       AuthenticateInput{CPF: cpf.String(), Secret: secret.String()},
+			expectedErr: ErrInvalidCredentials,
 		},
 		{
-			name:  "should return an error if cpf provided is invalid",
-			repo:  &mocks.StubAccountRepository{},
-			enc:   &mocks.StubHash{},
-			input: AuthenticateInput{CPF: "123.456.789-00", Secret: secret.String()},
-			err:   vos.ErrInvalidCPF,
+			name:        "should return an error if cpf provided is invalid",
+			repo:        &mocks.StubAccountRepository{},
+			enc:         &mocks.StubHash{},
+			input:       AuthenticateInput{CPF: "123.456.789-00", Secret: secret.String()},
+			expectedErr: vos.ErrInvalidCPF,
 		},
 		{
-			name: "should return an error if usecase fails to fetch account",
-			repo: &mocks.StubAccountRepository{
-				Err: errors.New("usecase fails to fetch account"),
-			},
-			enc:   &mocks.StubHash{},
-			input: AuthenticateInput{CPF: cpf.String(), Secret: secret.String()},
-			err:   entities.ErrInternalError,
+			name:        "should return an error if usecase fails to fetch account",
+			repo:        &mocks.StubAccountRepository{Err: testdata.ErrRepositoryFailsToFetch},
+			enc:         &mocks.StubHash{},
+			input:       AuthenticateInput{CPF: cpf.String(), Secret: secret.String()},
+			expectedErr: entities.ErrInternalError,
 		},
 		{
 			name: "should return an error if secret does not match",
@@ -56,11 +53,9 @@ func TestAuthenticate(t *testing.T) {
 					entities.NewAccount("Pedro", cpf, secret),
 				},
 			},
-			enc: &mocks.StubHash{
-				Err: ErrInvalidCredentials,
-			},
-			input: AuthenticateInput{CPF: cpf.String(), Secret: secret.String()},
-			err:   ErrInvalidCredentials,
+			enc:         &mocks.StubHash{Err: ErrInvalidCredentials},
+			input:       AuthenticateInput{CPF: cpf.String(), Secret: secret.String()},
+			expectedErr: ErrInvalidCredentials,
 		},
 		{
 			name: "should return nil if authenticated succeeds",
@@ -69,9 +64,9 @@ func TestAuthenticate(t *testing.T) {
 					entities.NewAccount("Pedro", cpf, secret),
 				},
 			},
-			enc:   &mocks.StubHash{},
-			input: AuthenticateInput{CPF: cpf.String(), Secret: secret.String()},
-			err:   nil,
+			enc:         &mocks.StubHash{},
+			input:       AuthenticateInput{CPF: cpf.String(), Secret: secret.String()},
+			expectedErr: nil,
 		},
 	}
 
@@ -83,7 +78,7 @@ func TestAuthenticate(t *testing.T) {
 
 			_, err := service.Autheticate(ctx, tt.input)
 
-			assert.Equal(t, tt.err, err)
+			assert.ErrorIs(t, err, tt.expectedErr)
 		})
 	}
 }

@@ -3,6 +3,7 @@ package account
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"github.com/jackc/pgx/v4"
 
@@ -27,12 +28,13 @@ func (r Repository) GetAccountByCPF(ctx context.Context, cpf vos.CPF) (*entities
 		&account.Balance,
 		&account.CreatedAt,
 	)
-	if err != nil {
-		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, entities.ErrAccountDoesNotExist
-		}
-		return nil, err
+	if err == nil {
+		return &account, nil
 	}
 
-	return &account, nil
+	if errors.Is(err, pgx.ErrNoRows) {
+		return nil, entities.ErrAccountDoesNotExist
+	}
+
+	return nil, fmt.Errorf("unexpected error occurred on get account by cpf query: %w", err)
 }

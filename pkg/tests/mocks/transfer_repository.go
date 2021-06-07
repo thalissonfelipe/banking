@@ -18,6 +18,7 @@ func (s StubTransferRepository) GetTransfers(ctx context.Context, id vos.ID) ([]
 	}
 
 	var transfers []entities.Transfer
+
 	for _, tr := range s.Transfers {
 		if tr.AccountOriginID == id {
 			transfers = append(transfers, tr)
@@ -31,6 +32,8 @@ func (s *StubTransferRepository) CreateTransfer(ctx context.Context, transfer *e
 	if s.Err != nil {
 		return entities.ErrInternalError
 	}
+
 	s.Transfers = append(s.Transfers, *transfer)
+
 	return nil
 }

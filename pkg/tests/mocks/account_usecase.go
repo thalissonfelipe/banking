@@ -17,6 +17,7 @@ func (s StubAccountUsecase) GetAccountBalanceByID(ctx context.Context, accountID
 	if s.Err != nil {
 		return 0, entities.ErrInternalError
 	}
+
 	for _, acc := range s.Accounts {
 		if acc.ID == accountID {
 			return acc.Balance, nil
@@ -30,7 +31,8 @@ func (s StubAccountUsecase) ListAccounts(ctx context.Context) ([]entities.Accoun
 	return nil, nil
 }
 
-func (s StubAccountUsecase) CreateAccount(ctx context.Context, input account.CreateAccountInput) (*entities.Account, error) {
+func (s StubAccountUsecase) CreateAccount(
+	ctx context.Context, input account.CreateAccountInput) (*entities.Account, error) {
 	if s.Err != nil {
 		return nil, entities.ErrInternalError
 	}
@@ -56,6 +58,7 @@ func (s StubAccountUsecase) GetAccountByID(ctx context.Context, accountID vos.ID
 	if s.Err != nil {
 		return nil, entities.ErrInternalError
 	}
+
 	for _, acc := range s.Accounts {
 		if acc.ID == accountID {
 			return &acc, nil
@@ -69,6 +72,7 @@ func (s StubAccountUsecase) GetAccountByCPF(ctx context.Context, cpf vos.CPF) (*
 	if s.Err != nil {
 		return nil, entities.ErrInternalError
 	}
+
 	for _, acc := range s.Accounts {
 		if acc.CPF == cpf {
 			return &acc, nil

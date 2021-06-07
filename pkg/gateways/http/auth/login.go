@@ -20,7 +20,7 @@ import (
 // @Failure 400 {object} responses.ErrorResponse
 // @Failure 404 {object} responses.ErrorResponse
 // @Failure 500 {object} responses.ErrorResponse
-// @Router /login [POST]
+// @Router /login [POST].
 func (h Handler) Login(w http.ResponseWriter, r *http.Request) {
 	var body schemes.LoginInput
 
@@ -31,7 +31,7 @@ func (h Handler) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := body.IsValid(); err != nil {
+	if err = body.IsValid(); err != nil {
 		responses.SendError(w, http.StatusBadRequest, err)
 
 		return

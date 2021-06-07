@@ -8,8 +8,7 @@ import (
 
 func TestNewToken(t *testing.T) {
 	t.Run("should create a token successfully", func(t *testing.T) {
-		accountID := "account_id"
-		token, err := NewToken(accountID)
+		token, err := NewToken("account_id")
 
 		assert.Nil(t, err)
 		assert.NotNil(t, token)
@@ -18,8 +17,7 @@ func TestNewToken(t *testing.T) {
 
 func TestIsValidToken(t *testing.T) {
 	t.Run("should return nil when token is valid", func(t *testing.T) {
-		accountID := "account_id"
-		token, _ := NewToken(accountID)
+		token, _ := NewToken("account_id")
 		err := IsValidToken(token)
 
 		assert.Nil(t, err)

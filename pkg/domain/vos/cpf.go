@@ -3,7 +3,7 @@ package vos
 import (
 	"database/sql/driver"
 	"errors"
-	"log"
+	"fmt"
 	"regexp"
 
 	"github.com/Nhanderu/brdoc"
@@ -11,6 +11,7 @@ import (
 
 var regexOnlyDigitsCPF = regexp.MustCompile(`^(\d{3})(\d{3})(\d{3})(\d{2})$`)
 
+// ErrInvalidCPF occurs when the cpf is not valid or is not formatted correctly.
 var ErrInvalidCPF = errors.New("invalid cpf")
 
 type CPF struct {
@@ -29,11 +30,7 @@ func (c *CPF) IsValid() bool {
 	// or XXXXXXXXXXX. The condition below guarantees that the cpf will be saved
 	// without any pontcuation.
 	if onlyDigits := regexOnlyDigitsCPF.MatchString(c.value); !onlyDigits {
-		reg, err := regexp.Compile("[^0-9]+")
-		if err != nil {
-			log.Fatal(err)
-		}
-
+		reg := regexp.MustCompile("[^0-9]+")
 		c.value = reg.ReplaceAllString(c.value, "")
 	}
 
@@ -59,15 +56,19 @@ func (c CPF) Value() (driver.Value, error) {
 
 func (c *CPF) Scan(value interface{}) error {
 	if value == nil {
-		*c = CPF(CPF{})
+		*c = CPF{}
+
 		return nil
 	}
-	if bv, err := driver.String.ConvertValue(value); err == nil {
+
+	bv, err := driver.String.ConvertValue(value)
+	if err == nil {
 		if v, ok := bv.(string); ok {
-			*c = CPF(CPF{v})
+			*c = CPF{v}
+
 			return nil
 		}
 	}
 
-	return errors.New("failed to scan CPF")
+	return fmt.Errorf("could not scan cpf: %w", err)
 }

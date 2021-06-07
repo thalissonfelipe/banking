@@ -8,8 +8,8 @@ import (
 	"time"
 
 	"github.com/golang-migrate/migrate/v4"
-	_ "github.com/golang-migrate/migrate/v4/database/postgres"
-	_ "github.com/golang-migrate/migrate/v4/source/file"
+	_ "github.com/golang-migrate/migrate/v4/database/postgres" // driver
+	_ "github.com/golang-migrate/migrate/v4/source/file"       // driver
 	"github.com/jackc/pgx/v4"
 	"github.com/ory/dockertest"
 )
@@ -25,7 +25,7 @@ func SetupTest(migrationsPath string) *PostgresDocker {
 
 	pool, err := dockertest.NewPool("")
 	if err != nil {
-		log.Fatalf("could not connect to docker: %s", err.Error())
+		log.Fatalf("could not connect to docker: %v", err)
 	}
 
 	database := getRandomDBName()
@@ -36,7 +36,7 @@ func SetupTest(migrationsPath string) *PostgresDocker {
 		[]string{"POSTGRES_PASSWORD=postgres", "POSTGRES_DB=" + database},
 	)
 	if err != nil {
-		log.Fatalf("could not start resource: %s", err)
+		log.Fatalf("could not start resource: %v", err)
 	}
 
 	connString := fmt.Sprintf(
@@ -45,19 +45,25 @@ func SetupTest(migrationsPath string) *PostgresDocker {
 		database)
 
 	if err = pool.Retry(func() error {
-		var err error
 		ctx := context.Background()
+
 		conn, err = pgx.Connect(ctx, connString)
 		if err != nil {
-			return err
+			return fmt.Errorf("could not connect with postgres: %w", err)
 		}
-		return conn.Ping(ctx)
+
+		err = conn.Ping(ctx)
+		if err != nil {
+			return fmt.Errorf("could not ping: %w", err)
+		}
+
+		return nil
 	}); err != nil {
-		log.Fatalf("could not connect to docker: %s", err)
+		log.Fatalf("could not connect to docker: %v", err)
 	}
 
 	if err := runMigrations(migrationsPath, connString); err != nil {
-		log.Fatalf("could not run migrations: %s", err.Error())
+		log.Fatalf("could not run migrations: %v", err)
 	}
 
 	return &PostgresDocker{
@@ -69,13 +75,13 @@ func SetupTest(migrationsPath string) *PostgresDocker {
 
 func RemoveContainer(pgDocker *PostgresDocker) {
 	if err := pgDocker.Pool.Purge(pgDocker.Resource); err != nil {
-		log.Fatalf("could not purge resource: %s", err.Error())
+		log.Fatalf("could not purge resource: %v", err)
 	}
 }
 
 func TruncateTables(ctx context.Context, db *pgx.Conn) {
 	if _, err := db.Exec(ctx, "truncate transfers, accounts"); err != nil {
-		log.Fatalf("could not truncate tables: %s", err.Error())
+		log.Fatalf("could not truncate tables: %v", err)
 	}
 }
 
@@ -83,11 +89,12 @@ func runMigrations(migrationsPath, connString string) error {
 	if migrationsPath != "" {
 		mig, err := migrate.New("file://"+migrationsPath, connString)
 		if err != nil {
-			return fmt.Errorf("failed to start migrate struct: %s", err.Error())
+			return fmt.Errorf("failed to start migrate struct: %w", err)
 		}
 		defer mig.Close()
+
 		if err = mig.Up(); err != nil {
-			return fmt.Errorf("failed to run migration: %s", err.Error())
+			return fmt.Errorf("failed to run migration: %w", err)
 		}
 	}
 

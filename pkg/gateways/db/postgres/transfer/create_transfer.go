@@ -2,6 +2,7 @@ package transfer
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/jackc/pgx/v4"
 
@@ -14,10 +15,12 @@ func (r Repository) CreateTransfer(ctx context.Context, transfer *entities.Trans
 	// Tutorial: https://www.sohamkamani.com/golang/sql-transactions/
 	tx, err := r.db.Begin(ctx)
 	if err != nil {
-		return err
+		return fmt.Errorf("unexpected error occurred on start transaction: %w", err)
 	}
 
-	defer tx.Rollback(ctx)
+	defer func() {
+		_ = tx.Rollback(ctx)
+	}()
 
 	err = r.updateBalance(ctx, tx, -transfer.Amount, transfer.AccountOriginID)
 	if err != nil {
@@ -34,35 +37,32 @@ func (r Repository) CreateTransfer(ctx context.Context, transfer *entities.Trans
 		return err
 	}
 
-	tx.Commit(ctx)
+	_ = tx.Commit(ctx)
 
 	return nil
 }
 
-func (r Repository) updateBalance(ctx context.Context, tx pgx.Tx, balance int, id vos.ID) error {
-	const query = `
-		UPDATE accounts
-		SET balance=balance+$1
-		WHERE id=$2
-	`
+const updateBalanceQuery = `
+update accounts set balance=balance+$1 where id=$2
+`
 
-	_, err := tx.Exec(ctx, query, balance, id)
-	return err
+func (r Repository) updateBalance(ctx context.Context, tx pgx.Tx, balance int, id vos.ID) error {
+	_, err := tx.Exec(ctx, updateBalanceQuery, balance, id)
+	if err != nil {
+		return fmt.Errorf("unexpected error occurred on update balance query: %w", err)
+	}
+
+	return nil
 }
 
-func (r Repository) saveTransfer(ctx context.Context, tx pgx.Tx, transfer *entities.Transfer) error {
-	const query = `
-		INSERT INTO transfers (
-			id,
-			account_origin_id,
-			account_destination_id,
-			amount
-		) VALUES (
-			$1, $2, $3, $4
-		) RETURNING created_at
-	`
+const insertTransferQuery = `
+insert into transfers (id, account_origin_id, account_destination_id, amount)
+values ($1, $2, $3, $4)
+returning created_at
+`
 
-	err := tx.QueryRow(ctx, query,
+func (r Repository) saveTransfer(ctx context.Context, tx pgx.Tx, transfer *entities.Transfer) error {
+	err := tx.QueryRow(ctx, insertTransferQuery,
 		transfer.ID,
 		transfer.AccountOriginID,
 		transfer.AccountDestinationID,
@@ -71,7 +71,7 @@ func (r Repository) saveTransfer(ctx context.Context, tx pgx.Tx, transfer *entit
 		&transfer.CreatedAt,
 	)
 	if err != nil {
-		return err
+		return fmt.Errorf("unexpected error occurred on insert transfer query: %w", err)
 	}
 
 	return nil

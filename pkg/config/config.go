@@ -6,7 +6,7 @@ import (
 	"github.com/kelseyhightower/envconfig"
 )
 
-type config struct {
+type Config struct {
 	API      *apiConfig
 	Postgres *postgresConfig
 }
@@ -36,8 +36,8 @@ func (p postgresConfig) DSN() string {
 	)
 }
 
-func LoadConfig() (*config, error) {
-	apiCfg, err := loadApiConfig()
+func LoadConfig() (*Config, error) {
+	apiCfg, err := loadAPIConfig()
 	if err != nil {
 		return nil, err
 	}
@@ -47,14 +47,15 @@ func LoadConfig() (*config, error) {
 		return nil, err
 	}
 
-	return &config{apiCfg, postgresCfg}, nil
+	return &Config{apiCfg, postgresCfg}, nil
 }
 
-func loadApiConfig() (*apiConfig, error) {
+func loadAPIConfig() (*apiConfig, error) {
 	var apiCfg apiConfig
+
 	err := envconfig.Process("API", &apiCfg)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("could not get api config: %w", err)
 	}
 
 	return &apiCfg, nil
@@ -62,9 +63,10 @@ func loadApiConfig() (*apiConfig, error) {
 
 func loadPostgresConfig() (*postgresConfig, error) {
 	var postgresCfg postgresConfig
+
 	err := envconfig.Process("DB", &postgresCfg)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("could not get postgres config: %w", err)
 	}
 
 	return &postgresCfg, nil

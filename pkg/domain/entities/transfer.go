@@ -16,8 +16,10 @@ type Transfer struct {
 }
 
 var (
-	ErrInsufficientFunds              error = errors.New("insufficient funds")
-	ErrAccountDestinationDoesNotExist error = errors.New("account destination does not exist")
+	// ErrInsufficientFunds occurs when an account does not have sufficient funds.
+	ErrInsufficientFunds = errors.New("insufficient funds")
+	// ErrAccountDestinationDoesNotExist ocurrs when the account destination does not exist.
+	ErrAccountDestinationDoesNotExist = errors.New("account destination does not exist")
 )
 
 func NewTransfer(accOriginID, accDestID vos.ID, amount int) Transfer {

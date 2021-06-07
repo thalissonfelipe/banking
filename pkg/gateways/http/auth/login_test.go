@@ -3,13 +3,13 @@ package auth
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/thalissonfelipe/banking/pkg/domain/account"
 	"github.com/thalissonfelipe/banking/pkg/domain/encrypter"
@@ -66,10 +66,8 @@ func TestLogin(t *testing.T) {
 			expectedCode: http.StatusBadRequest,
 		},
 		{
-			name: "should return status code 500 if usecase fails",
-			usecase: mocks.StubAccountUsecase{
-				Err: errors.New("usecase fails"),
-			},
+			name:         "should return status code 500 if usecase fails",
+			usecase:      mocks.StubAccountUsecase{Err: testdata.ErrUsecaseFails},
 			enc:          mocks.StubHash{},
 			body:         schemes.LoginInput{CPF: cpf.String(), Secret: secret.String()},
 			decoder:      tests.ErrorMessageDecoder{},
@@ -124,7 +122,7 @@ func TestLogin(t *testing.T) {
 
 			http.HandlerFunc(handler.Login).ServeHTTP(response, request)
 
-			result := tt.decoder.Decode(response.Body)
+			result := tt.decoder.Decode(t, response.Body)
 
 			// This is temporary because I don't know yet how to
 			// test the generated token. But it's working. (I hope)
@@ -139,8 +137,11 @@ func TestLogin(t *testing.T) {
 
 type responseBodyDecoder struct{}
 
-func (responseBodyDecoder) Decode(body *bytes.Buffer) interface{} {
+func (responseBodyDecoder) Decode(t *testing.T, body *bytes.Buffer) interface{} {
 	var result schemes.LoginResponse
-	json.NewDecoder(body).Decode(&result)
+
+	err := json.NewDecoder(body).Decode(&result)
+	require.NoError(t, err)
+
 	return result
 }
