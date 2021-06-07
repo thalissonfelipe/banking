@@ -12,7 +12,7 @@ import (
 var (
 	ErrInvalidJSON                = errors.New("invalid json")
 	ErrAccountNotFound            = errors.New("account does not exist")
-	ErrAccountOriginNotFound      = errors.New("account does not exist")
+	ErrAccountOriginNotFound      = errors.New("account origin does not exist")
 	ErrAccountDestinationNotFound = errors.New("account destination does not exist")
 	ErrInternalError              = errors.New("internal server error")
 	ErrInsufficientFunds          = errors.New("insufficient funds")
