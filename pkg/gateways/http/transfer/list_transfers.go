@@ -30,10 +30,10 @@ func (h Handler) ListTransfers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	transfersResponse := make([]transferResponse, 0)
+	transfersResponse := make([]TransferListResponse, 0)
 
 	for _, transfer := range transfers {
-		transfersResponse = append(transfersResponse, convertTransferToTransferResponse(transfer))
+		transfersResponse = append(transfersResponse, convertTransferToTransferListResponse(transfer))
 	}
 
 	responses.SendJSON(w, http.StatusOK, transfersResponse)

@@ -38,7 +38,7 @@ func TestHandler_CreateAccount(t *testing.T) {
 			repo:         &mocks.StubAccountRepository{},
 			enc:          &mocks.StubHash{},
 			decoder:      tests.ErrorMessageDecoder{},
-			body:         requestBody{CPF: cpf.String(), Secret: secret.String()},
+			body:         CreateAccountInput{CPF: cpf.String(), Secret: secret.String()},
 			expectedBody: responses.ErrorResponse{Message: "missing name parameter"},
 			expectedCode: http.StatusBadRequest,
 		},
@@ -47,7 +47,7 @@ func TestHandler_CreateAccount(t *testing.T) {
 			repo:         &mocks.StubAccountRepository{},
 			enc:          &mocks.StubHash{},
 			decoder:      tests.ErrorMessageDecoder{},
-			body:         requestBody{Name: "Pedro", Secret: secret.String()},
+			body:         CreateAccountInput{Name: "Pedro", Secret: secret.String()},
 			expectedBody: responses.ErrorResponse{Message: "missing cpf parameter"},
 			expectedCode: http.StatusBadRequest,
 		},
@@ -56,7 +56,7 @@ func TestHandler_CreateAccount(t *testing.T) {
 			repo:         &mocks.StubAccountRepository{},
 			enc:          &mocks.StubHash{},
 			decoder:      tests.ErrorMessageDecoder{},
-			body:         requestBody{Name: "Pedro", CPF: cpf.String()},
+			body:         CreateAccountInput{Name: "Pedro", CPF: cpf.String()},
 			expectedBody: responses.ErrorResponse{Message: "missing secret parameter"},
 			expectedCode: http.StatusBadRequest,
 		},
@@ -74,7 +74,7 @@ func TestHandler_CreateAccount(t *testing.T) {
 			repo:         &mocks.StubAccountRepository{},
 			enc:          &mocks.StubHash{},
 			decoder:      tests.ErrorMessageDecoder{},
-			body:         requestBody{Name: "Pedro", CPF: "123.456.789-00", Secret: secret.String()},
+			body:         CreateAccountInput{Name: "Pedro", CPF: "123.456.789-00", Secret: secret.String()},
 			expectedBody: responses.ErrorResponse{Message: "invalid cpf"},
 			expectedCode: http.StatusBadRequest,
 		},
@@ -83,7 +83,7 @@ func TestHandler_CreateAccount(t *testing.T) {
 			repo:         &mocks.StubAccountRepository{},
 			enc:          &mocks.StubHash{},
 			decoder:      tests.ErrorMessageDecoder{},
-			body:         requestBody{Name: "Pedro", CPF: cpf.String(), Secret: "12345678"},
+			body:         CreateAccountInput{Name: "Pedro", CPF: cpf.String(), Secret: "12345678"},
 			expectedBody: responses.ErrorResponse{Message: "invalid secret"},
 			expectedCode: http.StatusBadRequest,
 		},
@@ -96,7 +96,7 @@ func TestHandler_CreateAccount(t *testing.T) {
 			},
 			enc:          &mocks.StubHash{},
 			decoder:      tests.ErrorMessageDecoder{},
-			body:         requestBody{Name: "Pedro", CPF: cpf.String(), Secret: secret.String()},
+			body:         CreateAccountInput{Name: "Pedro", CPF: cpf.String(), Secret: secret.String()},
 			expectedBody: responses.ErrorResponse{Message: "account already exists"},
 			expectedCode: http.StatusConflict,
 		},
@@ -107,7 +107,7 @@ func TestHandler_CreateAccount(t *testing.T) {
 			},
 			enc:          &mocks.StubHash{},
 			decoder:      tests.ErrorMessageDecoder{},
-			body:         requestBody{Name: "Pedro", CPF: cpf.String(), Secret: secret.String()},
+			body:         CreateAccountInput{Name: "Pedro", CPF: cpf.String(), Secret: secret.String()},
 			expectedBody: responses.ErrorResponse{Message: "internal server error"},
 			expectedCode: http.StatusInternalServerError,
 		},
@@ -118,7 +118,7 @@ func TestHandler_CreateAccount(t *testing.T) {
 			},
 			enc:          &mocks.StubHash{Err: errors.New("hash error")},
 			decoder:      tests.ErrorMessageDecoder{},
-			body:         requestBody{Name: "Pedro", CPF: cpf.String(), Secret: secret.String()},
+			body:         CreateAccountInput{Name: "Pedro", CPF: cpf.String(), Secret: secret.String()},
 			expectedBody: responses.ErrorResponse{Message: "internal server error"},
 			expectedCode: http.StatusInternalServerError,
 		},
@@ -127,8 +127,8 @@ func TestHandler_CreateAccount(t *testing.T) {
 			repo:         &mocks.StubAccountRepository{},
 			enc:          &mocks.StubHash{},
 			decoder:      createdAccountDecoder{},
-			body:         requestBody{Name: "Pedro", CPF: cpf.String(), Secret: secret.String()},
-			expectedBody: createdAccountResponse{Name: "Pedro", CPF: cpf.String(), Balance: 0},
+			body:         CreateAccountInput{Name: "Pedro", CPF: cpf.String(), Secret: secret.String()},
+			expectedBody: CreateAccountResponse{Name: "Pedro", CPF: cpf.String(), Balance: 0},
 			expectedCode: http.StatusCreated,
 		},
 	}
@@ -155,7 +155,7 @@ func TestHandler_CreateAccount(t *testing.T) {
 type createdAccountDecoder struct{}
 
 func (createdAccountDecoder) Decode(body *bytes.Buffer) interface{} {
-	var result createdAccountResponse
+	var result CreateAccountResponse
 	json.NewDecoder(body).Decode(&result)
 	return result
 }

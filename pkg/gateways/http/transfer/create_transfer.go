@@ -26,7 +26,7 @@ import (
 // @Failure 500 {object} responses.ErrorResponse
 // @Router /transfers [POST]
 func (h Handler) CreateTransfer(w http.ResponseWriter, r *http.Request) {
-	var body transferRequest
+	var body CreateTransferInput
 
 	err := json.NewDecoder(r.Body).Decode(&body)
 	if err != nil {
@@ -66,7 +66,7 @@ func (h Handler) CreateTransfer(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response := transferCreatedResponse{
+	response := CreateTransferResponse{
 		AccountOriginID:      accountID.String(),
 		AccountDestinationID: body.AccountDestinationID,
 		Amount:               body.Amount,

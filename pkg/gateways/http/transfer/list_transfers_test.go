@@ -38,7 +38,7 @@ func TestHandler_ListTransfers(t *testing.T) {
 			name:         "should return a empty list of transfers",
 			repo:         &mocks.StubTransferRepository{},
 			decoder:      listTransfersDecoder{},
-			expectedBody: []transferResponse{},
+			expectedBody: []TransferListResponse{},
 			expectedCode: http.StatusOK,
 		},
 		{
@@ -47,7 +47,7 @@ func TestHandler_ListTransfers(t *testing.T) {
 				Transfers: []entities.Transfer{transfer},
 			},
 			decoder:      listTransfersDecoder{},
-			expectedBody: []transferResponse{convertTransferToTransferResponse(transfer)},
+			expectedBody: []TransferListResponse{convertTransferToTransferListResponse(transfer)},
 			expectedCode: http.StatusOK,
 		},
 		{
@@ -88,7 +88,7 @@ func TestHandler_ListTransfers(t *testing.T) {
 type listTransfersDecoder struct{}
 
 func (listTransfersDecoder) Decode(body *bytes.Buffer) interface{} {
-	var result []transferResponse
+	var result []TransferListResponse
 	json.NewDecoder(body).Decode(&result)
 	return result
 }

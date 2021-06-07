@@ -7,19 +7,20 @@ var (
 	errMissingSecretParameter = errors.New("missing secret parameter")
 )
 
-type responseBody struct {
+type LoginResponse struct {
 	Token string `json:"token"`
 }
 
-type requestBody struct {
+type LoginInput struct {
 	CPF    string `json:"cpf"`
 	Secret string `json:"secret"`
 }
 
-func (r requestBody) isValid() error {
+func (r LoginInput) isValid() error {
 	if r.CPF == "" {
 		return errMissingCPFParameter
 	}
+
 	if r.Secret == "" {
 		return errMissingSecretParameter
 	}

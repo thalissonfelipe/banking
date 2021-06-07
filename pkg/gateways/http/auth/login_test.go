@@ -39,7 +39,7 @@ func TestLogin(t *testing.T) {
 			name:         "should return status code 400 if cpf was not provided",
 			usecase:      mocks.StubAccountUsecase{},
 			enc:          mocks.StubHash{},
-			body:         requestBody{Secret: secret.String()},
+			body:         LoginInput{Secret: secret.String()},
 			decoder:      tests.ErrorMessageDecoder{},
 			expectedBody: responses.ErrorResponse{Message: "missing cpf parameter"},
 			expectedCode: http.StatusBadRequest,
@@ -48,7 +48,7 @@ func TestLogin(t *testing.T) {
 			name:         "should return status code 400 if secret was not provided",
 			usecase:      mocks.StubAccountUsecase{},
 			enc:          mocks.StubHash{},
-			body:         requestBody{CPF: cpf.String()},
+			body:         LoginInput{CPF: cpf.String()},
 			decoder:      tests.ErrorMessageDecoder{},
 			expectedBody: responses.ErrorResponse{Message: "missing secret parameter"},
 			expectedCode: http.StatusBadRequest,
@@ -70,7 +70,7 @@ func TestLogin(t *testing.T) {
 				Err: errors.New("usecase fails"),
 			},
 			enc:          mocks.StubHash{},
-			body:         requestBody{CPF: cpf.String(), Secret: secret.String()},
+			body:         LoginInput{CPF: cpf.String(), Secret: secret.String()},
 			decoder:      tests.ErrorMessageDecoder{},
 			expectedBody: responses.ErrorResponse{Message: "internal server error"},
 			expectedCode: http.StatusInternalServerError,
@@ -79,7 +79,7 @@ func TestLogin(t *testing.T) {
 			name:         "should return status code 400 if account does not exist",
 			usecase:      mocks.StubAccountUsecase{},
 			enc:          mocks.StubHash{},
-			body:         requestBody{CPF: cpf.String(), Secret: secret.String()},
+			body:         LoginInput{CPF: cpf.String(), Secret: secret.String()},
 			decoder:      tests.ErrorMessageDecoder{},
 			expectedBody: responses.ErrorResponse{Message: "cpf or secret are invalid"},
 			expectedCode: http.StatusBadRequest,
@@ -92,7 +92,7 @@ func TestLogin(t *testing.T) {
 				},
 			},
 			enc:          mocks.StubHash{Err: auth.ErrInvalidCredentials},
-			body:         requestBody{CPF: cpf.String(), Secret: "12345678"},
+			body:         LoginInput{CPF: cpf.String(), Secret: "12345678"},
 			decoder:      tests.ErrorMessageDecoder{},
 			expectedBody: responses.ErrorResponse{Message: "cpf or secret are invalid"},
 			expectedCode: http.StatusBadRequest,
@@ -105,9 +105,9 @@ func TestLogin(t *testing.T) {
 				},
 			},
 			enc:          mocks.StubHash{},
-			body:         requestBody{CPF: cpf.String(), Secret: secret.String()},
+			body:         LoginInput{CPF: cpf.String(), Secret: secret.String()},
 			decoder:      responseBodyDecoder{},
-			expectedBody: responseBody{},
+			expectedBody: LoginResponse{},
 			expectedCode: http.StatusOK,
 		},
 	}
@@ -139,7 +139,7 @@ func TestLogin(t *testing.T) {
 type responseBodyDecoder struct{}
 
 func (responseBodyDecoder) Decode(body *bytes.Buffer) interface{} {
-	var result responseBody
+	var result LoginResponse
 	json.NewDecoder(body).Decode(&result)
 	return result
 }
