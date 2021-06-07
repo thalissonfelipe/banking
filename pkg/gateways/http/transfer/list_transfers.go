@@ -5,6 +5,7 @@ import (
 
 	"github.com/thalissonfelipe/banking/pkg/domain/vos"
 	"github.com/thalissonfelipe/banking/pkg/gateways/http/responses"
+	"github.com/thalissonfelipe/banking/pkg/gateways/http/transfer/schemes"
 	"github.com/thalissonfelipe/banking/pkg/services/auth"
 )
 
@@ -30,7 +31,7 @@ func (h Handler) ListTransfers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	transfersResponse := make([]TransferListResponse, 0)
+	transfersResponse := make([]schemes.TransferListResponse, 0)
 
 	for _, transfer := range transfers {
 		transfersResponse = append(transfersResponse, convertTransferToTransferListResponse(transfer))

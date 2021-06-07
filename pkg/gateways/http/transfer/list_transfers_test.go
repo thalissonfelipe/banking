@@ -15,6 +15,7 @@ import (
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
 	"github.com/thalissonfelipe/banking/pkg/domain/transfer/usecase"
 	"github.com/thalissonfelipe/banking/pkg/gateways/http/responses"
+	"github.com/thalissonfelipe/banking/pkg/gateways/http/transfer/schemes"
 	"github.com/thalissonfelipe/banking/pkg/services/auth"
 	"github.com/thalissonfelipe/banking/pkg/tests"
 	"github.com/thalissonfelipe/banking/pkg/tests/fakes"
@@ -38,7 +39,7 @@ func TestHandler_ListTransfers(t *testing.T) {
 			name:         "should return a empty list of transfers",
 			repo:         &mocks.StubTransferRepository{},
 			decoder:      listTransfersDecoder{},
-			expectedBody: []TransferListResponse{},
+			expectedBody: []schemes.TransferListResponse{},
 			expectedCode: http.StatusOK,
 		},
 		{
@@ -47,7 +48,7 @@ func TestHandler_ListTransfers(t *testing.T) {
 				Transfers: []entities.Transfer{transfer},
 			},
 			decoder:      listTransfersDecoder{},
-			expectedBody: []TransferListResponse{convertTransferToTransferListResponse(transfer)},
+			expectedBody: []schemes.TransferListResponse{convertTransferToTransferListResponse(transfer)},
 			expectedCode: http.StatusOK,
 		},
 		{
@@ -88,7 +89,7 @@ func TestHandler_ListTransfers(t *testing.T) {
 type listTransfersDecoder struct{}
 
 func (listTransfersDecoder) Decode(body *bytes.Buffer) interface{} {
-	var result []TransferListResponse
+	var result []schemes.TransferListResponse
 	json.NewDecoder(body).Decode(&result)
 	return result
 }

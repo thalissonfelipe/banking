@@ -9,6 +9,7 @@ import (
 	"github.com/thalissonfelipe/banking/pkg/domain/transfer"
 	"github.com/thalissonfelipe/banking/pkg/domain/vos"
 	"github.com/thalissonfelipe/banking/pkg/gateways/http/responses"
+	"github.com/thalissonfelipe/banking/pkg/gateways/http/transfer/schemes"
 	"github.com/thalissonfelipe/banking/pkg/services/auth"
 )
 
@@ -26,7 +27,7 @@ import (
 // @Failure 500 {object} responses.ErrorResponse
 // @Router /transfers [POST]
 func (h Handler) CreateTransfer(w http.ResponseWriter, r *http.Request) {
-	var body CreateTransferInput
+	var body schemes.CreateTransferInput
 
 	err := json.NewDecoder(r.Body).Decode(&body)
 	if err != nil {
@@ -35,7 +36,7 @@ func (h Handler) CreateTransfer(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := body.isValid(); err != nil {
+	if err := body.IsValid(); err != nil {
 		responses.SendError(w, http.StatusBadRequest, err)
 
 		return
@@ -46,7 +47,7 @@ func (h Handler) CreateTransfer(w http.ResponseWriter, r *http.Request) {
 	accountDestinationID := vos.ConvertStringToID(body.AccountDestinationID)
 
 	if accountID == accountDestinationID {
-		responses.SendError(w, http.StatusBadRequest, errDestIDEqualCurrentID)
+		responses.SendError(w, http.StatusBadRequest, schemes.ErrDestIDEqualCurrentID)
 
 		return
 	}
@@ -66,7 +67,7 @@ func (h Handler) CreateTransfer(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response := CreateTransferResponse{
+	response := schemes.CreateTransferResponse{
 		AccountOriginID:      accountID.String(),
 		AccountDestinationID: body.AccountDestinationID,
 		Amount:               body.Amount,

@@ -13,6 +13,7 @@ import (
 
 	"github.com/thalissonfelipe/banking/pkg/domain/account/usecase"
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
+	"github.com/thalissonfelipe/banking/pkg/gateways/http/account/schemes"
 	"github.com/thalissonfelipe/banking/pkg/gateways/http/responses"
 	"github.com/thalissonfelipe/banking/pkg/tests"
 	"github.com/thalissonfelipe/banking/pkg/tests/fakes"
@@ -33,7 +34,7 @@ func TestHandler_ListAccounts(t *testing.T) {
 		{
 			name:         "should return 200 and an empty slice of accounts",
 			repoSetup:    &mocks.StubAccountRepository{},
-			expectedBody: []AccountListResponse{},
+			expectedBody: []schemes.AccountListResponse{},
 			expectedCode: http.StatusOK,
 			decoder:      listAccountsSuccessDecoder{},
 		},
@@ -42,7 +43,7 @@ func TestHandler_ListAccounts(t *testing.T) {
 			repoSetup: &mocks.StubAccountRepository{
 				Accounts: []entities.Account{acc},
 			},
-			expectedBody: []AccountListResponse{convertAccountToAccountListResponse(acc)},
+			expectedBody: []schemes.AccountListResponse{convertAccountToAccountListResponse(acc)},
 			decoder:      listAccountsSuccessDecoder{},
 			expectedCode: http.StatusOK,
 		},
@@ -78,7 +79,7 @@ func TestHandler_ListAccounts(t *testing.T) {
 type listAccountsSuccessDecoder struct{}
 
 func (listAccountsSuccessDecoder) Decode(body *bytes.Buffer) interface{} {
-	var result []AccountListResponse
+	var result []schemes.AccountListResponse
 	json.NewDecoder(body).Decode(&result)
 	return result
 }

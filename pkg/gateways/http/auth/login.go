@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/thalissonfelipe/banking/pkg/gateways/http/auth/schemes"
 	"github.com/thalissonfelipe/banking/pkg/gateways/http/responses"
 	"github.com/thalissonfelipe/banking/pkg/services/auth"
 )
@@ -21,7 +22,7 @@ import (
 // @Failure 500 {object} responses.ErrorResponse
 // @Router /login [POST]
 func (h Handler) Login(w http.ResponseWriter, r *http.Request) {
-	var body LoginInput
+	var body schemes.LoginInput
 
 	err := json.NewDecoder(r.Body).Decode(&body)
 	if err != nil {
@@ -30,7 +31,7 @@ func (h Handler) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := body.isValid(); err != nil {
+	if err := body.IsValid(); err != nil {
 		responses.SendError(w, http.StatusBadRequest, err)
 
 		return
@@ -48,6 +49,6 @@ func (h Handler) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response := LoginResponse{Token: token}
+	response := schemes.LoginResponse{Token: token}
 	responses.SendJSON(w, http.StatusOK, response)
 }

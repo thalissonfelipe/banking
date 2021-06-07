@@ -16,11 +16,6 @@ import (
 	"github.com/thalissonfelipe/banking/pkg/tests/testenv"
 )
 
-// var (
-// 	pgDocker *dockertest.PostgresDocker
-// 	server   *httptest.Server
-// )
-
 func TestMain(m *testing.M) {
 	pgDocker := dockertest.SetupTest("../../gateways/db/postgres/migrations")
 	r := h.NewRouter(pgDocker.DB)

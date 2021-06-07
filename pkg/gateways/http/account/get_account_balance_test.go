@@ -14,6 +14,7 @@ import (
 
 	"github.com/thalissonfelipe/banking/pkg/domain/account/usecase"
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
+	"github.com/thalissonfelipe/banking/pkg/gateways/http/account/schemes"
 	"github.com/thalissonfelipe/banking/pkg/gateways/http/responses"
 	"github.com/thalissonfelipe/banking/pkg/tests"
 	"github.com/thalissonfelipe/banking/pkg/tests/fakes"
@@ -41,7 +42,7 @@ func TestHandler_GetAccountBalance(t *testing.T) {
 			},
 			requestURI:   fmt.Sprintf("/accounts/%s/balance", acc.ID),
 			decoder:      balanceResponseDecoder{},
-			expectedBody: BalanceResponse{Balance: 0},
+			expectedBody: schemes.BalanceResponse{Balance: 0},
 			expectedCode: http.StatusOK,
 		},
 		{
@@ -55,7 +56,7 @@ func TestHandler_GetAccountBalance(t *testing.T) {
 			},
 			requestURI:   fmt.Sprintf("/accounts/%s/balance", acc.ID),
 			decoder:      balanceResponseDecoder{},
-			expectedBody: BalanceResponse{Balance: 100},
+			expectedBody: schemes.BalanceResponse{Balance: 100},
 			expectedCode: http.StatusOK,
 		},
 		{
@@ -111,7 +112,7 @@ func TestHandler_GetAccountBalance(t *testing.T) {
 type balanceResponseDecoder struct{}
 
 func (balanceResponseDecoder) Decode(body *bytes.Buffer) interface{} {
-	var result BalanceResponse
+	var result schemes.BalanceResponse
 	json.NewDecoder(body).Decode(&result)
 	return result
 }
