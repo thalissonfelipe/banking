@@ -2,8 +2,10 @@ package transfer
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 
+	"github.com/thalissonfelipe/banking/pkg/domain/entities"
 	"github.com/thalissonfelipe/banking/pkg/domain/transfer"
 	"github.com/thalissonfelipe/banking/pkg/domain/vos"
 	"github.com/thalissonfelipe/banking/pkg/gateways/http/responses"
@@ -53,6 +55,12 @@ func (h Handler) CreateTransfer(w http.ResponseWriter, r *http.Request) {
 
 	err = h.usecase.CreateTransfer(r.Context(), input)
 	if err != nil {
+		if errors.Is(err, entities.ErrAccountDoesNotExist) {
+			responses.SendError(w, http.StatusNotFound, responses.ErrAccountOriginNotFound)
+
+			return
+		}
+
 		responses.HandleError(w, err)
 
 		return
