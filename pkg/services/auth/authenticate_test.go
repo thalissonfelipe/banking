@@ -31,7 +31,7 @@ func TestAuthenticate(t *testing.T) {
 			repo:  &mocks.StubAccountRepository{},
 			enc:   &mocks.StubHash{},
 			input: AuthenticateInput{CPF: cpf.String(), Secret: secret.String()},
-			err:   entities.ErrAccountDoesNotExist,
+			err:   ErrInvalidCredentials,
 		},
 		{
 			name:  "should return an error if cpf provided is invalid",
@@ -57,10 +57,10 @@ func TestAuthenticate(t *testing.T) {
 				},
 			},
 			enc: &mocks.StubHash{
-				Err: ErrSecretDoesNotMatch,
+				Err: ErrInvalidCredentials,
 			},
 			input: AuthenticateInput{CPF: cpf.String(), Secret: secret.String()},
-			err:   ErrSecretDoesNotMatch,
+			err:   ErrInvalidCredentials,
 		},
 		{
 			name: "should return nil if authenticated succeeds",

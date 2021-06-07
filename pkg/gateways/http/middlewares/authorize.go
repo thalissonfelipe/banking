@@ -14,14 +14,14 @@ func AuthorizeMiddleware(next http.Handler) http.Handler {
 
 		parts := strings.Split(authHeader, "Bearer ")
 		if len(parts) != 2 {
-			responses.SendError(w, http.StatusUnauthorized, errUnauthorized)
+			responses.SendError(w, http.StatusUnauthorized, auth.ErrUnauthorized)
 
 			return
 		}
 
 		token := parts[1]
 		if err := auth.IsValidToken(token); err != nil {
-			responses.SendError(w, http.StatusUnauthorized, errUnauthorized)
+			responses.SendError(w, http.StatusUnauthorized, auth.ErrUnauthorized)
 
 			return
 		}

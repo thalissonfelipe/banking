@@ -16,7 +16,7 @@ var (
 	ErrAccountDestinationNotFound = errors.New("account destination does not exist")
 	ErrInternalError              = errors.New("internal server error")
 	ErrInsufficientFunds          = errors.New("insufficient funds")
-	ErrSecretDoesNotMatch         = errors.New("secret does not match")
+	ErrInvalidCredentials         = errors.New("cpf or secret are invalid")
 	ErrAccountAlreadyExists       = errors.New("account already exists")
 )
 
@@ -28,8 +28,8 @@ func HandleError(w http.ResponseWriter, err error) {
 	switch {
 	case errors.Is(err, entities.ErrInsufficientFunds):
 		SendError(w, http.StatusBadRequest, ErrInsufficientFunds)
-	case errors.Is(err, auth.ErrSecretDoesNotMatch):
-		SendError(w, http.StatusBadRequest, ErrSecretDoesNotMatch)
+	case errors.Is(err, auth.ErrInvalidCredentials):
+		SendError(w, http.StatusBadRequest, ErrInvalidCredentials)
 	case errors.Is(err, entities.ErrAccountDoesNotExist):
 		SendError(w, http.StatusNotFound, ErrAccountNotFound)
 	case errors.Is(err, entities.ErrAccountDestinationDoesNotExist):

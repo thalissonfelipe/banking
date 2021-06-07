@@ -3,6 +3,6 @@ package auth
 import "errors"
 
 var (
-	ErrSecretDoesNotMatch = errors.New("secret does not match")
+	ErrInvalidCredentials = errors.New("invalid credentials")
 	ErrUnauthorized       = errors.New("invalid token")
 )
