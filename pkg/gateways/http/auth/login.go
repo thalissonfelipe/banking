@@ -21,7 +21,7 @@ import (
 // @Failure 500 {object} responses.ErrorResponse
 // @Router /login [POST]
 func (h Handler) Login(w http.ResponseWriter, r *http.Request) {
-	var body requestBody
+	var body LoginInput
 
 	err := json.NewDecoder(r.Body).Decode(&body)
 	if err != nil {
@@ -48,6 +48,6 @@ func (h Handler) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response := responseBody{Token: token}
+	response := LoginResponse{Token: token}
 	responses.SendJSON(w, http.StatusOK, response)
 }

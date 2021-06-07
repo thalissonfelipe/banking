@@ -41,7 +41,7 @@ func TestHandler_GetAccountBalance(t *testing.T) {
 			},
 			requestURI:   fmt.Sprintf("/accounts/%s/balance", acc.ID),
 			decoder:      balanceResponseDecoder{},
-			expectedBody: balanceResponse{Balance: 0},
+			expectedBody: BalanceResponse{Balance: 0},
 			expectedCode: http.StatusOK,
 		},
 		{
@@ -55,7 +55,7 @@ func TestHandler_GetAccountBalance(t *testing.T) {
 			},
 			requestURI:   fmt.Sprintf("/accounts/%s/balance", acc.ID),
 			decoder:      balanceResponseDecoder{},
-			expectedBody: balanceResponse{Balance: 100},
+			expectedBody: BalanceResponse{Balance: 100},
 			expectedCode: http.StatusOK,
 		},
 		{
@@ -111,7 +111,7 @@ func TestHandler_GetAccountBalance(t *testing.T) {
 type balanceResponseDecoder struct{}
 
 func (balanceResponseDecoder) Decode(body *bytes.Buffer) interface{} {
-	var result balanceResponse
+	var result BalanceResponse
 	json.NewDecoder(body).Decode(&result)
 	return result
 }

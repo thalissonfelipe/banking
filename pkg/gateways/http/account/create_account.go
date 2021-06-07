@@ -25,7 +25,7 @@ import (
 // @Failure 500 {object} responses.ErrorResponse
 // @Router /accounts [POST]
 func (h Handler) CreateAccount(w http.ResponseWriter, r *http.Request) {
-	var body requestBody
+	var body CreateAccountInput
 
 	err := json.NewDecoder(r.Body).Decode(&body)
 	if err != nil {
@@ -63,6 +63,6 @@ func (h Handler) CreateAccount(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	accResponse := convertAccountToCreatedAccountResponse(acc)
+	accResponse := convertAccountToCreateAccountResponse(acc)
 	responses.SendJSON(w, http.StatusCreated, accResponse)
 }

@@ -45,7 +45,7 @@ func TestHandler_CreateTransfer(t *testing.T) {
 			accUsecase:  &mocks.StubAccountUsecase{},
 			decoder:     tests.ErrorMessageDecoder{},
 			accOriginID: accOrigin.ID,
-			body:        transferRequest{Amount: 100},
+			body:        CreateTransferInput{Amount: 100},
 			expectedBody: responses.ErrorResponse{
 				Message: "missing account destination id parameter",
 			},
@@ -57,7 +57,7 @@ func TestHandler_CreateTransfer(t *testing.T) {
 			accUsecase:   &mocks.StubAccountUsecase{},
 			decoder:      tests.ErrorMessageDecoder{},
 			accOriginID:  accOrigin.ID,
-			body:         transferRequest{AccountDestinationID: accDest.ID.String()},
+			body:         CreateTransferInput{AccountDestinationID: accDest.ID.String()},
 			expectedBody: responses.ErrorResponse{Message: "missing amount parameter"},
 			expectedCode: http.StatusBadRequest,
 		},
@@ -79,7 +79,7 @@ func TestHandler_CreateTransfer(t *testing.T) {
 			accUsecase:  &mocks.StubAccountUsecase{},
 			decoder:     tests.ErrorMessageDecoder{},
 			accOriginID: accOrigin.ID,
-			body: transferRequest{
+			body: CreateTransferInput{
 				AccountDestinationID: accDest.ID.String(),
 				Amount:               100,
 			},
@@ -94,7 +94,7 @@ func TestHandler_CreateTransfer(t *testing.T) {
 			},
 			decoder:     tests.ErrorMessageDecoder{},
 			accOriginID: accOrigin.ID,
-			body: transferRequest{
+			body: CreateTransferInput{
 				AccountDestinationID: accDest.ID.String(),
 				Amount:               100,
 			},
@@ -109,7 +109,7 @@ func TestHandler_CreateTransfer(t *testing.T) {
 			},
 			decoder:     tests.ErrorMessageDecoder{},
 			accOriginID: accOrigin.ID,
-			body: transferRequest{
+			body: CreateTransferInput{
 				AccountDestinationID: accDest.ID.String(),
 				Amount:               100,
 			},
@@ -124,7 +124,7 @@ func TestHandler_CreateTransfer(t *testing.T) {
 			},
 			decoder:     tests.ErrorMessageDecoder{},
 			accOriginID: accOrigin.ID,
-			body: transferRequest{
+			body: CreateTransferInput{
 				AccountDestinationID: accDest.ID.String(),
 				Amount:               100,
 			},
@@ -137,7 +137,7 @@ func TestHandler_CreateTransfer(t *testing.T) {
 			accUsecase:  &mocks.StubAccountUsecase{},
 			decoder:     tests.ErrorMessageDecoder{},
 			accOriginID: accOrigin.ID,
-			body: transferRequest{
+			body: CreateTransferInput{
 				AccountDestinationID: accOrigin.ID.String(),
 				Amount:               100,
 			},
@@ -154,11 +154,11 @@ func TestHandler_CreateTransfer(t *testing.T) {
 			},
 			decoder:     createdTransferDecoder{},
 			accOriginID: accOriginWithBalance.ID,
-			body: transferRequest{
+			body: CreateTransferInput{
 				AccountDestinationID: accDest.ID.String(),
 				Amount:               100,
 			},
-			expectedBody: transferCreatedResponse{
+			expectedBody: CreateTransferResponse{
 				AccountOriginID:      accOriginWithBalance.ID.String(),
 				AccountDestinationID: accDest.ID.String(),
 				Amount:               100,
@@ -193,7 +193,7 @@ func TestHandler_CreateTransfer(t *testing.T) {
 type createdTransferDecoder struct{}
 
 func (createdTransferDecoder) Decode(body *bytes.Buffer) interface{} {
-	var result transferCreatedResponse
+	var result CreateTransferResponse
 	json.NewDecoder(body).Decode(&result)
 	return result
 }

@@ -33,7 +33,7 @@ func TestHandler_ListAccounts(t *testing.T) {
 		{
 			name:         "should return 200 and an empty slice of accounts",
 			repoSetup:    &mocks.StubAccountRepository{},
-			expectedBody: []accountResponse{},
+			expectedBody: []AccountListResponse{},
 			expectedCode: http.StatusOK,
 			decoder:      listAccountsSuccessDecoder{},
 		},
@@ -42,7 +42,7 @@ func TestHandler_ListAccounts(t *testing.T) {
 			repoSetup: &mocks.StubAccountRepository{
 				Accounts: []entities.Account{acc},
 			},
-			expectedBody: []accountResponse{convertAccountToAccountResponse(acc)},
+			expectedBody: []AccountListResponse{convertAccountToAccountListResponse(acc)},
 			decoder:      listAccountsSuccessDecoder{},
 			expectedCode: http.StatusOK,
 		},
@@ -78,7 +78,7 @@ func TestHandler_ListAccounts(t *testing.T) {
 type listAccountsSuccessDecoder struct{}
 
 func (listAccountsSuccessDecoder) Decode(body *bytes.Buffer) interface{} {
-	var result []accountResponse
+	var result []AccountListResponse
 	json.NewDecoder(body).Decode(&result)
 	return result
 }

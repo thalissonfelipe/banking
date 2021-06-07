@@ -23,10 +23,10 @@ func (h Handler) ListAccounts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	accountsResponse := make([]accountResponse, 0)
+	accountsResponse := make([]AccountListResponse, 0)
 
 	for _, acc := range accounts {
-		accountsResponse = append(accountsResponse, convertAccountToAccountResponse(acc))
+		accountsResponse = append(accountsResponse, convertAccountToAccountListResponse(acc))
 	}
 
 	responses.SendJSON(w, http.StatusOK, accountsResponse)

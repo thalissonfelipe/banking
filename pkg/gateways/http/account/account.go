@@ -13,7 +13,7 @@ var (
 	errMissingSecretParameter = errors.New("missing secret parameter")
 )
 
-type accountResponse struct {
+type AccountListResponse struct {
 	Id        string `json:"id"`
 	Name      string `json:"name"`
 	CPF       string `json:"cpf"`
@@ -21,29 +21,31 @@ type accountResponse struct {
 	CreatedAt string `json:"created_at"`
 }
 
-type balanceResponse struct {
+type BalanceResponse struct {
 	Balance int `json:"balance"`
 }
 
-type requestBody struct {
+type CreateAccountInput struct {
 	Name   string `json:"name"`
 	CPF    string `json:"cpf"`
 	Secret string `json:"secret"`
 }
 
-type createdAccountResponse struct {
+type CreateAccountResponse struct {
 	Name    string `json:"name"`
 	CPF     string `json:"cpf"`
 	Balance int    `json:"balance"`
 }
 
-func (r requestBody) isValid() error {
+func (r CreateAccountInput) isValid() error {
 	if r.Name == "" {
 		return errMissingNameParameter
 	}
+
 	if r.CPF == "" {
 		return errMissingCPFParameter
 	}
+
 	if r.Secret == "" {
 		return errMissingSecretParameter
 	}
@@ -51,8 +53,8 @@ func (r requestBody) isValid() error {
 	return nil
 }
 
-func convertAccountToAccountResponse(account entities.Account) accountResponse {
-	return accountResponse{
+func convertAccountToAccountListResponse(account entities.Account) AccountListResponse {
+	return AccountListResponse{
 		Id:        account.ID.String(),
 		Name:      account.Name,
 		CPF:       account.CPF.String(),
@@ -61,8 +63,8 @@ func convertAccountToAccountResponse(account entities.Account) accountResponse {
 	}
 }
 
-func convertAccountToCreatedAccountResponse(account *entities.Account) createdAccountResponse {
-	return createdAccountResponse{
+func convertAccountToCreateAccountResponse(account *entities.Account) CreateAccountResponse {
+	return CreateAccountResponse{
 		Name:    account.Name,
 		CPF:     account.CPF.String(),
 		Balance: account.Balance,
