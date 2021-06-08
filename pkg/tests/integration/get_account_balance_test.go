@@ -36,7 +36,7 @@ func TestIntegration_GetAccountBalance(t *testing.T) {
 		{
 			name: "should return status code 404 if account does not exist",
 			uriSetup: func(t *testing.T) string {
-				return fmt.Sprintf("%s/api/v1/accounts/%s/balance", testenv.ServerURL, vos.NewID().String())
+				return fmt.Sprintf("%s/api/v1/accounts/%s/balance", testenv.ServerURL, vos.NewAccountID().String())
 			},
 			expectedStatus: http.StatusNotFound,
 		},

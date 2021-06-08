@@ -46,7 +46,7 @@ const updateBalanceQuery = `
 update accounts set balance=balance+$1 where id=$2
 `
 
-func (r Repository) updateBalance(ctx context.Context, tx pgx.Tx, balance int, id vos.ID) error {
+func (r Repository) updateBalance(ctx context.Context, tx pgx.Tx, balance int, id vos.AccountID) error {
 	_, err := tx.Exec(ctx, updateBalanceQuery, balance, id)
 	if err != nil {
 		return fmt.Errorf("unexpected error occurred on update balance query: %w", err)

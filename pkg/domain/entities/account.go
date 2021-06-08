@@ -8,7 +8,7 @@ import (
 )
 
 type Account struct {
-	ID        vos.ID
+	ID        vos.AccountID
 	Name      string
 	CPF       vos.CPF
 	Secret    vos.Secret
@@ -29,7 +29,7 @@ var (
 
 func NewAccount(name string, cpf vos.CPF, secret vos.Secret) Account {
 	return Account{
-		ID:      vos.NewID(),
+		ID:      vos.NewAccountID(),
 		Name:    name,
 		CPF:     cpf,
 		Secret:  secret,

@@ -9,7 +9,7 @@ import (
 	"github.com/thalissonfelipe/banking/pkg/domain/vos"
 )
 
-func (a Account) GetAccountByID(ctx context.Context, accountID vos.ID) (*entities.Account, error) {
+func (a Account) GetAccountByID(ctx context.Context, accountID vos.AccountID) (*entities.Account, error) {
 	acc, err := a.repository.GetAccountByID(ctx, accountID)
 	if err == nil {
 		return acc, nil

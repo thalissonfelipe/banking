@@ -21,7 +21,7 @@ import (
 // @Failure 500 {object} responses.ErrorResponse
 // @Router /accounts/{accountID}/balance [GET].
 func (h Handler) GetAccountBalance(w http.ResponseWriter, r *http.Request) {
-	accountID := vos.ConvertStringToID(chi.URLParam(r, "accountID"))
+	accountID := vos.ConvertStringToAccountID(chi.URLParam(r, "accountID"))
 
 	balance, err := h.usecase.GetAccountBalanceByID(r.Context(), accountID)
 	if err != nil {

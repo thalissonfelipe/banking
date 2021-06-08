@@ -9,8 +9,8 @@ import (
 
 type Repository interface {
 	GetAccounts(ctx context.Context) ([]entities.Account, error)
-	GetBalanceByID(ctx context.Context, id vos.ID) (int, error)
+	GetBalanceByID(ctx context.Context, id vos.AccountID) (int, error)
 	CreateAccount(ctx context.Context, account *entities.Account) error
 	GetAccountByCPF(ctx context.Context, cpf vos.CPF) (*entities.Account, error)
-	GetAccountByID(ctx context.Context, id vos.ID) (*entities.Account, error)
+	GetAccountByID(ctx context.Context, id vos.AccountID) (*entities.Account, error)
 }

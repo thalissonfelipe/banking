@@ -17,7 +17,7 @@ from accounts
 where id=$1
 `
 
-func (r Repository) GetAccountByID(ctx context.Context, id vos.ID) (*entities.Account, error) {
+func (r Repository) GetAccountByID(ctx context.Context, id vos.AccountID) (*entities.Account, error) {
 	var account entities.Account
 
 	err := r.db.QueryRow(ctx, getAccountByIDQuery, id).Scan(

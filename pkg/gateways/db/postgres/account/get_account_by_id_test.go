@@ -19,7 +19,7 @@ func TestRepository_GetAccountByID(t *testing.T) {
 
 	defer dockertest.TruncateTables(ctx, db)
 
-	randomID := vos.NewID()
+	randomID := vos.NewAccountID()
 	a, err := r.GetAccountByID(ctx, randomID)
 
 	assert.Equal(t, entities.ErrAccountDoesNotExist, err)

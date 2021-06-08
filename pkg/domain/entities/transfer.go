@@ -4,13 +4,15 @@ import (
 	"errors"
 	"time"
 
+	"github.com/google/uuid"
+
 	"github.com/thalissonfelipe/banking/pkg/domain/vos"
 )
 
 type Transfer struct {
-	ID                   vos.ID
-	AccountOriginID      vos.ID
-	AccountDestinationID vos.ID
+	ID                   uuid.UUID
+	AccountOriginID      vos.AccountID
+	AccountDestinationID vos.AccountID
 	Amount               int
 	CreatedAt            time.Time
 }
@@ -22,9 +24,9 @@ var (
 	ErrAccountDestinationDoesNotExist = errors.New("account destination does not exist")
 )
 
-func NewTransfer(accOriginID, accDestID vos.ID, amount int) Transfer {
+func NewTransfer(accOriginID, accDestID vos.AccountID, amount int) Transfer {
 	return Transfer{
-		ID:                   vos.NewID(),
+		ID:                   uuid.New(),
 		AccountOriginID:      accOriginID,
 		AccountDestinationID: accDestID,
 		Amount:               amount,

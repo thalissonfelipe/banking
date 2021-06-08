@@ -18,7 +18,7 @@ func TestRepository_GetTransfers(t *testing.T) {
 	r := NewRepository(db)
 	ctx := context.Background()
 
-	randomID := vos.NewID()
+	randomID := vos.NewAccountID()
 
 	transfers, err := r.GetTransfers(ctx, randomID)
 	assert.NoError(t, err)

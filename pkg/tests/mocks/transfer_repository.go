@@ -15,7 +15,7 @@ type TransferRepositoryMock struct {
 	Err       error
 }
 
-func (s TransferRepositoryMock) GetTransfers(ctx context.Context, id vos.ID) ([]entities.Transfer, error) {
+func (s TransferRepositoryMock) GetTransfers(ctx context.Context, id vos.AccountID) ([]entities.Transfer, error) {
 	if s.Err != nil {
 		return nil, entities.ErrInternalError
 	}

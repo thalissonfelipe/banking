@@ -13,12 +13,12 @@ import (
 )
 
 func TestUsecase_ListTransfers(t *testing.T) {
-	accountOriginID := vos.NewID()
+	accountOriginID := vos.NewAccountID()
 
 	testCases := []struct {
 		name        string
 		repoSetup   func() *mocks.TransferRepositoryMock
-		accountID   vos.ID
+		accountID   vos.AccountID
 		expectedErr error
 	}{
 		{
@@ -26,7 +26,7 @@ func TestUsecase_ListTransfers(t *testing.T) {
 			repoSetup: func() *mocks.TransferRepositoryMock {
 				transfer := entities.NewTransfer(
 					accountOriginID,
-					vos.NewID(),
+					vos.NewAccountID(),
 					100,
 				)
 

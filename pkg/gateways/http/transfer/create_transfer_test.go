@@ -35,7 +35,7 @@ func TestHandler_CreateTransfer(t *testing.T) {
 		repo         *mocks.TransferRepositoryMock
 		accUsecase   *mocks.AccountUsecaseMock
 		decoder      tests.Decoder
-		accOriginID  vos.ID
+		accOriginID  vos.AccountID
 		body         interface{}
 		expectedBody interface{}
 		expectedCode int

@@ -23,7 +23,7 @@ func (s AccountRepositoryMock) GetAccounts(ctx context.Context) ([]entities.Acco
 	return s.Accounts, nil
 }
 
-func (s AccountRepositoryMock) GetBalanceByID(ctx context.Context, id vos.ID) (int, error) {
+func (s AccountRepositoryMock) GetBalanceByID(ctx context.Context, id vos.AccountID) (int, error) {
 	if s.Err != nil {
 		return 0, s.Err
 	}
@@ -67,7 +67,7 @@ func (s AccountRepositoryMock) GetAccountByCPF(ctx context.Context, cpf vos.CPF)
 	return nil, entities.ErrAccountDoesNotExist
 }
 
-func (s AccountRepositoryMock) GetAccountByID(ctx context.Context, id vos.ID) (*entities.Account, error) {
+func (s AccountRepositoryMock) GetAccountByID(ctx context.Context, id vos.AccountID) (*entities.Account, error) {
 	if s.Err != nil {
 		return nil, s.Err
 	}

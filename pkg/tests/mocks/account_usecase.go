@@ -15,7 +15,7 @@ type AccountUsecaseMock struct {
 	Err      error
 }
 
-func (s AccountUsecaseMock) GetAccountBalanceByID(ctx context.Context, accountID vos.ID) (int, error) {
+func (s AccountUsecaseMock) GetAccountBalanceByID(ctx context.Context, accountID vos.AccountID) (int, error) {
 	if s.Err != nil {
 		return 0, entities.ErrInternalError
 	}
@@ -60,7 +60,7 @@ func (s AccountUsecaseMock) CreateAccount(
 	return &acc, nil
 }
 
-func (s AccountUsecaseMock) GetAccountByID(ctx context.Context, accountID vos.ID) (*entities.Account, error) {
+func (s AccountUsecaseMock) GetAccountByID(ctx context.Context, accountID vos.AccountID) (*entities.Account, error) {
 	if s.Err != nil {
 		return nil, entities.ErrInternalError
 	}

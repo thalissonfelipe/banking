@@ -9,9 +9,9 @@ import (
 
 type Usecase interface {
 	ListAccounts(ctx context.Context) ([]entities.Account, error)
-	GetAccountBalanceByID(ctx context.Context, accountID vos.ID) (int, error)
+	GetAccountBalanceByID(ctx context.Context, accountID vos.AccountID) (int, error)
 	CreateAccount(ctx context.Context, input CreateAccountInput) (*entities.Account, error)
-	GetAccountByID(ctx context.Context, accountID vos.ID) (*entities.Account, error)
+	GetAccountByID(ctx context.Context, accountID vos.AccountID) (*entities.Account, error)
 	GetAccountByCPF(ctx context.Context, cpf vos.CPF) (*entities.Account, error)
 }
 

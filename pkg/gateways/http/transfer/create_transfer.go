@@ -43,8 +43,8 @@ func (h Handler) CreateTransfer(w http.ResponseWriter, r *http.Request) {
 	}
 
 	token := getTokenFromHeader(r.Header.Get("Authorization"))
-	accountID := vos.ConvertStringToID(auth.GetIDFromToken(token))
-	accountDestinationID := vos.ConvertStringToID(body.AccountDestinationID)
+	accountID := vos.ConvertStringToAccountID(auth.GetIDFromToken(token))
+	accountDestinationID := vos.ConvertStringToAccountID(body.AccountDestinationID)
 
 	if accountID == accountDestinationID {
 		responses.SendError(w, http.StatusBadRequest, schemes.ErrDestIDEqualCurrentID)

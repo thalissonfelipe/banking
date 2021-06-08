@@ -14,7 +14,7 @@ from transfers
 where account_origin_id=$1
 `
 
-func (r Repository) GetTransfers(ctx context.Context, id vos.ID) ([]entities.Transfer, error) {
+func (r Repository) GetTransfers(ctx context.Context, id vos.AccountID) ([]entities.Transfer, error) {
 	rows, err := r.db.Query(ctx, getTransfersQuery, id)
 	if err != nil {
 		return nil, fmt.Errorf("unexpected error occurred on get transfers query: %w", err)

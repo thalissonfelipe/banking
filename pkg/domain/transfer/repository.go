@@ -8,6 +8,6 @@ import (
 )
 
 type Repository interface {
-	GetTransfers(ctx context.Context, id vos.ID) ([]entities.Transfer, error)
+	GetTransfers(ctx context.Context, id vos.AccountID) ([]entities.Transfer, error)
 	CreateTransfer(ctx context.Context, transfer *entities.Transfer) error
 }

@@ -20,7 +20,7 @@ func TestUsecase_GetBalanceByAccountID(t *testing.T) {
 	testCases := []struct {
 		name        string
 		repoSetup   *mocks.AccountRepositoryMock
-		accountID   vos.ID
+		accountID   vos.AccountID
 		expected    int
 		expectedErr error
 	}{
@@ -36,7 +36,7 @@ func TestUsecase_GetBalanceByAccountID(t *testing.T) {
 		{
 			name:        "should return an error if account does not exist",
 			repoSetup:   &mocks.AccountRepositoryMock{},
-			accountID:   vos.NewID(),
+			accountID:   vos.NewAccountID(),
 			expected:    entities.DefaultBalance,
 			expectedErr: entities.ErrAccountDoesNotExist,
 		},
