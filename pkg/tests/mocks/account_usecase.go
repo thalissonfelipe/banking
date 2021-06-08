@@ -8,12 +8,14 @@ import (
 	"github.com/thalissonfelipe/banking/pkg/domain/vos"
 )
 
-type StubAccountUsecase struct {
+var _ account.Usecase = (*AccountUsecaseMock)(nil)
+
+type AccountUsecaseMock struct {
 	Accounts []entities.Account
 	Err      error
 }
 
-func (s StubAccountUsecase) GetAccountBalanceByID(ctx context.Context, accountID vos.ID) (int, error) {
+func (s AccountUsecaseMock) GetAccountBalanceByID(ctx context.Context, accountID vos.ID) (int, error) {
 	if s.Err != nil {
 		return 0, entities.ErrInternalError
 	}
@@ -24,14 +26,18 @@ func (s StubAccountUsecase) GetAccountBalanceByID(ctx context.Context, accountID
 		}
 	}
 
-	return 0, nil
+	return 0, entities.ErrAccountDoesNotExist
 }
 
-func (s StubAccountUsecase) ListAccounts(ctx context.Context) ([]entities.Account, error) {
-	return nil, nil
+func (s AccountUsecaseMock) ListAccounts(ctx context.Context) ([]entities.Account, error) {
+	if s.Err != nil {
+		return nil, entities.ErrInternalError
+	}
+
+	return s.Accounts, nil
 }
 
-func (s StubAccountUsecase) CreateAccount(
+func (s AccountUsecaseMock) CreateAccount(
 	ctx context.Context, input account.CreateAccountInput) (*entities.Account, error) {
 	if s.Err != nil {
 		return nil, entities.ErrInternalError
@@ -54,7 +60,7 @@ func (s StubAccountUsecase) CreateAccount(
 	return &acc, nil
 }
 
-func (s StubAccountUsecase) GetAccountByID(ctx context.Context, accountID vos.ID) (*entities.Account, error) {
+func (s AccountUsecaseMock) GetAccountByID(ctx context.Context, accountID vos.ID) (*entities.Account, error) {
 	if s.Err != nil {
 		return nil, entities.ErrInternalError
 	}
@@ -68,7 +74,7 @@ func (s StubAccountUsecase) GetAccountByID(ctx context.Context, accountID vos.ID
 	return nil, entities.ErrAccountDoesNotExist
 }
 
-func (s StubAccountUsecase) GetAccountByCPF(ctx context.Context, cpf vos.CPF) (*entities.Account, error) {
+func (s AccountUsecaseMock) GetAccountByCPF(ctx context.Context, cpf vos.CPF) (*entities.Account, error) {
 	if s.Err != nil {
 		return nil, entities.ErrInternalError
 	}

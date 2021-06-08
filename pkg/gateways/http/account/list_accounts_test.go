@@ -11,7 +11,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/thalissonfelipe/banking/pkg/domain/account/usecase"
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
 	"github.com/thalissonfelipe/banking/pkg/gateways/http/account/schemes"
 	"github.com/thalissonfelipe/banking/pkg/gateways/http/responses"
@@ -26,21 +25,21 @@ func TestHandler_ListAccounts(t *testing.T) {
 
 	testCases := []struct {
 		name         string
-		repoSetup    *mocks.StubAccountRepository
+		usecase      *mocks.AccountUsecaseMock
 		expectedBody interface{}
 		decoder      tests.Decoder
 		expectedCode int
 	}{
 		{
 			name:         "should return 200 and an empty slice of accounts",
-			repoSetup:    &mocks.StubAccountRepository{},
+			usecase:      &mocks.AccountUsecaseMock{},
 			expectedBody: []schemes.AccountListResponse{},
 			expectedCode: http.StatusOK,
 			decoder:      listAccountsSuccessDecoder{},
 		},
 		{
 			name: "should return 200 and an slice of accounts",
-			repoSetup: &mocks.StubAccountRepository{
+			usecase: &mocks.AccountUsecaseMock{
 				Accounts: []entities.Account{acc},
 			},
 			expectedBody: []schemes.AccountListResponse{convertAccountToAccountListResponse(acc)},
@@ -49,7 +48,7 @@ func TestHandler_ListAccounts(t *testing.T) {
 		},
 		{
 			name:         "should return 500 and error message if something went wrong",
-			repoSetup:    &mocks.StubAccountRepository{Err: testdata.ErrRepositoryFailsToFetch},
+			usecase:      &mocks.AccountUsecaseMock{Err: testdata.ErrRepositoryFailsToFetch},
 			expectedBody: responses.ErrorResponse{Message: "internal server error"},
 			decoder:      tests.ErrorMessageDecoder{},
 			expectedCode: http.StatusInternalServerError,
@@ -58,9 +57,8 @@ func TestHandler_ListAccounts(t *testing.T) {
 
 	for _, tt := range testCases {
 		t.Run(tt.name, func(t *testing.T) {
-			accUseCase := usecase.NewAccountUsecase(tt.repoSetup, nil)
 			r := chi.NewRouter()
-			handler := NewHandler(r, accUseCase)
+			handler := NewHandler(r, tt.usecase)
 
 			request := fakes.FakeRequest(http.MethodGet, "/accounts", nil)
 			response := httptest.NewRecorder()

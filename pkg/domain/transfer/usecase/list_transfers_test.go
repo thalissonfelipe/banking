@@ -17,20 +17,20 @@ func TestUsecase_ListTransfers(t *testing.T) {
 
 	testCases := []struct {
 		name        string
-		repoSetup   func() *mocks.StubTransferRepository
+		repoSetup   func() *mocks.TransferRepositoryMock
 		accountID   vos.ID
 		expectedErr error
 	}{
 		{
 			name: "should return a list of transfers",
-			repoSetup: func() *mocks.StubTransferRepository {
+			repoSetup: func() *mocks.TransferRepositoryMock {
 				transfer := entities.NewTransfer(
 					accountOriginID,
 					vos.NewID(),
 					100,
 				)
 
-				return &mocks.StubTransferRepository{
+				return &mocks.TransferRepositoryMock{
 					Transfers: []entities.Transfer{transfer},
 				}
 			},
@@ -39,8 +39,8 @@ func TestUsecase_ListTransfers(t *testing.T) {
 		},
 		{
 			name: "should return an error if something went wrong on repository",
-			repoSetup: func() *mocks.StubTransferRepository {
-				return &mocks.StubTransferRepository{
+			repoSetup: func() *mocks.TransferRepositoryMock {
+				return &mocks.TransferRepositoryMock{
 					Err: testdata.ErrRepositoryFailsToFetch,
 				}
 			},

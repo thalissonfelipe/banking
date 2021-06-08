@@ -16,13 +16,13 @@ func TestUsecase_ListAccounts(t *testing.T) {
 
 	testCases := []struct {
 		name        string
-		repoSetup   *mocks.StubAccountRepository
+		repoSetup   *mocks.AccountRepositoryMock
 		expected    []entities.Account
 		expectedErr error
 	}{
 		{
 			name: "should return a list of accounts",
-			repoSetup: &mocks.StubAccountRepository{
+			repoSetup: &mocks.AccountRepositoryMock{
 				Accounts: []entities.Account{acc},
 			},
 			expected:    []entities.Account{acc},
@@ -30,7 +30,7 @@ func TestUsecase_ListAccounts(t *testing.T) {
 		},
 		{
 			name:        "should return an error if something went wrong on repository",
-			repoSetup:   &mocks.StubAccountRepository{Err: testdata.ErrRepositoryFailsToFetch},
+			repoSetup:   &mocks.AccountRepositoryMock{Err: testdata.ErrRepositoryFailsToFetch},
 			expected:    nil,
 			expectedErr: entities.ErrInternalError,
 		},

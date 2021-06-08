@@ -18,19 +18,19 @@ func TestUsecase_CreateTransfer(t *testing.T) {
 
 	testCases := []struct {
 		name        string
-		repoSetup   *mocks.StubTransferRepository
-		accUsecase  func() *mocks.StubAccountUsecase
+		repoSetup   *mocks.TransferRepositoryMock
+		accUsecase  func() *mocks.AccountUsecaseMock
 		input       func() transfer.CreateTransferInput
 		expectedErr error
 	}{
 		{
 			name:      "should perform a transfer successfully",
-			repoSetup: &mocks.StubTransferRepository{},
-			accUsecase: func() *mocks.StubAccountUsecase {
+			repoSetup: &mocks.TransferRepositoryMock{},
+			accUsecase: func() *mocks.AccountUsecaseMock {
 				accOriginWithBalance := accOrigin
 				accOriginWithBalance.Balance = 100
 
-				return &mocks.StubAccountUsecase{
+				return &mocks.AccountUsecaseMock{
 					Accounts: []entities.Account{accOriginWithBalance, accDest},
 				}
 			},
@@ -41,9 +41,9 @@ func TestUsecase_CreateTransfer(t *testing.T) {
 		},
 		{
 			name:      "should return an error if accOrigin does not have sufficient funds",
-			repoSetup: &mocks.StubTransferRepository{},
-			accUsecase: func() *mocks.StubAccountUsecase {
-				return &mocks.StubAccountUsecase{
+			repoSetup: &mocks.TransferRepositoryMock{},
+			accUsecase: func() *mocks.AccountUsecaseMock {
+				return &mocks.AccountUsecaseMock{
 					Accounts: []entities.Account{accOrigin, accDest},
 				}
 			},
@@ -54,12 +54,12 @@ func TestUsecase_CreateTransfer(t *testing.T) {
 		},
 		{
 			name:      "should return an error if transfer repository fails",
-			repoSetup: &mocks.StubTransferRepository{Err: testdata.ErrRepositoryFailsToSave},
-			accUsecase: func() *mocks.StubAccountUsecase {
+			repoSetup: &mocks.TransferRepositoryMock{Err: testdata.ErrRepositoryFailsToSave},
+			accUsecase: func() *mocks.AccountUsecaseMock {
 				accOriginWithBalance := accOrigin
 				accOriginWithBalance.Balance = 100
 
-				return &mocks.StubAccountUsecase{
+				return &mocks.AccountUsecaseMock{
 					Accounts: []entities.Account{accOriginWithBalance, accDest},
 				}
 			},
@@ -70,12 +70,12 @@ func TestUsecase_CreateTransfer(t *testing.T) {
 		},
 		{
 			name:      "should return an error if accUsecase fails",
-			repoSetup: &mocks.StubTransferRepository{},
-			accUsecase: func() *mocks.StubAccountUsecase {
+			repoSetup: &mocks.TransferRepositoryMock{},
+			accUsecase: func() *mocks.AccountUsecaseMock {
 				accOriginWithBalance := accOrigin
 				accOriginWithBalance.Balance = 100
 
-				return &mocks.StubAccountUsecase{
+				return &mocks.AccountUsecaseMock{
 					Accounts: []entities.Account{accOriginWithBalance, accDest},
 					Err:      testdata.ErrUsecaseFails,
 				}
@@ -87,9 +87,9 @@ func TestUsecase_CreateTransfer(t *testing.T) {
 		},
 		{
 			name:      "should return an error if account origin does not exist",
-			repoSetup: &mocks.StubTransferRepository{},
-			accUsecase: func() *mocks.StubAccountUsecase {
-				return &mocks.StubAccountUsecase{
+			repoSetup: &mocks.TransferRepositoryMock{},
+			accUsecase: func() *mocks.AccountUsecaseMock {
+				return &mocks.AccountUsecaseMock{
 					Accounts: []entities.Account{accDest},
 				}
 			},
@@ -100,12 +100,12 @@ func TestUsecase_CreateTransfer(t *testing.T) {
 		},
 		{
 			name:      "should return an error if account destination does not exist",
-			repoSetup: &mocks.StubTransferRepository{},
-			accUsecase: func() *mocks.StubAccountUsecase {
+			repoSetup: &mocks.TransferRepositoryMock{},
+			accUsecase: func() *mocks.AccountUsecaseMock {
 				accOriginWithBalance := accOrigin
 				accOriginWithBalance.Balance = 100
 
-				return &mocks.StubAccountUsecase{
+				return &mocks.AccountUsecaseMock{
 					Accounts: []entities.Account{accOriginWithBalance},
 				}
 			},

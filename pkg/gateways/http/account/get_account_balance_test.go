@@ -13,7 +13,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/thalissonfelipe/banking/pkg/domain/account/usecase"
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
 	"github.com/thalissonfelipe/banking/pkg/gateways/http/account/schemes"
 	"github.com/thalissonfelipe/banking/pkg/gateways/http/responses"
@@ -28,7 +27,7 @@ func TestHandler_GetAccountBalance(t *testing.T) {
 
 	testCases := []struct {
 		name         string
-		repo         func() *mocks.StubAccountRepository
+		usecase      func() *mocks.AccountUsecaseMock
 		requestURI   string
 		decoder      tests.Decoder
 		expectedBody interface{}
@@ -36,8 +35,8 @@ func TestHandler_GetAccountBalance(t *testing.T) {
 	}{
 		{
 			name: "should return status 200 and a balance equal to 0",
-			repo: func() *mocks.StubAccountRepository {
-				return &mocks.StubAccountRepository{
+			usecase: func() *mocks.AccountUsecaseMock {
+				return &mocks.AccountUsecaseMock{
 					Accounts: []entities.Account{acc},
 				}
 			},
@@ -48,11 +47,11 @@ func TestHandler_GetAccountBalance(t *testing.T) {
 		},
 		{
 			name: "should return status 200 and a balance equal to 100",
-			repo: func() *mocks.StubAccountRepository {
+			usecase: func() *mocks.AccountUsecaseMock {
 				accWithBalance := acc
 				accWithBalance.Balance = 100
 
-				return &mocks.StubAccountRepository{
+				return &mocks.AccountUsecaseMock{
 					Accounts: []entities.Account{accWithBalance},
 				}
 			},
@@ -63,8 +62,8 @@ func TestHandler_GetAccountBalance(t *testing.T) {
 		},
 		{
 			name: "should return status 404 if account does not exist",
-			repo: func() *mocks.StubAccountRepository {
-				return &mocks.StubAccountRepository{}
+			usecase: func() *mocks.AccountUsecaseMock {
+				return &mocks.AccountUsecaseMock{}
 			},
 			requestURI:   fmt.Sprintf("/accounts/%s/balance", acc.ID),
 			decoder:      tests.ErrorMessageDecoder{},
@@ -73,8 +72,8 @@ func TestHandler_GetAccountBalance(t *testing.T) {
 		},
 		{
 			name: "should return status 500 if something went wrong on usecase",
-			repo: func() *mocks.StubAccountRepository {
-				return &mocks.StubAccountRepository{Err: entities.ErrInternalError}
+			usecase: func() *mocks.AccountUsecaseMock {
+				return &mocks.AccountUsecaseMock{Err: entities.ErrInternalError}
 			},
 			requestURI:   fmt.Sprintf("/accounts/%s/balance", acc.ID),
 			decoder:      tests.ErrorMessageDecoder{},
@@ -86,9 +85,7 @@ func TestHandler_GetAccountBalance(t *testing.T) {
 	for _, tt := range testCases {
 		t.Run(tt.name, func(t *testing.T) {
 			r := chi.NewRouter()
-
-			usecase := usecase.NewAccountUsecase(tt.repo(), nil)
-			handler := NewHandler(r, usecase)
+			handler := NewHandler(r, tt.usecase())
 
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("accountID", acc.ID.String())

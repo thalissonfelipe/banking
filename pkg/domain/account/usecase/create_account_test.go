@@ -21,49 +21,49 @@ func TestUsecase_CreateAccount(t *testing.T) {
 
 	testCases := []struct {
 		name        string
-		repoSetup   func() *mocks.StubAccountRepository
-		encSetup    *mocks.StubHash
+		repoSetup   func() *mocks.AccountRepositoryMock
+		encSetup    *mocks.HashMock
 		input       account.CreateAccountInput
 		expectedErr error
 	}{
 		{
 			name: "should create an account successfully",
-			repoSetup: func() *mocks.StubAccountRepository {
-				return &mocks.StubAccountRepository{}
+			repoSetup: func() *mocks.AccountRepositoryMock {
+				return &mocks.AccountRepositoryMock{}
 			},
-			encSetup:    &mocks.StubHash{},
+			encSetup:    &mocks.HashMock{},
 			input:       validInput,
 			expectedErr: nil,
 		},
 		{
 			name: "should return an error if repository fails to fetch account",
-			repoSetup: func() *mocks.StubAccountRepository {
-				return &mocks.StubAccountRepository{Err: testdata.ErrRepositoryFailsToFetch}
+			repoSetup: func() *mocks.AccountRepositoryMock {
+				return &mocks.AccountRepositoryMock{Err: testdata.ErrRepositoryFailsToFetch}
 			},
-			encSetup:    &mocks.StubHash{},
+			encSetup:    &mocks.HashMock{},
 			input:       validInput,
 			expectedErr: entities.ErrInternalError,
 		},
 		{
 			name: "should return an error if cpf already exists",
-			repoSetup: func() *mocks.StubAccountRepository {
+			repoSetup: func() *mocks.AccountRepositoryMock {
 				acc := entities.NewAccount(validInput.Name, validInput.CPF, validInput.Secret)
 
-				return &mocks.StubAccountRepository{
+				return &mocks.AccountRepositoryMock{
 					Accounts: []entities.Account{acc},
 				}
 			},
 			input:       validInput,
-			encSetup:    &mocks.StubHash{},
+			encSetup:    &mocks.HashMock{},
 			expectedErr: entities.ErrAccountAlreadyExists,
 		},
 		{
 			name: "should return an error if hash secret fails",
-			repoSetup: func() *mocks.StubAccountRepository {
-				return &mocks.StubAccountRepository{}
+			repoSetup: func() *mocks.AccountRepositoryMock {
+				return &mocks.AccountRepositoryMock{}
 			},
 			input:       validInput,
-			encSetup:    &mocks.StubHash{Err: testdata.ErrHashFails},
+			encSetup:    &mocks.HashMock{Err: testdata.ErrHashFails},
 			expectedErr: entities.ErrInternalError,
 		},
 	}

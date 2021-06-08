@@ -30,21 +30,21 @@ func TestHandler_ListTransfers(t *testing.T) {
 
 	testCases := []struct {
 		name         string
-		repo         *mocks.StubTransferRepository
+		repo         *mocks.TransferRepositoryMock
 		decoder      tests.Decoder
 		expectedBody interface{}
 		expectedCode int
 	}{
 		{
 			name:         "should return a empty list of transfers",
-			repo:         &mocks.StubTransferRepository{},
+			repo:         &mocks.TransferRepositoryMock{},
 			decoder:      listTransfersDecoder{},
 			expectedBody: []schemes.TransferListResponse{},
 			expectedCode: http.StatusOK,
 		},
 		{
 			name: "should return a list of transfers",
-			repo: &mocks.StubTransferRepository{
+			repo: &mocks.TransferRepositoryMock{
 				Transfers: []entities.Transfer{transfer},
 			},
 			decoder:      listTransfersDecoder{},
@@ -53,7 +53,7 @@ func TestHandler_ListTransfers(t *testing.T) {
 		},
 		{
 			name:         "should return an error if usecase fails",
-			repo:         &mocks.StubTransferRepository{Err: testdata.ErrUsecaseFails},
+			repo:         &mocks.TransferRepositoryMock{Err: testdata.ErrUsecaseFails},
 			decoder:      tests.ErrorMessageDecoder{},
 			expectedBody: responses.ErrorResponse{Message: "internal server error"},
 			expectedCode: http.StatusInternalServerError,
@@ -63,7 +63,7 @@ func TestHandler_ListTransfers(t *testing.T) {
 	for _, tt := range testCases {
 		t.Run(tt.name, func(t *testing.T) {
 			r := chi.NewRouter()
-			accUsecase := &mocks.StubAccountUsecase{}
+			accUsecase := &mocks.AccountUsecaseMock{}
 			trUsecase := usecase.NewTransferUsecase(tt.repo, accUsecase)
 			handler := NewHandler(r, trUsecase)
 

@@ -38,8 +38,8 @@ func TestLogin(t *testing.T) {
 	}{
 		{
 			name:         "should return status code 400 if cpf was not provided",
-			usecase:      &mocks.StubAccountUsecase{},
-			enc:          mocks.StubHash{},
+			usecase:      mocks.AccountUsecaseMock{},
+			enc:          mocks.HashMock{},
 			body:         schemes.LoginInput{Secret: secret.String()},
 			decoder:      tests.ErrorMessageDecoder{},
 			expectedBody: responses.ErrorResponse{Message: "missing cpf parameter"},
@@ -47,8 +47,8 @@ func TestLogin(t *testing.T) {
 		},
 		{
 			name:         "should return status code 400 if secret was not provided",
-			usecase:      &mocks.StubAccountUsecase{},
-			enc:          mocks.StubHash{},
+			usecase:      mocks.AccountUsecaseMock{},
+			enc:          mocks.HashMock{},
 			body:         schemes.LoginInput{CPF: cpf.String()},
 			decoder:      tests.ErrorMessageDecoder{},
 			expectedBody: responses.ErrorResponse{Message: "missing secret parameter"},
@@ -56,8 +56,8 @@ func TestLogin(t *testing.T) {
 		},
 		{
 			name:    "should return status code 400 if json provided was not valid",
-			usecase: &mocks.StubAccountUsecase{},
-			enc:     mocks.StubHash{},
+			usecase: mocks.AccountUsecaseMock{},
+			enc:     mocks.HashMock{},
 			body: map[string]interface{}{
 				"cpf": 123,
 			},
@@ -67,8 +67,8 @@ func TestLogin(t *testing.T) {
 		},
 		{
 			name:         "should return status code 500 if usecase fails",
-			usecase:      &mocks.StubAccountUsecase{Err: testdata.ErrUsecaseFails},
-			enc:          mocks.StubHash{},
+			usecase:      mocks.AccountUsecaseMock{Err: testdata.ErrUsecaseFails},
+			enc:          mocks.HashMock{},
 			body:         schemes.LoginInput{CPF: cpf.String(), Secret: secret.String()},
 			decoder:      tests.ErrorMessageDecoder{},
 			expectedBody: responses.ErrorResponse{Message: "internal server error"},
@@ -76,8 +76,8 @@ func TestLogin(t *testing.T) {
 		},
 		{
 			name:         "should return status code 400 if account does not exist",
-			usecase:      &mocks.StubAccountUsecase{},
-			enc:          mocks.StubHash{},
+			usecase:      mocks.AccountUsecaseMock{},
+			enc:          mocks.HashMock{},
 			body:         schemes.LoginInput{CPF: cpf.String(), Secret: secret.String()},
 			decoder:      tests.ErrorMessageDecoder{},
 			expectedBody: responses.ErrorResponse{Message: "cpf or secret are invalid"},
@@ -85,12 +85,12 @@ func TestLogin(t *testing.T) {
 		},
 		{
 			name: "should return status code 400 if secret was not correct",
-			usecase: &mocks.StubAccountUsecase{
+			usecase: mocks.AccountUsecaseMock{
 				Accounts: []entities.Account{
 					entities.NewAccount("Pedro", cpf, secret),
 				},
 			},
-			enc:          mocks.StubHash{Err: auth.ErrInvalidCredentials},
+			enc:          mocks.HashMock{Err: auth.ErrInvalidCredentials},
 			body:         schemes.LoginInput{CPF: cpf.String(), Secret: "12345678"},
 			decoder:      tests.ErrorMessageDecoder{},
 			expectedBody: responses.ErrorResponse{Message: "cpf or secret are invalid"},
@@ -98,12 +98,12 @@ func TestLogin(t *testing.T) {
 		},
 		{
 			name: "should authenticate successfully and return a token",
-			usecase: &mocks.StubAccountUsecase{
+			usecase: mocks.AccountUsecaseMock{
 				Accounts: []entities.Account{
 					entities.NewAccount("Pedro", cpf, secret),
 				},
 			},
-			enc:          mocks.StubHash{},
+			enc:          mocks.HashMock{},
 			body:         schemes.LoginInput{CPF: cpf.String(), Secret: secret.String()},
 			decoder:      responseBodyDecoder{},
 			expectedBody: schemes.LoginResponse{},

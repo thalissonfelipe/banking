@@ -19,14 +19,14 @@ func TestUsecase_GetBalanceByAccountID(t *testing.T) {
 
 	testCases := []struct {
 		name        string
-		repoSetup   *mocks.StubAccountRepository
+		repoSetup   *mocks.AccountRepositoryMock
 		accountID   vos.ID
 		expected    int
 		expectedErr error
 	}{
 		{
 			name: "should return a default balance",
-			repoSetup: &mocks.StubAccountRepository{
+			repoSetup: &mocks.AccountRepositoryMock{
 				Accounts: []entities.Account{accBalanceDefault},
 			},
 			accountID:   accBalanceDefault.ID,
@@ -35,14 +35,14 @@ func TestUsecase_GetBalanceByAccountID(t *testing.T) {
 		},
 		{
 			name:        "should return an error if account does not exist",
-			repoSetup:   &mocks.StubAccountRepository{},
+			repoSetup:   &mocks.AccountRepositoryMock{},
 			accountID:   vos.NewID(),
 			expected:    entities.DefaultBalance,
 			expectedErr: entities.ErrAccountDoesNotExist,
 		},
 		{
 			name: "should return correct balance when balance is not default",
-			repoSetup: &mocks.StubAccountRepository{
+			repoSetup: &mocks.AccountRepositoryMock{
 				Accounts: []entities.Account{accBalance100},
 			},
 			accountID:   accBalance100.ID,

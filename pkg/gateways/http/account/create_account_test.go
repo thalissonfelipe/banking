@@ -11,7 +11,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/thalissonfelipe/banking/pkg/domain/account/usecase"
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
 	"github.com/thalissonfelipe/banking/pkg/gateways/http/account/schemes"
 	"github.com/thalissonfelipe/banking/pkg/gateways/http/responses"
@@ -27,8 +26,8 @@ func TestHandler_CreateAccount(t *testing.T) {
 
 	testCases := []struct {
 		name         string
-		repo         *mocks.StubAccountRepository
-		enc          *mocks.StubHash
+		usecase      *mocks.AccountUsecaseMock
+		enc          *mocks.HashMock
 		decoder      tests.Decoder
 		body         interface{}
 		expectedBody interface{}
@@ -36,8 +35,8 @@ func TestHandler_CreateAccount(t *testing.T) {
 	}{
 		{
 			name:         "should return status code 400 if name was not provided",
-			repo:         &mocks.StubAccountRepository{},
-			enc:          &mocks.StubHash{},
+			usecase:      &mocks.AccountUsecaseMock{},
+			enc:          &mocks.HashMock{},
 			decoder:      tests.ErrorMessageDecoder{},
 			body:         schemes.CreateAccountInput{CPF: cpf.String(), Secret: secret.String()},
 			expectedBody: responses.ErrorResponse{Message: "missing name parameter"},
@@ -45,8 +44,8 @@ func TestHandler_CreateAccount(t *testing.T) {
 		},
 		{
 			name:         "should return status code 400 if cpf was not provided",
-			repo:         &mocks.StubAccountRepository{},
-			enc:          &mocks.StubHash{},
+			usecase:      &mocks.AccountUsecaseMock{},
+			enc:          &mocks.HashMock{},
 			decoder:      tests.ErrorMessageDecoder{},
 			body:         schemes.CreateAccountInput{Name: "Pedro", Secret: secret.String()},
 			expectedBody: responses.ErrorResponse{Message: "missing cpf parameter"},
@@ -54,8 +53,8 @@ func TestHandler_CreateAccount(t *testing.T) {
 		},
 		{
 			name:         "should return status code 400 if secret was not provided",
-			repo:         &mocks.StubAccountRepository{},
-			enc:          &mocks.StubHash{},
+			usecase:      &mocks.AccountUsecaseMock{},
+			enc:          &mocks.HashMock{},
 			decoder:      tests.ErrorMessageDecoder{},
 			body:         schemes.CreateAccountInput{Name: "Pedro", CPF: cpf.String()},
 			expectedBody: responses.ErrorResponse{Message: "missing secret parameter"},
@@ -63,8 +62,8 @@ func TestHandler_CreateAccount(t *testing.T) {
 		},
 		{
 			name:         "should return status code 400 if an invalid json was provided",
-			repo:         &mocks.StubAccountRepository{},
-			enc:          &mocks.StubHash{},
+			usecase:      &mocks.AccountUsecaseMock{},
+			enc:          &mocks.HashMock{},
 			decoder:      tests.ErrorMessageDecoder{},
 			body:         map[string]interface{}{"name": 123456},
 			expectedBody: responses.ErrorResponse{Message: "invalid json"},
@@ -72,8 +71,8 @@ func TestHandler_CreateAccount(t *testing.T) {
 		},
 		{
 			name:         "should return status code 400 if cpf provided is not valid",
-			repo:         &mocks.StubAccountRepository{},
-			enc:          &mocks.StubHash{},
+			usecase:      &mocks.AccountUsecaseMock{},
+			enc:          &mocks.HashMock{},
 			decoder:      tests.ErrorMessageDecoder{},
 			body:         schemes.CreateAccountInput{Name: "Pedro", CPF: "123.456.789-00", Secret: secret.String()},
 			expectedBody: responses.ErrorResponse{Message: "invalid cpf"},
@@ -81,8 +80,8 @@ func TestHandler_CreateAccount(t *testing.T) {
 		},
 		{
 			name:         "should return status code 400 if secret provided is not valid",
-			repo:         &mocks.StubAccountRepository{},
-			enc:          &mocks.StubHash{},
+			usecase:      &mocks.AccountUsecaseMock{},
+			enc:          &mocks.HashMock{},
 			decoder:      tests.ErrorMessageDecoder{},
 			body:         schemes.CreateAccountInput{Name: "Pedro", CPF: cpf.String(), Secret: "12345678"},
 			expectedBody: responses.ErrorResponse{Message: "invalid secret"},
@@ -90,12 +89,12 @@ func TestHandler_CreateAccount(t *testing.T) {
 		},
 		{
 			name: "should return status code 409 if cpf already exists",
-			repo: &mocks.StubAccountRepository{
+			usecase: &mocks.AccountUsecaseMock{
 				Accounts: []entities.Account{entities.NewAccount(
 					"Junior", cpf, secret,
 				)},
 			},
-			enc:          &mocks.StubHash{},
+			enc:          &mocks.HashMock{},
 			decoder:      tests.ErrorMessageDecoder{},
 			body:         schemes.CreateAccountInput{Name: "Pedro", CPF: cpf.String(), Secret: secret.String()},
 			expectedBody: responses.ErrorResponse{Message: "account already exists"},
@@ -103,17 +102,8 @@ func TestHandler_CreateAccount(t *testing.T) {
 		},
 		{
 			name:         "should return status code 500 if usecase fails to create account",
-			repo:         &mocks.StubAccountRepository{Err: testdata.ErrUsecaseFails},
-			enc:          &mocks.StubHash{},
-			decoder:      tests.ErrorMessageDecoder{},
-			body:         schemes.CreateAccountInput{Name: "Pedro", CPF: cpf.String(), Secret: secret.String()},
-			expectedBody: responses.ErrorResponse{Message: "internal server error"},
-			expectedCode: http.StatusInternalServerError,
-		},
-		{
-			name:         "should return status code 500 if hash fails to hash secret",
-			repo:         &mocks.StubAccountRepository{},
-			enc:          &mocks.StubHash{Err: testdata.ErrHashFails},
+			usecase:      &mocks.AccountUsecaseMock{Err: testdata.ErrUsecaseFails},
+			enc:          &mocks.HashMock{},
 			decoder:      tests.ErrorMessageDecoder{},
 			body:         schemes.CreateAccountInput{Name: "Pedro", CPF: cpf.String(), Secret: secret.String()},
 			expectedBody: responses.ErrorResponse{Message: "internal server error"},
@@ -121,8 +111,8 @@ func TestHandler_CreateAccount(t *testing.T) {
 		},
 		{
 			name:         "should return status code 201 and created account",
-			repo:         &mocks.StubAccountRepository{},
-			enc:          &mocks.StubHash{},
+			usecase:      &mocks.AccountUsecaseMock{},
+			enc:          &mocks.HashMock{},
 			decoder:      createdAccountDecoder{},
 			body:         schemes.CreateAccountInput{Name: "Pedro", CPF: cpf.String(), Secret: secret.String()},
 			expectedBody: schemes.CreateAccountResponse{Name: "Pedro", CPF: cpf.String(), Balance: 0},
@@ -133,8 +123,7 @@ func TestHandler_CreateAccount(t *testing.T) {
 	for _, tt := range testCases {
 		t.Run(tt.name, func(t *testing.T) {
 			r := chi.NewRouter()
-			usecase := usecase.NewAccountUsecase(tt.repo, tt.enc)
-			handler := NewHandler(r, usecase)
+			handler := NewHandler(r, tt.usecase)
 
 			request := fakes.FakeRequest(http.MethodPost, "/accounts", tt.body)
 			response := httptest.NewRecorder()

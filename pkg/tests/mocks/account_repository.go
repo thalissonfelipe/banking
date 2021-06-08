@@ -3,16 +3,19 @@ package mocks
 import (
 	"context"
 
+	"github.com/thalissonfelipe/banking/pkg/domain/account"
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
 	"github.com/thalissonfelipe/banking/pkg/domain/vos"
 )
 
-type StubAccountRepository struct {
+var _ account.Repository = (*AccountRepositoryMock)(nil)
+
+type AccountRepositoryMock struct {
 	Accounts []entities.Account
 	Err      error
 }
 
-func (s StubAccountRepository) GetAccounts(ctx context.Context) ([]entities.Account, error) {
+func (s AccountRepositoryMock) GetAccounts(ctx context.Context) ([]entities.Account, error) {
 	if s.Err != nil {
 		return nil, entities.ErrInternalError
 	}
@@ -20,7 +23,7 @@ func (s StubAccountRepository) GetAccounts(ctx context.Context) ([]entities.Acco
 	return s.Accounts, nil
 }
 
-func (s StubAccountRepository) GetBalanceByID(ctx context.Context, id vos.ID) (int, error) {
+func (s AccountRepositoryMock) GetBalanceByID(ctx context.Context, id vos.ID) (int, error) {
 	if s.Err != nil {
 		return 0, s.Err
 	}
@@ -34,7 +37,7 @@ func (s StubAccountRepository) GetBalanceByID(ctx context.Context, id vos.ID) (i
 	return 0, entities.ErrAccountDoesNotExist
 }
 
-func (s *StubAccountRepository) CreateAccount(ctx context.Context, account *entities.Account) error {
+func (s *AccountRepositoryMock) CreateAccount(ctx context.Context, account *entities.Account) error {
 	if s.Err != nil {
 		return entities.ErrInternalError
 	}
@@ -50,7 +53,7 @@ func (s *StubAccountRepository) CreateAccount(ctx context.Context, account *enti
 	return nil
 }
 
-func (s StubAccountRepository) GetAccountByCPF(ctx context.Context, cpf vos.CPF) (*entities.Account, error) {
+func (s AccountRepositoryMock) GetAccountByCPF(ctx context.Context, cpf vos.CPF) (*entities.Account, error) {
 	if s.Err != nil {
 		return nil, s.Err
 	}
@@ -64,7 +67,7 @@ func (s StubAccountRepository) GetAccountByCPF(ctx context.Context, cpf vos.CPF)
 	return nil, entities.ErrAccountDoesNotExist
 }
 
-func (s StubAccountRepository) GetAccountByID(ctx context.Context, id vos.ID) (*entities.Account, error) {
+func (s AccountRepositoryMock) GetAccountByID(ctx context.Context, id vos.ID) (*entities.Account, error) {
 	if s.Err != nil {
 		return nil, s.Err
 	}

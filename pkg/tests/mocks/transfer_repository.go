@@ -4,15 +4,18 @@ import (
 	"context"
 
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
+	"github.com/thalissonfelipe/banking/pkg/domain/transfer"
 	"github.com/thalissonfelipe/banking/pkg/domain/vos"
 )
 
-type StubTransferRepository struct {
+var _ transfer.Repository = (*TransferRepositoryMock)(nil)
+
+type TransferRepositoryMock struct {
 	Transfers []entities.Transfer
 	Err       error
 }
 
-func (s StubTransferRepository) GetTransfers(ctx context.Context, id vos.ID) ([]entities.Transfer, error) {
+func (s TransferRepositoryMock) GetTransfers(ctx context.Context, id vos.ID) ([]entities.Transfer, error) {
 	if s.Err != nil {
 		return nil, entities.ErrInternalError
 	}
@@ -28,7 +31,7 @@ func (s StubTransferRepository) GetTransfers(ctx context.Context, id vos.ID) ([]
 	return transfers, nil
 }
 
-func (s *StubTransferRepository) CreateTransfer(ctx context.Context, transfer *entities.Transfer) error {
+func (s *TransferRepositoryMock) CreateTransfer(ctx context.Context, transfer *entities.Transfer) error {
 	if s.Err != nil {
 		return entities.ErrInternalError
 	}
