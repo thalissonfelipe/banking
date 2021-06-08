@@ -1,11 +1,11 @@
 package auth
 
 import (
-	"encoding/json"
 	"net/http"
 
 	"github.com/thalissonfelipe/banking/pkg/gateways/http/auth/schemes"
 	"github.com/thalissonfelipe/banking/pkg/gateways/http/responses"
+	"github.com/thalissonfelipe/banking/pkg/gateways/http/rest"
 	"github.com/thalissonfelipe/banking/pkg/services/auth"
 )
 
@@ -24,15 +24,9 @@ import (
 func (h Handler) Login(w http.ResponseWriter, r *http.Request) {
 	var body schemes.LoginInput
 
-	err := json.NewDecoder(r.Body).Decode(&body)
+	err := rest.DecodeRequestBody(r, &body)
 	if err != nil {
-		responses.SendError(w, http.StatusBadRequest, responses.ErrInvalidJSON)
-
-		return
-	}
-
-	if err = body.IsValid(); err != nil {
-		responses.SendError(w, http.StatusBadRequest, err)
+		responses.HandleBadRequestError(w, err)
 
 		return
 	}

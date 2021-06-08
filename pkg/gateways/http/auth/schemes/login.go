@@ -1,12 +1,6 @@
 package schemes
 
-import "errors"
-
-// Request input errors.
-var (
-	ErrMissingCPFParameter    = errors.New("missing cpf parameter")
-	ErrMissingSecretParameter = errors.New("missing secret parameter")
-)
+import "github.com/thalissonfelipe/banking/pkg/gateways/http/responses"
 
 type LoginResponse struct {
 	Token string `json:"token"`
@@ -19,11 +13,11 @@ type LoginInput struct {
 
 func (r LoginInput) IsValid() error {
 	if r.CPF == "" {
-		return ErrMissingCPFParameter
+		return responses.ErrMissingCPFParameter
 	}
 
 	if r.Secret == "" {
-		return ErrMissingSecretParameter
+		return responses.ErrMissingSecretParameter
 	}
 
 	return nil

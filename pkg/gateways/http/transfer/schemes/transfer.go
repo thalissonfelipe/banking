@@ -1,13 +1,6 @@
 package schemes
 
-import "errors"
-
-// Request input errors.
-var (
-	ErrMissingAccDestIDParameter = errors.New("missing account destination id parameter")
-	ErrMissingAmountParameter    = errors.New("missing amount parameter")
-	ErrDestIDEqualCurrentID      = errors.New("account destination cannot be the account origin id")
-)
+import "github.com/thalissonfelipe/banking/pkg/gateways/http/responses"
 
 type TransferListResponse struct {
 	AccountDestinationID string `json:"account_destination_id"`
@@ -28,11 +21,11 @@ type CreateTransferResponse struct {
 
 func (t CreateTransferInput) IsValid() error {
 	if t.AccountDestinationID == "" {
-		return ErrMissingAccDestIDParameter
+		return responses.ErrMissingAccDestinationIDParameter
 	}
 
 	if t.Amount == 0 {
-		return ErrMissingAmountParameter
+		return responses.ErrMissingAmountParameter
 	}
 
 	return nil

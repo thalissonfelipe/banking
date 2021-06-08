@@ -1,13 +1,13 @@
 package account
 
 import (
-	"encoding/json"
 	"net/http"
 
 	"github.com/thalissonfelipe/banking/pkg/domain/account"
 	"github.com/thalissonfelipe/banking/pkg/domain/vos"
 	"github.com/thalissonfelipe/banking/pkg/gateways/http/account/schemes"
 	"github.com/thalissonfelipe/banking/pkg/gateways/http/responses"
+	"github.com/thalissonfelipe/banking/pkg/gateways/http/rest"
 )
 
 // CreateAccount creates a new account
@@ -28,15 +28,8 @@ import (
 func (h Handler) CreateAccount(w http.ResponseWriter, r *http.Request) {
 	var body schemes.CreateAccountInput
 
-	err := json.NewDecoder(r.Body).Decode(&body)
-	if err != nil {
-		responses.SendError(w, http.StatusBadRequest, responses.ErrInvalidJSON)
-
-		return
-	}
-
-	if err = body.IsValid(); err != nil {
-		responses.SendError(w, http.StatusBadRequest, err)
+	if err := rest.DecodeRequestBody(r, &body); err != nil {
+		responses.HandleBadRequestError(w, err)
 
 		return
 	}

@@ -1,13 +1,6 @@
 package schemes
 
-import "errors"
-
-// Request input errors.
-var (
-	ErrMissingNameParameter   = errors.New("missing name parameter")
-	ErrMissingCPFParameter    = errors.New("missing cpf parameter")
-	ErrMissingSecretParameter = errors.New("missing secret parameter")
-)
+import "github.com/thalissonfelipe/banking/pkg/gateways/http/responses"
 
 type AccountListResponse struct {
 	ID        string `json:"id"`
@@ -35,15 +28,15 @@ type CreateAccountResponse struct {
 
 func (r CreateAccountInput) IsValid() error {
 	if r.Name == "" {
-		return ErrMissingNameParameter
+		return responses.ErrMissingNameParameter
 	}
 
 	if r.CPF == "" {
-		return ErrMissingCPFParameter
+		return responses.ErrMissingCPFParameter
 	}
 
 	if r.Secret == "" {
-		return ErrMissingSecretParameter
+		return responses.ErrMissingSecretParameter
 	}
 
 	return nil
