@@ -1,11 +1,8 @@
 package testdata
 
 import (
-	"fmt"
-	"math"
 	"math/rand"
 	"strconv"
-	"strings"
 
 	"github.com/thalissonfelipe/banking/pkg/domain/vos"
 )
@@ -17,46 +14,35 @@ func GetValidCPF() vos.CPF {
 
 // https://github.com/fnando/cpf/blob/master/src/index.ts
 func generateValidCPF() string {
-	var numbers string
+	numbers := rand.Perm(9)
+	numbers = append(numbers, verifierDigit(numbers))
+	numbers = append(numbers, verifierDigit(numbers))
 
-	for i := 0; i < 9; i++ {
-		numbers += fmt.Sprint(math.Floor(rand.Float64() * 9))
+	var cpfString string
+
+	for _, n := range numbers {
+		cpfString += strconv.Itoa(n)
 	}
 
-	d := strconv.Itoa(verifierDigit(numbers))
-	numbers += d
-
-	d = strconv.Itoa(verifierDigit(numbers))
-	numbers += d
-
-	return numbers
+	return cpfString
 }
 
-func verifierDigit(digits string) int {
-	numbersList := strings.Split(digits, "")
-
-	var numbers []int
-
-	for _, n := range numbersList {
-		nn, _ := strconv.Atoi(n)
-		numbers = append(numbers, nn)
-	}
-
-	modulus := len(numbersList) + 1
+func verifierDigit(digits []int) int {
+	modulus := len(digits) + 1
 
 	var multiplied []int
 
-	for i, n := range numbers {
+	for i, n := range digits {
 		multiplied = append(multiplied, (n * (modulus - i)))
 	}
 
 	sum := 0
+
 	for _, n := range multiplied {
 		sum += n
 	}
 
 	mod := sum % 11
-
 	if mod < 2 {
 		return 0
 	}
