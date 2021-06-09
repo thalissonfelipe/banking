@@ -10,12 +10,12 @@ type Handler struct {
 	authService *auth.Auth
 }
 
-func NewHandler(r *chi.Mux, authService *auth.Auth) *Handler {
+func NewHandler(r chi.Router, authService *auth.Auth) *Handler {
 	handler := &Handler{
 		authService: authService,
 	}
 
-	r.Post("/api/v1/login", handler.Login)
+	r.Post("/login", handler.Login)
 
 	return handler
 }

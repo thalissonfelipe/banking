@@ -44,9 +44,11 @@ func NewRouter(db *pgx.Conn) http.Handler {
 
 	router.Use(middleware.Timeout(timeout * time.Second))
 
-	acc_handler.NewHandler(router, accountUsecase)
-	auth_handler.NewHandler(router, authService)
-	tr_handler.NewHandler(router, transferUsecase)
+	router.Route("/api/v1", func(r chi.Router) {
+		acc_handler.NewHandler(r, accountUsecase)
+		auth_handler.NewHandler(r, authService)
+		tr_handler.NewHandler(r, transferUsecase)
+	})
 
 	router.Get("/swagger/*", httpSwagger.Handler(
 		httpSwagger.URL("http://localhost:5000/swagger/doc.json"),

@@ -10,10 +10,10 @@ type Handler struct {
 	usecase account.Usecase
 }
 
-func NewHandler(r *chi.Mux, usecase account.Usecase) *Handler {
+func NewHandler(r chi.Router, usecase account.Usecase) *Handler {
 	handler := Handler{usecase: usecase}
 
-	r.Route("/api/v1/accounts", func(r chi.Router) {
+	r.Route("/accounts", func(r chi.Router) {
 		r.Get("/", handler.ListAccounts)
 		r.Post("/", handler.CreateAccount)
 		r.Get("/{accountID}/balance", handler.GetAccountBalance)
