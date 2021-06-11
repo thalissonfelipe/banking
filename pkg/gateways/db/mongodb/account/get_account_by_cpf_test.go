@@ -12,9 +12,9 @@ import (
 )
 
 func TestRepostory_GetAccountByCPF(t *testing.T) {
-	r := Repository{collection: collection}
+	r := NewRepository(db)
 
-	defer dockertest.DropCollection(t, collection)
+	defer dockertest.DropCollection(t, db.Collection("accounts"))
 
 	account, err := r.GetAccountByCPF(context.Background(), testdata.GetValidCPF())
 	assert.Nil(t, account)

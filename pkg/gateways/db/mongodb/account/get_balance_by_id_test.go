@@ -12,9 +12,9 @@ import (
 )
 
 func TestRepository_GetBalanceByID(t *testing.T) {
-	r := Repository{collection: collection}
+	r := NewRepository(db)
 
-	defer dockertest.DropCollection(t, collection)
+	defer dockertest.DropCollection(t, db.Collection("accounts"))
 
 	balance, err := r.GetBalanceByID(context.Background(), vos.NewID())
 	assert.Zero(t, balance)

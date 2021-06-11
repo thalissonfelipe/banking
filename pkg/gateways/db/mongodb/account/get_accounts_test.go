@@ -9,9 +9,9 @@ import (
 )
 
 func TestRepository_GetAccounts(t *testing.T) {
-	r := Repository{collection: collection}
+	r := NewRepository(db)
 
-	defer dockertest.DropCollection(t, collection)
+	defer dockertest.DropCollection(t, db.Collection("accounts"))
 
 	accounts, err := r.GetAccounts(context.Background())
 	assert.NoError(t, err)

@@ -9,9 +9,9 @@ import (
 var _ account.Repository = (*Repository)(nil)
 
 type Repository struct {
-	collection *mongo.Collection
+	db *mongo.Database
 }
 
-func NewRepository(collection *mongo.Collection) Repository {
-	return Repository{collection: collection}
+func NewRepository(db *mongo.Database) Repository {
+	return Repository{db: db}
 }

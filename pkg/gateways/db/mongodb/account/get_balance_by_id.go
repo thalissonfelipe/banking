@@ -18,7 +18,7 @@ func (r Repository) GetBalanceByID(ctx context.Context, accountID vos.ID) (int, 
 
 	var account entities.Account
 
-	err := r.collection.FindOne(ctx, bson.M{"id": accountID}, opts).Decode(&account)
+	err := r.db.Collection("accounts").FindOne(ctx, bson.M{"id": accountID}, opts).Decode(&account)
 	if err == nil {
 		return account.Balance, nil
 	}

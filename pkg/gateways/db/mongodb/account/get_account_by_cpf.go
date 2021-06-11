@@ -15,7 +15,7 @@ import (
 func (r Repository) GetAccountByCPF(ctx context.Context, cpf vos.CPF) (*entities.Account, error) {
 	var account entities.Account
 
-	err := r.collection.FindOne(ctx, bson.M{"cpf": cpf.String()}).Decode(&account)
+	err := r.db.Collection("accounts").FindOne(ctx, bson.M{"cpf": cpf.String()}).Decode(&account)
 	if err == nil {
 		return &account, nil
 	}

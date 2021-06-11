@@ -12,9 +12,9 @@ import (
 )
 
 func TestRepository_CreateAccount(t *testing.T) {
-	r := Repository{collection: collection}
+	r := NewRepository(db)
 
-	defer dockertest.DropCollection(t, collection)
+	defer dockertest.DropCollection(t, db.Collection("accounts"))
 
 	account := entities.NewAccount("Felipe", testdata.GetValidCPF(), testdata.GetValidSecret())
 

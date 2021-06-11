@@ -16,12 +16,12 @@ import (
 	"github.com/thalissonfelipe/banking/pkg/tests/testdata"
 )
 
-var collection *mongo.Collection
+var db *mongo.Database
 
 func TestMain(m *testing.M) {
 	mgoDocker := dockertest.SetupMongoDB()
 
-	collection = mgoDocker.Client.Database("banking").Collection("accounts")
+	db = mgoDocker.Client.Database("banking")
 
 	indexModel := mongo.IndexModel{
 		Keys: bson.M{
@@ -30,7 +30,7 @@ func TestMain(m *testing.M) {
 		Options: options.Index().SetUnique(true),
 	}
 
-	_, err := collection.Indexes().CreateOne(context.Background(), indexModel)
+	_, err := db.Collection("accounts").Indexes().CreateOne(context.Background(), indexModel)
 	if err != nil {
 		log.Fatalf("could not create cpf index: %v", err)
 	}

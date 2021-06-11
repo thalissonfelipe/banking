@@ -15,7 +15,7 @@ import (
 func (r Repository) CreateAccount(ctx context.Context, account *entities.Account) error {
 	createdAt := time.Now()
 
-	_, err := r.collection.InsertOne(ctx, bson.D{
+	_, err := r.db.Collection("accounts").InsertOne(ctx, bson.D{
 		primitive.E{Key: "id", Value: account.ID},
 		primitive.E{Key: "name", Value: account.Name},
 		primitive.E{Key: "cpf", Value: account.CPF.String()},
