@@ -7,19 +7,20 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
+	"github.com/thalissonfelipe/banking/pkg/tests/dockertest"
 	"github.com/thalissonfelipe/banking/pkg/tests/testdata"
 )
 
 func TestRepostory_GetAccountByCPF(t *testing.T) {
 	r := Repository{collection: collection}
 
-	defer dropCollection(t, collection)
+	defer dockertest.DropCollection(t, collection)
 
 	account, err := r.GetAccountByCPF(context.Background(), testdata.GetValidCPF())
 	assert.Nil(t, account)
 	assert.ErrorIs(t, err, entities.ErrAccountDoesNotExist)
 
-	acc := createAccount(t, 100)
+	acc := createAccount(t, r, 100)
 
 	account, err = r.GetAccountByCPF(context.Background(), acc.CPF)
 	assert.NoError(t, err)

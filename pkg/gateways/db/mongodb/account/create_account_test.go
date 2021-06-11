@@ -7,13 +7,14 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
+	"github.com/thalissonfelipe/banking/pkg/tests/dockertest"
 	"github.com/thalissonfelipe/banking/pkg/tests/testdata"
 )
 
 func TestRepository_CreateAccount(t *testing.T) {
 	r := Repository{collection: collection}
 
-	defer dropCollection(t, collection)
+	defer dockertest.DropCollection(t, collection)
 
 	account := entities.NewAccount("Felipe", testdata.GetValidCPF(), testdata.GetValidSecret())
 

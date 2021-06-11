@@ -5,11 +5,9 @@ import (
 	"log"
 	"os"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/require"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 
@@ -44,27 +42,14 @@ func TestMain(m *testing.M) {
 	os.Exit(code)
 }
 
-func createAccount(t *testing.T, balance int) entities.Account {
+func createAccount(t *testing.T, r Repository, balance int) entities.Account {
 	t.Helper()
 
 	acc := entities.NewAccount("Felipe", testdata.GetValidCPF(), testdata.GetValidSecret())
 	acc.Balance = balance
-	acc.CreatedAt = time.Now()
 
-	_, err := collection.InsertOne(context.Background(), bson.D{
-		primitive.E{Key: "id", Value: acc.ID},
-		primitive.E{Key: "name", Value: acc.Name},
-		primitive.E{Key: "cpf", Value: acc.CPF.String()},
-		primitive.E{Key: "secret", Value: acc.Secret.String()},
-		primitive.E{Key: "balance", Value: acc.Balance},
-		primitive.E{Key: "created_at", Value: primitive.Timestamp{T: uint32(acc.CreatedAt.Unix()), I: 0}},
-	})
+	err := r.CreateAccount(context.Background(), &acc)
 	require.NoError(t, err)
 
 	return acc
-}
-
-func dropCollection(t *testing.T, collection *mongo.Collection) {
-	err := collection.Drop(context.Background())
-	require.NoError(t, err)
 }

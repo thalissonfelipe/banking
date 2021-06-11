@@ -8,18 +8,19 @@ import (
 
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
 	"github.com/thalissonfelipe/banking/pkg/domain/vos"
+	"github.com/thalissonfelipe/banking/pkg/tests/dockertest"
 )
 
 func TestRepostory_GetAccountByID(t *testing.T) {
 	r := Repository{collection: collection}
 
-	defer dropCollection(t, collection)
+	defer dockertest.DropCollection(t, collection)
 
 	account, err := r.GetAccountByID(context.Background(), vos.NewID())
 	assert.Nil(t, account)
 	assert.ErrorIs(t, err, entities.ErrAccountDoesNotExist)
 
-	acc := createAccount(t, 100)
+	acc := createAccount(t, r, 100)
 
 	account, err = r.GetAccountByID(context.Background(), acc.ID)
 	assert.NoError(t, err)

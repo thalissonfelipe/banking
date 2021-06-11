@@ -4,8 +4,10 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"testing"
 
 	"github.com/ory/dockertest"
+	"github.com/stretchr/testify/require"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
@@ -62,4 +64,9 @@ func RemoveMongoDBContainer(mgoDocker *MongoDBDocker) {
 	if err := mgoDocker.Pool.Purge(mgoDocker.Resource); err != nil {
 		log.Fatalf("Could not purge resource: %v", err)
 	}
+}
+
+func DropCollection(t *testing.T, collection *mongo.Collection) {
+	err := collection.Drop(context.Background())
+	require.NoError(t, err)
 }

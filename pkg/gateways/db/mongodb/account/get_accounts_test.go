@@ -5,18 +5,19 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/thalissonfelipe/banking/pkg/tests/dockertest"
 )
 
 func TestRepository_GetAccounts(t *testing.T) {
 	r := Repository{collection: collection}
 
-	defer dropCollection(t, collection)
+	defer dockertest.DropCollection(t, collection)
 
 	accounts, err := r.GetAccounts(context.Background())
 	assert.NoError(t, err)
 	assert.Empty(t, accounts)
 
-	acc := createAccount(t, 0)
+	acc := createAccount(t, r, 0)
 	assert.NoError(t, err)
 
 	accounts, err = r.GetAccounts(context.Background())
