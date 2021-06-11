@@ -10,6 +10,8 @@ import (
 func TestRepository_GetAccounts(t *testing.T) {
 	r := Repository{collection: collection}
 
+	defer dropCollection(t, collection)
+
 	accounts, err := r.GetAccounts(context.Background())
 	assert.NoError(t, err)
 	assert.Empty(t, accounts)

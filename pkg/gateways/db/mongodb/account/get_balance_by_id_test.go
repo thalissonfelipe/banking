@@ -13,6 +13,8 @@ import (
 func TestRepository_GetBalanceByID(t *testing.T) {
 	r := Repository{collection: collection}
 
+	defer dropCollection(t, collection)
+
 	balance, err := r.GetBalanceByID(context.Background(), vos.NewID())
 	assert.Zero(t, balance)
 	assert.ErrorIs(t, err, entities.ErrAccountDoesNotExist)
