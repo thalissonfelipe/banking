@@ -16,9 +16,9 @@ import (
 )
 
 func TestRepository_GetTransfers(t *testing.T) {
-	r := NewRepository(collection)
+	r := NewRepository(db)
 
-	defer dockertest.DropCollection(t, collection)
+	defer dockertest.DropCollection(t, db.Collection("transfers"))
 
 	transfers, err := r.GetTransfers(context.Background(), vos.NewID())
 	assert.NoError(t, err)
@@ -30,7 +30,7 @@ func TestRepository_GetTransfers(t *testing.T) {
 	transfer := entities.NewTransfer(acc1.ID, acc2.ID, 100)
 	transfer.CreatedAt = time.Now()
 
-	insertedID, err := collection.InsertOne(context.Background(), bson.D{
+	insertedID, err := db.Collection("transfers").InsertOne(context.Background(), bson.D{
 		primitive.E{Key: "id", Value: transfer.ID},
 		primitive.E{Key: "account_origin_id", Value: transfer.AccountOriginID},
 		primitive.E{Key: "account_destination_id", Value: transfer.AccountDestinationID},

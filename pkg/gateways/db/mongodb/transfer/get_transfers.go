@@ -11,7 +11,7 @@ import (
 )
 
 func (r Repository) GetTransfers(ctx context.Context, id vos.ID) ([]entities.Transfer, error) {
-	cur, err := r.collection.Find(ctx, bson.M{"account_origin_id": id})
+	cur, err := r.db.Collection("transfers").Find(ctx, bson.M{"account_origin_id": id})
 	if err != nil {
 		return nil, fmt.Errorf("could not get transfers: %w", err)
 	}

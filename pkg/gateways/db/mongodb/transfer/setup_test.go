@@ -9,12 +9,12 @@ import (
 	"github.com/thalissonfelipe/banking/pkg/tests/dockertest"
 )
 
-var collection *mongo.Collection
+var db *mongo.Database
 
 func TestMain(m *testing.M) {
 	mgoDocker := dockertest.SetupMongoDB()
 
-	collection = mgoDocker.Client.Database("banking").Collection("transfers")
+	db = mgoDocker.Client.Database("banking")
 
 	code := m.Run()
 
