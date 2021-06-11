@@ -5,11 +5,6 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
-
-	"github.com/thalissonfelipe/banking/pkg/domain/entities"
-	"github.com/thalissonfelipe/banking/pkg/tests/testdata"
 )
 
 func TestRepository_GetAccounts(t *testing.T) {
@@ -19,15 +14,7 @@ func TestRepository_GetAccounts(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Empty(t, accounts)
 
-	acc := entities.NewAccount("Felipe", testdata.GetValidCPF(), testdata.GetValidSecret())
-
-	_, err = collection.InsertOne(context.Background(), bson.D{
-		primitive.E{Key: "id", Value: acc.ID},
-		primitive.E{Key: "name", Value: acc.Name},
-		primitive.E{Key: "cpf", Value: acc.CPF.String()},
-		primitive.E{Key: "secret", Value: acc.Secret.String()},
-		primitive.E{Key: "balance", Value: acc.Balance},
-	})
+	acc := createAccount(t, 0)
 	assert.NoError(t, err)
 
 	accounts, err = r.GetAccounts(context.Background())
