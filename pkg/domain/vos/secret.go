@@ -7,6 +7,8 @@ import (
 	"regexp"
 
 	"github.com/thalissonfelipe/banking/pkg/domain/encrypter"
+	"go.mongodb.org/mongo-driver/bson/bsontype"
+	"go.mongodb.org/mongo-driver/x/bsonx/bsoncore"
 )
 
 // ErrInvalidSecret occurs when the secret does meet the basic requirements. Also, the secret
@@ -91,6 +93,13 @@ func (s *Secret) Hash(encrypter encrypter.Encrypter) error {
 	}
 
 	s.value = string(hashedSecret)
+
+	return nil
+}
+
+func (s *Secret) UnmarshalBSONValue(t bsontype.Type, data []byte) error {
+	value, _, _ := bsoncore.ReadString(data)
+	s.value = value
 
 	return nil
 }

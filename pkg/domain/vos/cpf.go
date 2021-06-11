@@ -7,6 +7,8 @@ import (
 	"regexp"
 
 	"github.com/Nhanderu/brdoc"
+	"go.mongodb.org/mongo-driver/bson/bsontype"
+	"go.mongodb.org/mongo-driver/x/bsonx/bsoncore"
 )
 
 var regexOnlyDigitsCPF = regexp.MustCompile(`^(\d{3})(\d{3})(\d{3})(\d{2})$`)
@@ -71,4 +73,11 @@ func (c *CPF) Scan(value interface{}) error {
 	}
 
 	return fmt.Errorf("could not scan cpf: %w", err)
+}
+
+func (c *CPF) UnmarshalBSONValue(t bsontype.Type, data []byte) error {
+	value, _, _ := bsoncore.ReadString(data)
+	c.value = value
+
+	return nil
 }
