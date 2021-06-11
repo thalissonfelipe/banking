@@ -17,19 +17,12 @@ func (r Repository) GetAccounts(ctx context.Context) ([]entities.Account, error)
 	if err != nil {
 		return nil, fmt.Errorf("could not get accounts: %w", err)
 	}
-	defer cur.Close(ctx)
 
 	accounts := make([]entities.Account, 0)
 
-	for cur.Next(ctx) {
-		var account entities.Account
-
-		err = cur.Decode(&account)
-		if err != nil {
-			return nil, fmt.Errorf("could not decode cursor: %w", err)
-		}
-
-		accounts = append(accounts, account)
+	err = cur.All(ctx, &accounts)
+	if err != nil {
+		return nil, fmt.Errorf("could not decode cursor: %w", err)
 	}
 
 	if err = cur.Err(); err != nil {
