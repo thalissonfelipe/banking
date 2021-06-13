@@ -16,7 +16,7 @@ import (
 func (r Repository) GetBalanceByID(ctx context.Context, accountID vos.ID) (int, error) {
 	opts := options.FindOne().SetProjection(bson.M{"balance": 1})
 
-	var account entities.Account
+	var account accountAdpater
 
 	err := r.db.Collection("accounts").FindOne(ctx, bson.M{"id": accountID}, opts).Decode(&account)
 	if err == nil {

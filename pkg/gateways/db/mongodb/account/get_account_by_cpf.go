@@ -13,11 +13,11 @@ import (
 )
 
 func (r Repository) GetAccountByCPF(ctx context.Context, cpf vos.CPF) (*entities.Account, error) {
-	var account entities.Account
+	var account accountAdpater
 
 	err := r.db.Collection("accounts").FindOne(ctx, bson.M{"cpf": cpf.String()}).Decode(&account)
 	if err == nil {
-		return &account, nil
+		return account.convertToDomainAccount(), nil
 	}
 
 	if errors.Is(err, mongo.ErrNoDocuments) {

@@ -29,5 +29,6 @@ func TestRepostory_GetAccountByID(t *testing.T) {
 	assert.Equal(t, acc.Name, account.Name)
 	assert.Equal(t, acc.CPF, account.CPF)
 	assert.Equal(t, acc.Balance, account.Balance)
-	assert.NotEmpty(t, account.Secret)
+	assert.Equal(t, acc.Secret, account.Secret)
+	assert.Equal(t, acc.CreatedAt.Unix(), account.CreatedAt.Unix())
 }

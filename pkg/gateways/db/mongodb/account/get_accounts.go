@@ -18,15 +18,21 @@ func (r Repository) GetAccounts(ctx context.Context) ([]entities.Account, error)
 		return nil, fmt.Errorf("could not get accounts: %w", err)
 	}
 
-	accounts := make([]entities.Account, 0)
+	accountsBSON := make([]accountAdpater, 0)
 
-	err = cur.All(ctx, &accounts)
+	err = cur.All(ctx, &accountsBSON)
 	if err != nil {
 		return nil, fmt.Errorf("could not decode cursor: %w", err)
 	}
 
 	if err = cur.Err(); err != nil {
 		return nil, fmt.Errorf("unexpected cursor error: %w", err)
+	}
+
+	accounts := make([]entities.Account, 0)
+
+	for _, a := range accountsBSON {
+		accounts = append(accounts, *a.convertToDomainAccount())
 	}
 
 	return accounts, nil

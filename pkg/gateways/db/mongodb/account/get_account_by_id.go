@@ -13,11 +13,11 @@ import (
 )
 
 func (r Repository) GetAccountByID(ctx context.Context, id vos.ID) (*entities.Account, error) {
-	var account entities.Account
+	var account accountAdpater
 
 	err := r.db.Collection("accounts").FindOne(ctx, bson.M{"id": id}).Decode(&account)
 	if err == nil {
-		return &account, nil
+		return account.convertToDomainAccount(), nil
 	}
 
 	if errors.Is(err, mongo.ErrNoDocuments) {

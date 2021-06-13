@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
 	"github.com/thalissonfelipe/banking/pkg/tests/dockertest"
 )
 
@@ -28,4 +29,5 @@ func TestRepository_GetAccounts(t *testing.T) {
 	assert.Equal(t, acc.Name, accounts[0].Name)
 	assert.Equal(t, acc.CPF, accounts[0].CPF)
 	assert.Equal(t, acc.Balance, accounts[0].Balance)
+	assert.Equal(t, acc.CreatedAt.Unix(), accounts[0].CreatedAt.Unix())
 }
