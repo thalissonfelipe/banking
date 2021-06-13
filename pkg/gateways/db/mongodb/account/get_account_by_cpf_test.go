@@ -25,10 +25,5 @@ func TestRepostory_GetAccountByCPF(t *testing.T) {
 	account, err = r.GetAccountByCPF(context.Background(), acc.CPF)
 	assert.NoError(t, err)
 
-	assert.Equal(t, acc.ID, account.ID)
-	assert.Equal(t, acc.Name, account.Name)
-	assert.Equal(t, acc.CPF, account.CPF)
-	assert.Equal(t, acc.Balance, account.Balance)
-	assert.Equal(t, acc.Secret, account.Secret)
-	assert.Equal(t, acc.CreatedAt.Unix(), account.CreatedAt.Unix())
+	assertAccountResponse(t, acc, *account, false)
 }

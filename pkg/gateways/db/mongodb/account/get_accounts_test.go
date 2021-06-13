@@ -25,9 +25,10 @@ func TestRepository_GetAccounts(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Len(t, accounts, 1)
 
-	assert.Equal(t, acc.ID, accounts[0].ID)
-	assert.Equal(t, acc.Name, accounts[0].Name)
-	assert.Equal(t, acc.CPF, accounts[0].CPF)
-	assert.Equal(t, acc.Balance, accounts[0].Balance)
-	assert.Equal(t, acc.CreatedAt.Unix(), accounts[0].CreatedAt.Unix())
+	// assert.Equal(t, acc.ID, accounts[0].ID)
+	// assert.Equal(t, acc.Name, accounts[0].Name)
+	// assert.Equal(t, acc.CPF, accounts[0].CPF)
+	// assert.Equal(t, acc.Balance, accounts[0].Balance)
+	// assert.Equal(t, acc.CreatedAt.Unix(), accounts[0].CreatedAt.Unix())
+	assertAccountResponse(t, acc, accounts[0], true)
 }
