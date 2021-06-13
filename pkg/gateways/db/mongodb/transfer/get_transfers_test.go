@@ -6,39 +6,30 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
 	"github.com/thalissonfelipe/banking/pkg/domain/vos"
 	"github.com/thalissonfelipe/banking/pkg/tests/dockertest"
-	"github.com/thalissonfelipe/banking/pkg/tests/testdata"
 )
 
 func TestRepository_GetTransfers(t *testing.T) {
 	r := NewRepository(db)
 
 	defer dockertest.DropCollection(t, db.Collection("transfers"))
+	defer dockertest.DropCollection(t, db.Collection("accounts"))
 
 	transfers, err := r.GetTransfers(context.Background(), vos.NewID())
 	assert.NoError(t, err)
 	assert.Len(t, transfers, 0)
 
-	acc1 := entities.NewAccount("Felipe", testdata.GetValidCPF(), testdata.GetValidSecret())
-	acc2 := entities.NewAccount("Sousa", testdata.GetValidCPF(), testdata.GetValidSecret())
+	acc1 := dockertest.CreateAccount(t, db.Collection("accounts"), 100)
+	acc2 := dockertest.CreateAccount(t, db.Collection("accounts"), 100)
 
 	transfer := entities.NewTransfer(acc1.ID, acc2.ID, 100)
 	transfer.CreatedAt = time.Now()
 
-	insertedID, err := db.Collection("transfers").InsertOne(context.Background(), bson.D{
-		primitive.E{Key: "id", Value: transfer.ID},
-		primitive.E{Key: "account_origin_id", Value: transfer.AccountOriginID},
-		primitive.E{Key: "account_destination_id", Value: transfer.AccountDestinationID},
-		primitive.E{Key: "amount", Value: transfer.Amount},
-		primitive.E{Key: "created_at", Value: transfer.CreatedAt},
-	})
+	err = r.CreateTransfer(context.Background(), &transfer)
 	assert.NoError(t, err)
-	assert.NotNil(t, insertedID)
 
 	// still should return an empty slice because the account origin id does not exist.
 	transfers, err = r.GetTransfers(context.Background(), vos.NewID())
@@ -48,4 +39,10 @@ func TestRepository_GetTransfers(t *testing.T) {
 	transfers, err = r.GetTransfers(context.Background(), transfer.AccountOriginID)
 	assert.NoError(t, err)
 	assert.Len(t, transfers, 1)
+
+	assert.Equal(t, transfer.ID, transfers[0].ID)
+	assert.Equal(t, transfer.AccountOriginID, transfers[0].AccountOriginID)
+	assert.Equal(t, transfer.AccountDestinationID, transfers[0].AccountDestinationID)
+	assert.Equal(t, transfer.Amount, transfers[0].Amount)
+	assert.Equal(t, transfer.CreatedAt.Unix(), transfers[0].CreatedAt.Unix())
 }
