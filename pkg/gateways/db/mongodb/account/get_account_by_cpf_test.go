@@ -20,7 +20,7 @@ func TestRepostory_GetAccountByCPF(t *testing.T) {
 	assert.Nil(t, account)
 	assert.ErrorIs(t, err, entities.ErrAccountDoesNotExist)
 
-	acc := createAccount(t, r, 100)
+	acc := dockertest.CreateAccount(t, db.Collection("accounts"), 100)
 
 	account, err = r.GetAccountByCPF(context.Background(), acc.CPF)
 	assert.NoError(t, err)

@@ -17,7 +17,7 @@ func TestRepository_GetAccounts(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Empty(t, accounts)
 
-	acc := createAccount(t, r, 0)
+	acc := dockertest.CreateAccount(t, db.Collection("accounts"), 0)
 	assert.NoError(t, err)
 
 	accounts, err = r.GetAccounts(context.Background())

@@ -20,7 +20,7 @@ func TestRepository_GetBalanceByID(t *testing.T) {
 	assert.Zero(t, balance)
 	assert.ErrorIs(t, err, entities.ErrAccountDoesNotExist)
 
-	acc := createAccount(t, r, 100)
+	acc := dockertest.CreateAccount(t, db.Collection("accounts"), 100)
 
 	balance, err = r.GetBalanceByID(context.Background(), acc.ID)
 	assert.NoError(t, err)
