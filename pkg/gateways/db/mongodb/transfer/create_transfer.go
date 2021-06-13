@@ -40,21 +40,22 @@ func (r Repository) CreateTransfer(ctx context.Context, transfer *entities.Trans
 	if err != nil {
 		return fmt.Errorf("could not start a new session: %w", err)
 	}
+
 	defer session.EndSession(ctx)
 
 	_, err = session.WithTransaction(ctx, callback)
 	if err != nil {
-		return err
+		return fmt.Errorf("could not run session.WithTransaction: %w", err)
 	}
 
 	return nil
 }
 
-func (r Repository) updateBalance(ctx context.Context, collection *mongo.Collection, id vos.ID, amount int) error {
+func (r Repository) updateBalance(ctx context.Context, coll *mongo.Collection, id vos.ID, amount int) error {
 	filter := bson.M{"id": id}
 	update := bson.D{primitive.E{Key: "$inc", Value: bson.D{primitive.E{Key: "balance", Value: amount}}}}
 
-	_, err := collection.UpdateOne(ctx, filter, update)
+	_, err := coll.UpdateOne(ctx, filter, update)
 	if err != nil {
 		return fmt.Errorf("could not update balance: %w", err)
 	}
@@ -62,10 +63,10 @@ func (r Repository) updateBalance(ctx context.Context, collection *mongo.Collect
 	return nil
 }
 
-func (r Repository) createTransfer(ctx context.Context, collection *mongo.Collection, transfer *entities.Transfer) error {
+func (r Repository) createTransfer(ctx context.Context, coll *mongo.Collection, transfer *entities.Transfer) error {
 	transfer.CreatedAt = time.Now()
 
-	_, err := collection.InsertOne(ctx, bson.D{
+	_, err := coll.InsertOne(ctx, bson.D{
 		primitive.E{Key: "id", Value: transfer.ID},
 		primitive.E{Key: "account_origin_id", Value: transfer.AccountOriginID},
 		primitive.E{Key: "account_destination_id", Value: transfer.AccountDestinationID},
