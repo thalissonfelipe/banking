@@ -38,7 +38,7 @@ func TestLogin(t *testing.T) {
 	}{
 		{
 			name:         "should return status code 400 if cpf was not provided",
-			usecase:      mocks.StubAccountUsecase{},
+			usecase:      &mocks.StubAccountUsecase{},
 			enc:          mocks.StubHash{},
 			body:         schemes.LoginInput{Secret: secret.String()},
 			decoder:      tests.ErrorMessageDecoder{},
@@ -47,7 +47,7 @@ func TestLogin(t *testing.T) {
 		},
 		{
 			name:         "should return status code 400 if secret was not provided",
-			usecase:      mocks.StubAccountUsecase{},
+			usecase:      &mocks.StubAccountUsecase{},
 			enc:          mocks.StubHash{},
 			body:         schemes.LoginInput{CPF: cpf.String()},
 			decoder:      tests.ErrorMessageDecoder{},
@@ -56,7 +56,7 @@ func TestLogin(t *testing.T) {
 		},
 		{
 			name:    "should return status code 400 if json provided was not valid",
-			usecase: mocks.StubAccountUsecase{},
+			usecase: &mocks.StubAccountUsecase{},
 			enc:     mocks.StubHash{},
 			body: map[string]interface{}{
 				"cpf": 123,
@@ -67,7 +67,7 @@ func TestLogin(t *testing.T) {
 		},
 		{
 			name:         "should return status code 500 if usecase fails",
-			usecase:      mocks.StubAccountUsecase{Err: testdata.ErrUsecaseFails},
+			usecase:      &mocks.StubAccountUsecase{Err: testdata.ErrUsecaseFails},
 			enc:          mocks.StubHash{},
 			body:         schemes.LoginInput{CPF: cpf.String(), Secret: secret.String()},
 			decoder:      tests.ErrorMessageDecoder{},
@@ -76,7 +76,7 @@ func TestLogin(t *testing.T) {
 		},
 		{
 			name:         "should return status code 400 if account does not exist",
-			usecase:      mocks.StubAccountUsecase{},
+			usecase:      &mocks.StubAccountUsecase{},
 			enc:          mocks.StubHash{},
 			body:         schemes.LoginInput{CPF: cpf.String(), Secret: secret.String()},
 			decoder:      tests.ErrorMessageDecoder{},
@@ -85,7 +85,7 @@ func TestLogin(t *testing.T) {
 		},
 		{
 			name: "should return status code 400 if secret was not correct",
-			usecase: mocks.StubAccountUsecase{
+			usecase: &mocks.StubAccountUsecase{
 				Accounts: []entities.Account{
 					entities.NewAccount("Pedro", cpf, secret),
 				},
@@ -98,7 +98,7 @@ func TestLogin(t *testing.T) {
 		},
 		{
 			name: "should authenticate successfully and return a token",
-			usecase: mocks.StubAccountUsecase{
+			usecase: &mocks.StubAccountUsecase{
 				Accounts: []entities.Account{
 					entities.NewAccount("Pedro", cpf, secret),
 				},
