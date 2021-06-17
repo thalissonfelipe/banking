@@ -19,7 +19,7 @@ import (
 // @Success 200 {array} transferResponse
 // @Failure 401 {object} responses.ErrorResponse
 // @Failure 500 {object} responses.ErrorResponse
-// @Router /transfers [GET]
+// @Router /transfers [GET].
 func (h Handler) ListTransfers(w http.ResponseWriter, r *http.Request) {
 	token := getTokenFromHeader(r.Header.Get("Authorization"))
 	accountID := vos.ConvertStringToID(auth.GetIDFromToken(token))

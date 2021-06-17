@@ -21,6 +21,5 @@ func formatTime(t time.Time) string {
 }
 
 func getTokenFromHeader(authHeader string) string {
-	splitToken := strings.Split(authHeader, "Bearer ")
-	return splitToken[1]
+	return strings.Split(authHeader, "Bearer ")[1]
 }

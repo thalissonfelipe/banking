@@ -22,6 +22,8 @@ func TestIntegration_GetAccounts(t *testing.T) {
 	resp, err := http.DefaultClient.Do(request)
 	require.NoError(t, err)
 
+	defer resp.Body.Close()
+
 	var body bytes.Buffer
 
 	_, err = io.Copy(&body, resp.Body)

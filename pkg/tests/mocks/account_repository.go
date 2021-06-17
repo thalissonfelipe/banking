@@ -16,6 +16,7 @@ func (s StubAccountRepository) GetAccounts(ctx context.Context) ([]entities.Acco
 	if s.Err != nil {
 		return nil, entities.ErrInternalError
 	}
+
 	return s.Accounts, nil
 }
 
@@ -23,11 +24,13 @@ func (s StubAccountRepository) GetBalanceByID(ctx context.Context, id vos.ID) (i
 	if s.Err != nil {
 		return 0, s.Err
 	}
+
 	for _, account := range s.Accounts {
 		if account.ID == id {
 			return account.Balance, nil
 		}
 	}
+
 	return 0, entities.ErrAccountDoesNotExist
 }
 
@@ -51,11 +54,13 @@ func (s StubAccountRepository) GetAccountByCPF(ctx context.Context, cpf vos.CPF)
 	if s.Err != nil {
 		return nil, s.Err
 	}
+
 	for _, acc := range s.Accounts {
 		if acc.CPF == cpf {
 			return &acc, nil
 		}
 	}
+
 	return nil, entities.ErrAccountDoesNotExist
 }
 
@@ -63,10 +68,12 @@ func (s StubAccountRepository) GetAccountByID(ctx context.Context, id vos.ID) (*
 	if s.Err != nil {
 		return nil, s.Err
 	}
+
 	for _, acc := range s.Accounts {
 		if acc.ID == id {
 			return &acc, nil
 		}
 	}
+
 	return nil, entities.ErrAccountDoesNotExist
 }

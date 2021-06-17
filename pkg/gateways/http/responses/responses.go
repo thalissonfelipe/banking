@@ -9,6 +9,7 @@ import (
 	"github.com/thalissonfelipe/banking/pkg/services/auth"
 )
 
+// HTTP Errors.
 var (
 	ErrInvalidJSON                = errors.New("invalid json")
 	ErrAccountNotFound            = errors.New("account does not exist")
@@ -44,11 +45,13 @@ func HandleError(w http.ResponseWriter, err error) {
 func SendError(w http.ResponseWriter, statusCode int, err error) {
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
-	json.NewEncoder(w).Encode(ErrorResponse{Message: err.Error()})
+
+	_ = json.NewEncoder(w).Encode(ErrorResponse{Message: err.Error()})
 }
 
 func SendJSON(w http.ResponseWriter, statusCode int, payload interface{}) {
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
-	json.NewEncoder(w).Encode(payload)
+
+	_ = json.NewEncoder(w).Encode(payload)
 }

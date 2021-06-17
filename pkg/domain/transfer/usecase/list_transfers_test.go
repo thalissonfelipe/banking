@@ -2,7 +2,6 @@ package usecase
 
 import (
 	"context"
-	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -10,6 +9,7 @@ import (
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
 	"github.com/thalissonfelipe/banking/pkg/domain/vos"
 	"github.com/thalissonfelipe/banking/pkg/tests/mocks"
+	"github.com/thalissonfelipe/banking/pkg/tests/testdata"
 )
 
 func TestUsecase_ListTransfers(t *testing.T) {
@@ -18,8 +18,8 @@ func TestUsecase_ListTransfers(t *testing.T) {
 	testCases := []struct {
 		name        string
 		repoSetup   func() *mocks.StubTransferRepository
-		accountId   vos.ID
-		errExpected error
+		accountID   vos.ID
+		expectedErr error
 	}{
 		{
 			name: "should return a list of transfers",
@@ -29,22 +29,23 @@ func TestUsecase_ListTransfers(t *testing.T) {
 					vos.NewID(),
 					100,
 				)
+
 				return &mocks.StubTransferRepository{
 					Transfers: []entities.Transfer{transfer},
 				}
 			},
-			accountId:   accountOriginID,
-			errExpected: nil,
+			accountID:   accountOriginID,
+			expectedErr: nil,
 		},
 		{
 			name: "should return an error if something went wrong on repository",
 			repoSetup: func() *mocks.StubTransferRepository {
 				return &mocks.StubTransferRepository{
-					Err: errors.New("failed to fetch transfers"),
+					Err: testdata.ErrRepositoryFailsToFetch,
 				}
 			},
-			accountId:   accountOriginID,
-			errExpected: entities.ErrInternalError,
+			accountID:   accountOriginID,
+			expectedErr: entities.ErrInternalError,
 		},
 	}
 
@@ -52,10 +53,10 @@ func TestUsecase_ListTransfers(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			ctx := context.Background()
 			usecase := NewTransferUsecase(tt.repoSetup(), nil)
-			_, err := usecase.ListTransfers(ctx, tt.accountId)
+			_, err := usecase.ListTransfers(ctx, tt.accountID)
 
 			// TODO: add result validation
-			assert.Equal(t, tt.errExpected, err)
+			assert.Equal(t, err, tt.expectedErr)
 		})
 	}
 }

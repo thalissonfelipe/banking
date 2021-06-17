@@ -2,26 +2,22 @@ package transfer
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
 	"github.com/thalissonfelipe/banking/pkg/domain/vos"
 )
 
-func (r Repository) GetTransfers(ctx context.Context, id vos.ID) ([]entities.Transfer, error) {
-	const query = `
-		SELECT
-			id,
-			account_origin_id,
-			account_destination_id,
-			amount,
-			created_at
-		FROM transfers
-		WHERE account_origin_id=$1
-	`
+const getTransfersQuery = `
+select id, account_origin_id, account_destination_id, amount, created_at
+from transfers
+where account_origin_id=$1
+`
 
-	rows, err := r.db.Query(ctx, query, id)
+func (r Repository) GetTransfers(ctx context.Context, id vos.ID) ([]entities.Transfer, error) {
+	rows, err := r.db.Query(ctx, getTransfersQuery, id)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("unexpected error occurred on get transfers query: %w", err)
 	}
 	defer rows.Close()
 
@@ -29,7 +25,8 @@ func (r Repository) GetTransfers(ctx context.Context, id vos.ID) ([]entities.Tra
 
 	for rows.Next() {
 		var account entities.Transfer
-		err := rows.Scan(
+
+		err = rows.Scan(
 			&account.ID,
 			&account.AccountOriginID,
 			&account.AccountDestinationID,
@@ -37,13 +34,14 @@ func (r Repository) GetTransfers(ctx context.Context, id vos.ID) ([]entities.Tra
 			&account.CreatedAt,
 		)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("unexpected error occurred while scanning rows: %w", err)
 		}
+
 		transfers = append(transfers, account)
 	}
 
-	if err := rows.Err(); err != nil {
-		return nil, err
+	if err = rows.Err(); err != nil {
+		return nil, fmt.Errorf("unexpected error occurred while scanning rows: %w", err)
 	}
 
 	return transfers, nil

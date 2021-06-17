@@ -2,7 +2,6 @@ package usecase
 
 import (
 	"context"
-	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -25,7 +24,7 @@ func TestUsecase_CreateAccount(t *testing.T) {
 		repoSetup   func() *mocks.StubAccountRepository
 		encSetup    *mocks.StubHash
 		input       account.CreateAccountInput
-		errExpected error
+		expectedErr error
 	}{
 		{
 			name: "should create an account successfully",
@@ -34,30 +33,29 @@ func TestUsecase_CreateAccount(t *testing.T) {
 			},
 			encSetup:    &mocks.StubHash{},
 			input:       validInput,
-			errExpected: nil,
+			expectedErr: nil,
 		},
 		{
-			name: "should return an error if repository fails to save account",
+			name: "should return an error if repository fails to fetch account",
 			repoSetup: func() *mocks.StubAccountRepository {
-				return &mocks.StubAccountRepository{
-					Err: errors.New("failed to save account"),
-				}
+				return &mocks.StubAccountRepository{Err: testdata.ErrRepositoryFailsToFetch}
 			},
 			encSetup:    &mocks.StubHash{},
 			input:       validInput,
-			errExpected: entities.ErrInternalError,
+			expectedErr: entities.ErrInternalError,
 		},
 		{
 			name: "should return an error if cpf already exists",
 			repoSetup: func() *mocks.StubAccountRepository {
 				acc := entities.NewAccount(validInput.Name, validInput.CPF, validInput.Secret)
+
 				return &mocks.StubAccountRepository{
 					Accounts: []entities.Account{acc},
 				}
 			},
 			input:       validInput,
 			encSetup:    &mocks.StubHash{},
-			errExpected: entities.ErrAccountAlreadyExists,
+			expectedErr: entities.ErrAccountAlreadyExists,
 		},
 		{
 			name: "should return an error if hash secret fails",
@@ -65,8 +63,8 @@ func TestUsecase_CreateAccount(t *testing.T) {
 				return &mocks.StubAccountRepository{}
 			},
 			input:       validInput,
-			encSetup:    &mocks.StubHash{Err: errors.New("could not hash secret")},
-			errExpected: entities.ErrInternalError,
+			encSetup:    &mocks.StubHash{Err: testdata.ErrHashFails},
+			expectedErr: entities.ErrInternalError,
 		},
 	}
 
@@ -77,7 +75,7 @@ func TestUsecase_CreateAccount(t *testing.T) {
 			_, err := usecase.CreateAccount(ctx, tt.input)
 
 			// TODO: add result validation
-			assert.Equal(t, tt.errExpected, err)
+			assert.ErrorIs(t, err, tt.expectedErr)
 		})
 	}
 }

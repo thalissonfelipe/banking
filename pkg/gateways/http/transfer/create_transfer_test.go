@@ -3,7 +3,6 @@ package transfer
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -11,6 +10,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
 	"github.com/thalissonfelipe/banking/pkg/domain/transfer/usecase"
@@ -118,11 +118,9 @@ func TestHandler_CreateTransfer(t *testing.T) {
 			expectedCode: http.StatusBadRequest,
 		},
 		{
-			name: "should return status 500 if usecase fails",
-			repo: &mocks.StubTransferRepository{},
-			accUsecase: &mocks.StubAccountUsecase{
-				Err: errors.New("usecase fails to fetch"),
-			},
+			name:        "should return status 500 if usecase fails",
+			repo:        &mocks.StubTransferRepository{},
+			accUsecase:  &mocks.StubAccountUsecase{Err: testdata.ErrUsecaseFails},
 			decoder:     tests.ErrorMessageDecoder{},
 			accOriginID: accOrigin.ID,
 			body: schemes.CreateTransferInput{
@@ -182,7 +180,7 @@ func TestHandler_CreateTransfer(t *testing.T) {
 
 			http.HandlerFunc(handler.CreateTransfer).ServeHTTP(response, request)
 
-			result := tt.decoder.Decode(response.Body)
+			result := tt.decoder.Decode(t, response.Body)
 
 			assert.Equal(t, tt.expectedBody, result)
 			assert.Equal(t, tt.expectedCode, response.Code)
@@ -193,8 +191,11 @@ func TestHandler_CreateTransfer(t *testing.T) {
 
 type createdTransferDecoder struct{}
 
-func (createdTransferDecoder) Decode(body *bytes.Buffer) interface{} {
+func (createdTransferDecoder) Decode(t *testing.T, body *bytes.Buffer) interface{} {
 	var result schemes.CreateTransferResponse
-	json.NewDecoder(body).Decode(&result)
+
+	err := json.NewDecoder(body).Decode(&result)
+	require.NoError(t, err)
+
 	return result
 }

@@ -3,13 +3,13 @@ package account
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/thalissonfelipe/banking/pkg/domain/account/usecase"
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
@@ -49,7 +49,7 @@ func TestHandler_ListAccounts(t *testing.T) {
 		},
 		{
 			name:         "should return 500 and error message if something went wrong",
-			repoSetup:    &mocks.StubAccountRepository{Err: errors.New("failed to list accounts")},
+			repoSetup:    &mocks.StubAccountRepository{Err: testdata.ErrRepositoryFailsToFetch},
 			expectedBody: responses.ErrorResponse{Message: "internal server error"},
 			decoder:      tests.ErrorMessageDecoder{},
 			expectedCode: http.StatusInternalServerError,
@@ -67,7 +67,7 @@ func TestHandler_ListAccounts(t *testing.T) {
 
 			http.HandlerFunc(handler.ListAccounts).ServeHTTP(response, request)
 
-			result := tt.decoder.Decode(response.Body)
+			result := tt.decoder.Decode(t, response.Body)
 
 			assert.Equal(t, tt.expectedCode, response.Code)
 			assert.Equal(t, "application/json", response.Header().Get("Content-Type"))
@@ -78,8 +78,11 @@ func TestHandler_ListAccounts(t *testing.T) {
 
 type listAccountsSuccessDecoder struct{}
 
-func (listAccountsSuccessDecoder) Decode(body *bytes.Buffer) interface{} {
+func (listAccountsSuccessDecoder) Decode(t *testing.T, body *bytes.Buffer) interface{} {
 	var result []schemes.AccountListResponse
-	json.NewDecoder(body).Decode(&result)
+
+	err := json.NewDecoder(body).Decode(&result)
+	require.NoError(t, err)
+
 	return result
 }

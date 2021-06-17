@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 
@@ -24,13 +25,20 @@ func main() {
 						Action: func(c *cli.Context) error {
 							cfg, err := config.LoadConfig()
 							if err != nil {
-								log.Fatalf("unable to load config: %s", err.Error())
+								return fmt.Errorf("could not load config: %w", err)
 							}
+
 							m, err := postgres.GetMigrationHandler(cfg.Postgres.DSN())
 							if err != nil {
-								log.Fatal(err)
+								return fmt.Errorf("could not get migration handler: %w", err)
 							}
-							return m.Up()
+
+							err = m.Up()
+							if err != nil {
+								return fmt.Errorf("could not apply up migrations: %w", err)
+							}
+
+							return nil
 						},
 					},
 					{
@@ -39,13 +47,20 @@ func main() {
 						Action: func(c *cli.Context) error {
 							cfg, err := config.LoadConfig()
 							if err != nil {
-								log.Fatalf("unable to load config: %s", err.Error())
+								return fmt.Errorf("could not load config: %w", err)
 							}
+
 							m, err := postgres.GetMigrationHandler(cfg.Postgres.DSN())
 							if err != nil {
-								log.Fatal(err)
+								return fmt.Errorf("could not get migration handler: %w", err)
 							}
-							return m.Down()
+
+							err = m.Down()
+							if err != nil {
+								return fmt.Errorf("could not apply up migrations: %w", err)
+							}
+
+							return nil
 						},
 					},
 				},
@@ -53,8 +68,7 @@ func main() {
 		},
 	}
 
-	err := app.Run(os.Args)
-	if err != nil {
-		log.Fatal(err)
+	if err := app.Run(os.Args); err != nil {
+		log.Fatalf("could not run app: %v", err)
 	}
 }

@@ -40,7 +40,9 @@ func NewRouter(db *pgx.Conn) http.Handler {
 	// Set a timeout value on the request context (ctx), that will signal
 	// through ctx.Done() that the request has timed out and further
 	// processing should be stopped.
-	router.Use(middleware.Timeout(60 * time.Second))
+	const timeout = 60
+
+	router.Use(middleware.Timeout(timeout * time.Second))
 
 	acc_handler.NewHandler(router, accountUsecase)
 	auth_handler.NewHandler(router, authService)

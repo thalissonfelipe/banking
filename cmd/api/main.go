@@ -44,7 +44,7 @@ func main() {
 
 	err = postgres.RunMigrations(cfg.Postgres.DSN())
 	if err != nil {
-		log.Fatalf("unable to run migrations: %s", err.Error())
+		log.Panicf("unable to run migrations: %v", err)
 	}
 
 	router := h.NewRouter(conn)
@@ -56,5 +56,5 @@ func main() {
 	}
 
 	log.Printf("Server listening on %s!\n", addr)
-	log.Fatal(server.ListenAndServe())
+	log.Panic(server.ListenAndServe())
 }

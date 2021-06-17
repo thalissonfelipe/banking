@@ -11,6 +11,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/thalissonfelipe/banking/pkg/domain/account/usecase"
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
@@ -50,6 +51,7 @@ func TestHandler_GetAccountBalance(t *testing.T) {
 			repo: func() *mocks.StubAccountRepository {
 				accWithBalance := acc
 				accWithBalance.Balance = 100
+
 				return &mocks.StubAccountRepository{
 					Accounts: []entities.Account{accWithBalance},
 				}
@@ -72,9 +74,7 @@ func TestHandler_GetAccountBalance(t *testing.T) {
 		{
 			name: "should return status 500 if something went wrong on usecase",
 			repo: func() *mocks.StubAccountRepository {
-				return &mocks.StubAccountRepository{
-					Err: entities.ErrInternalError,
-				}
+				return &mocks.StubAccountRepository{Err: entities.ErrInternalError}
 			},
 			requestURI:   fmt.Sprintf("/accounts/%s/balance", acc.ID),
 			decoder:      tests.ErrorMessageDecoder{},
@@ -100,7 +100,7 @@ func TestHandler_GetAccountBalance(t *testing.T) {
 
 			http.HandlerFunc(handler.GetAccountBalance).ServeHTTP(response, request)
 
-			result := tt.decoder.Decode(response.Body)
+			result := tt.decoder.Decode(t, response.Body)
 
 			assert.Equal(t, tt.expectedBody, result)
 			assert.Equal(t, tt.expectedCode, response.Code)
@@ -111,8 +111,11 @@ func TestHandler_GetAccountBalance(t *testing.T) {
 
 type balanceResponseDecoder struct{}
 
-func (balanceResponseDecoder) Decode(body *bytes.Buffer) interface{} {
+func (balanceResponseDecoder) Decode(t *testing.T, body *bytes.Buffer) interface{} {
 	var result schemes.BalanceResponse
-	json.NewDecoder(body).Decode(&result)
+
+	err := json.NewDecoder(body).Decode(&result)
+	require.NoError(t, err)
+
 	return result
 }

@@ -2,6 +2,7 @@ package schemes
 
 import "errors"
 
+// Request input errors.
 var (
 	ErrMissingAccDestIDParameter = errors.New("missing account destination id parameter")
 	ErrMissingAmountParameter    = errors.New("missing amount parameter")
@@ -29,6 +30,7 @@ func (t CreateTransferInput) IsValid() error {
 	if t.AccountDestinationID == "" {
 		return ErrMissingAccDestIDParameter
 	}
+
 	if t.Amount == 0 {
 		return ErrMissingAmountParameter
 	}

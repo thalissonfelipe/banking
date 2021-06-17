@@ -2,6 +2,7 @@ package schemes
 
 import "errors"
 
+// Request input errors.
 var (
 	ErrMissingNameParameter   = errors.New("missing name parameter")
 	ErrMissingCPFParameter    = errors.New("missing cpf parameter")
@@ -9,7 +10,7 @@ var (
 )
 
 type AccountListResponse struct {
-	Id        string `json:"id"`
+	ID        string `json:"id"`
 	Name      string `json:"name"`
 	CPF       string `json:"cpf"`
 	Balance   int    `json:"balance"`

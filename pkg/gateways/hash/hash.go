@@ -1,14 +1,27 @@
 package hash
 
-import "golang.org/x/crypto/bcrypt"
+import (
+	"fmt"
+
+	"golang.org/x/crypto/bcrypt"
+)
 
 type Hash struct{}
 
 func (h Hash) Hash(secret string) ([]byte, error) {
 	hashedSecret, err := bcrypt.GenerateFromPassword([]byte(secret), bcrypt.DefaultCost)
-	return hashedSecret, err
+	if err != nil {
+		return nil, fmt.Errorf("could not hash secret: %w", err)
+	}
+
+	return hashedSecret, nil
 }
 
 func (h Hash) CompareHashAndSecret(hashedSecret, secret []byte) error {
-	return bcrypt.CompareHashAndPassword(hashedSecret, secret)
+	err := bcrypt.CompareHashAndPassword(hashedSecret, secret)
+	if err != nil {
+		return fmt.Errorf("could not compare hash and secret: %w", err)
+	}
+
+	return nil
 }

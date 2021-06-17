@@ -24,7 +24,7 @@ import (
 // @Failure 400 {object} responses.ErrorResponse
 // @Failure 409 {object} responses.ErrorResponse
 // @Failure 500 {object} responses.ErrorResponse
-// @Router /accounts [POST]
+// @Router /accounts [POST].
 func (h Handler) CreateAccount(w http.ResponseWriter, r *http.Request) {
 	var body schemes.CreateAccountInput
 
@@ -35,7 +35,7 @@ func (h Handler) CreateAccount(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := body.IsValid(); err != nil {
+	if err = body.IsValid(); err != nil {
 		responses.SendError(w, http.StatusBadRequest, err)
 
 		return

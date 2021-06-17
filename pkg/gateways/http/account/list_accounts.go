@@ -15,7 +15,7 @@ import (
 // @Produce json
 // @Success 200 {array} accountResponse
 // @Failure 500 {object} responses.ErrorResponse
-// @Router /accounts [GET]
+// @Router /accounts [GET].
 func (h Handler) ListAccounts(w http.ResponseWriter, r *http.Request) {
 	accounts, err := h.usecase.ListAccounts(r.Context())
 	if err != nil {

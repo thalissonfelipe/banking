@@ -25,7 +25,7 @@ import (
 // @Failure 401 {object} responses.ErrorResponse
 // @Failure 404 {object} responses.ErrorResponse
 // @Failure 500 {object} responses.ErrorResponse
-// @Router /transfers [POST]
+// @Router /transfers [POST].
 func (h Handler) CreateTransfer(w http.ResponseWriter, r *http.Request) {
 	var body schemes.CreateTransferInput
 
@@ -36,7 +36,7 @@ func (h Handler) CreateTransfer(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := body.IsValid(); err != nil {
+	if err = body.IsValid(); err != nil {
 		responses.SendError(w, http.StatusBadRequest, err)
 
 		return

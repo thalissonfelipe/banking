@@ -25,7 +25,7 @@ func TestIntegration_GetTransfers(t *testing.T) {
 		expectedStatus int
 	}{
 		{
-			name: "should return list of transfers sucessfully",
+			name: "should return list of transfers successfully",
 			requestSetup: func() *http.Request {
 				secret := testdata.GetValidSecret()
 				acc := createAccount(t, testdata.GetValidCPF(), secret, 0)
@@ -51,6 +51,8 @@ func TestIntegration_GetTransfers(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			resp, err := http.DefaultClient.Do(tt.requestSetup())
 			require.NoError(t, err)
+
+			defer resp.Body.Close()
 
 			var body bytes.Buffer
 

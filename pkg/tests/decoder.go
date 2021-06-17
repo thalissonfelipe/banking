@@ -3,18 +3,24 @@ package tests
 import (
 	"bytes"
 	"encoding/json"
+	"testing"
+
+	"github.com/stretchr/testify/require"
 
 	"github.com/thalissonfelipe/banking/pkg/gateways/http/responses"
 )
 
 type Decoder interface {
-	Decode(body *bytes.Buffer) interface{}
+	Decode(t *testing.T, body *bytes.Buffer) interface{}
 }
 
 type ErrorMessageDecoder struct{}
 
-func (ErrorMessageDecoder) Decode(body *bytes.Buffer) interface{} {
+func (ErrorMessageDecoder) Decode(t *testing.T, body *bytes.Buffer) interface{} {
 	var errMessage responses.ErrorResponse
-	json.NewDecoder(body).Decode(&errMessage)
+
+	err := json.NewDecoder(body).Decode(&errMessage)
+	require.NoError(t, err)
+
 	return errMessage
 }
