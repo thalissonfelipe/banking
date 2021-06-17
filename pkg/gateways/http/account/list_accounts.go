@@ -3,6 +3,7 @@ package account
 import (
 	"net/http"
 
+	"github.com/thalissonfelipe/banking/pkg/gateways/http/account/schemes"
 	"github.com/thalissonfelipe/banking/pkg/gateways/http/responses"
 )
 
@@ -23,7 +24,7 @@ func (h Handler) ListAccounts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	accountsResponse := make([]AccountListResponse, 0)
+	accountsResponse := make([]schemes.AccountListResponse, 0)
 
 	for _, acc := range accounts {
 		accountsResponse = append(accountsResponse, convertAccountToAccountListResponse(acc))

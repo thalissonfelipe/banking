@@ -6,6 +6,7 @@ import (
 	"github.com/go-chi/chi/v5"
 
 	"github.com/thalissonfelipe/banking/pkg/domain/vos"
+	"github.com/thalissonfelipe/banking/pkg/gateways/http/account/schemes"
 	"github.com/thalissonfelipe/banking/pkg/gateways/http/responses"
 )
 
@@ -29,6 +30,6 @@ func (h Handler) GetAccountBalance(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response := BalanceResponse{Balance: balance}
+	response := schemes.BalanceResponse{Balance: balance}
 	responses.SendJSON(w, http.StatusOK, response)
 }
