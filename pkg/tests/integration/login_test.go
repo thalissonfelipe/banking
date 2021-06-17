@@ -39,7 +39,10 @@ func TestIntegration_Login(t *testing.T) {
 		{
 			name: "should return status code 400 if account does not exist",
 			requestSetup: func() *http.Request {
-				reqBody := schemes.LoginInput{CPF: testdata.GetValidCPF().String(), Secret: testdata.GetValidSecret().String()}
+				reqBody := schemes.LoginInput{
+					CPF:    testdata.GetValidCPF().String(),
+					Secret: testdata.GetValidSecret().String(),
+				}
 				request := fakes.FakeRequest(http.MethodPost, testenv.ServerURL+"/api/v1/login", reqBody)
 
 				return request
@@ -64,6 +67,8 @@ func TestIntegration_Login(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			resp, err := http.DefaultClient.Do(tt.requestSetup())
 			require.NoError(t, err)
+
+			defer resp.Body.Close()
 
 			var body bytes.Buffer
 

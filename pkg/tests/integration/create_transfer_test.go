@@ -34,7 +34,8 @@ func TestIntegration_CreateTransfer(t *testing.T) {
 				acc2 := createAccount(t, testdata.GetValidCPF(), testdata.GetValidSecret(), 0)
 
 				reqBody := schemes.CreateTransferInput{AccountDestinationID: acc2.ID.String(), Amount: 100}
-				request := fakes.FakeAuthorizedRequest(t, http.MethodPost, uri, acc1.CPF.String(), secret.String(), reqBody)
+				request := fakes.FakeAuthorizedRequest(
+					t, http.MethodPost, uri, acc1.CPF.String(), secret.String(), reqBody)
 
 				return request
 			},
@@ -48,7 +49,8 @@ func TestIntegration_CreateTransfer(t *testing.T) {
 				acc2 := createAccount(t, testdata.GetValidCPF(), testdata.GetValidSecret(), 0)
 
 				reqBody := schemes.CreateTransferInput{AccountDestinationID: acc2.ID.String(), Amount: 200}
-				request := fakes.FakeAuthorizedRequest(t, http.MethodPost, uri, acc1.CPF.String(), secret.String(), reqBody)
+				request := fakes.FakeAuthorizedRequest(
+					t, http.MethodPost, uri, acc1.CPF.String(), secret.String(), reqBody)
 
 				return request
 			},
@@ -61,7 +63,8 @@ func TestIntegration_CreateTransfer(t *testing.T) {
 				accOrigin := createAccount(t, testdata.GetValidCPF(), secret, 100)
 
 				reqBody := schemes.CreateTransferInput{AccountDestinationID: accOrigin.ID.String(), Amount: 200}
-				request := fakes.FakeAuthorizedRequest(t, http.MethodPost, uri, accOrigin.CPF.String(), secret.String(), reqBody)
+				request := fakes.FakeAuthorizedRequest(
+					t, http.MethodPost, uri, accOrigin.CPF.String(), secret.String(), reqBody)
 
 				return request
 			},
@@ -74,7 +77,8 @@ func TestIntegration_CreateTransfer(t *testing.T) {
 				accOrigin := createAccount(t, testdata.GetValidCPF(), secret, 100)
 
 				reqBody := schemes.CreateTransferInput{AccountDestinationID: vos.NewID().String(), Amount: 200}
-				request := fakes.FakeAuthorizedRequest(t, http.MethodPost, uri, accOrigin.CPF.String(), secret.String(), reqBody)
+				request := fakes.FakeAuthorizedRequest(
+					t, http.MethodPost, uri, accOrigin.CPF.String(), secret.String(), reqBody)
 
 				dockertest.TruncateTables(context.Background(), testenv.DB)
 
@@ -89,7 +93,8 @@ func TestIntegration_CreateTransfer(t *testing.T) {
 				accOrigin := createAccount(t, testdata.GetValidCPF(), secret, 100)
 
 				reqBody := schemes.CreateTransferInput{AccountDestinationID: vos.NewID().String(), Amount: 200}
-				request := fakes.FakeAuthorizedRequest(t, http.MethodPost, uri, accOrigin.CPF.String(), secret.String(), reqBody)
+				request := fakes.FakeAuthorizedRequest(
+					t, http.MethodPost, uri, accOrigin.CPF.String(), secret.String(), reqBody)
 
 				return request
 			},
@@ -113,6 +118,8 @@ func TestIntegration_CreateTransfer(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			resp, err := http.DefaultClient.Do(tt.requestSetup(t))
 			require.NoError(t, err)
+
+			defer resp.Body.Close()
 
 			var body bytes.Buffer
 

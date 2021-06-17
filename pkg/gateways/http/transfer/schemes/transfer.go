@@ -29,6 +29,7 @@ func (t CreateTransferInput) IsValid() error {
 	if t.AccountDestinationID == "" {
 		return ErrMissingAccDestIDParameter
 	}
+
 	if t.Amount == 0 {
 		return ErrMissingAmountParameter
 	}
