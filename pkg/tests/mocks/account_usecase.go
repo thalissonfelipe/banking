@@ -31,7 +31,7 @@ func (s StubAccountUsecase) ListAccounts(ctx context.Context) ([]entities.Accoun
 	return nil, nil
 }
 
-func (s *StubAccountUsecase) CreateAccount(
+func (s StubAccountUsecase) CreateAccount(
 	ctx context.Context, input account.CreateAccountInput) (*entities.Account, error) {
 	if s.Err != nil {
 		return nil, entities.ErrInternalError
