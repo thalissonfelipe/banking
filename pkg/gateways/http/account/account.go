@@ -9,7 +9,7 @@ import (
 
 func convertAccountToAccountListResponse(account entities.Account) schemes.AccountListResponse {
 	return schemes.AccountListResponse{
-		Id:        account.ID.String(),
+		ID:        account.ID.String(),
 		Name:      account.Name,
 		CPF:       account.CPF.String(),
 		Balance:   account.Balance,

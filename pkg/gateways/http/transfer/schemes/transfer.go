@@ -2,6 +2,7 @@ package schemes
 
 import "errors"
 
+// Request input errors.
 var (
 	ErrMissingAccDestIDParameter = errors.New("missing account destination id parameter")
 	ErrMissingAmountParameter    = errors.New("missing amount parameter")

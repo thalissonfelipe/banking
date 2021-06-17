@@ -61,7 +61,7 @@ linters:
     - nolintlint
     - prealloc
     - predeclared
-    # - revive until I merge with main
+    - revive
     - rowserrcheck
     - unconvert
     - wastedassign
