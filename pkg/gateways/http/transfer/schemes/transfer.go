@@ -1,6 +1,6 @@
 package schemes
 
-import "github.com/thalissonfelipe/banking/pkg/gateways/http/responses"
+import "github.com/thalissonfelipe/banking/pkg/gateways/http/rest"
 
 type TransferListResponse struct {
 	AccountDestinationID string `json:"account_destination_id"`
@@ -21,11 +21,11 @@ type CreateTransferResponse struct {
 
 func (t CreateTransferInput) IsValid() error {
 	if t.AccountDestinationID == "" {
-		return responses.ErrMissingAccDestinationIDParameter
+		return rest.ErrMissingAccDestinationIDParameter
 	}
 
 	if t.Amount == 0 {
-		return responses.ErrMissingAmountParameter
+		return rest.ErrMissingAmountParameter
 	}
 
 	return nil

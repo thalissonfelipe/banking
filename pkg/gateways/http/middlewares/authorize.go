@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/thalissonfelipe/banking/pkg/gateways/http/responses"
+	"github.com/thalissonfelipe/banking/pkg/gateways/http/rest"
 	"github.com/thalissonfelipe/banking/pkg/services/auth"
 )
 
@@ -15,14 +15,14 @@ func AuthorizeMiddleware(next http.Handler) http.Handler {
 
 		parts := strings.Split(authHeader, "Bearer ")
 		if len(parts) != partsSize {
-			responses.SendError(w, http.StatusUnauthorized, auth.ErrUnauthorized)
+			rest.SendError(w, http.StatusUnauthorized, auth.ErrUnauthorized)
 
 			return
 		}
 
 		token := parts[1]
 		if err := auth.IsValidToken(token); err != nil {
-			responses.SendError(w, http.StatusUnauthorized, auth.ErrUnauthorized)
+			rest.SendError(w, http.StatusUnauthorized, auth.ErrUnauthorized)
 
 			return
 		}

@@ -13,7 +13,7 @@ import (
 
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
 	"github.com/thalissonfelipe/banking/pkg/gateways/http/account/schemes"
-	"github.com/thalissonfelipe/banking/pkg/gateways/http/responses"
+	"github.com/thalissonfelipe/banking/pkg/gateways/http/rest"
 	"github.com/thalissonfelipe/banking/pkg/tests"
 	"github.com/thalissonfelipe/banking/pkg/tests/fakes"
 	"github.com/thalissonfelipe/banking/pkg/tests/mocks"
@@ -49,7 +49,7 @@ func TestHandler_ListAccounts(t *testing.T) {
 		{
 			name:         "should return 500 and error message if something went wrong",
 			usecase:      &mocks.AccountUsecaseMock{Err: testdata.ErrRepositoryFailsToFetch},
-			expectedBody: responses.ErrorResponse{Message: "internal server error"},
+			expectedBody: rest.ErrorResponse{Message: "internal server error"},
 			decoder:      tests.ErrorMessageDecoder{},
 			expectedCode: http.StatusInternalServerError,
 		},

@@ -15,7 +15,7 @@ import (
 	"github.com/thalissonfelipe/banking/pkg/domain/encrypter"
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
 	"github.com/thalissonfelipe/banking/pkg/gateways/http/auth/schemes"
-	"github.com/thalissonfelipe/banking/pkg/gateways/http/responses"
+	"github.com/thalissonfelipe/banking/pkg/gateways/http/rest"
 	"github.com/thalissonfelipe/banking/pkg/services/auth"
 	"github.com/thalissonfelipe/banking/pkg/tests"
 	"github.com/thalissonfelipe/banking/pkg/tests/fakes"
@@ -42,7 +42,7 @@ func TestLogin(t *testing.T) {
 			enc:          mocks.HashMock{},
 			body:         schemes.LoginInput{Secret: secret.String()},
 			decoder:      tests.ErrorMessageDecoder{},
-			expectedBody: responses.ErrorResponse{Message: "missing cpf parameter"},
+			expectedBody: rest.ErrorResponse{Message: "missing cpf parameter"},
 			expectedCode: http.StatusBadRequest,
 		},
 		{
@@ -51,7 +51,7 @@ func TestLogin(t *testing.T) {
 			enc:          mocks.HashMock{},
 			body:         schemes.LoginInput{CPF: cpf.String()},
 			decoder:      tests.ErrorMessageDecoder{},
-			expectedBody: responses.ErrorResponse{Message: "missing secret parameter"},
+			expectedBody: rest.ErrorResponse{Message: "missing secret parameter"},
 			expectedCode: http.StatusBadRequest,
 		},
 		{
@@ -62,7 +62,7 @@ func TestLogin(t *testing.T) {
 				"cpf": 123,
 			},
 			decoder:      tests.ErrorMessageDecoder{},
-			expectedBody: responses.ErrorResponse{Message: "invalid json"},
+			expectedBody: rest.ErrorResponse{Message: "invalid json"},
 			expectedCode: http.StatusBadRequest,
 		},
 		{
@@ -71,7 +71,7 @@ func TestLogin(t *testing.T) {
 			enc:          mocks.HashMock{},
 			body:         schemes.LoginInput{CPF: cpf.String(), Secret: secret.String()},
 			decoder:      tests.ErrorMessageDecoder{},
-			expectedBody: responses.ErrorResponse{Message: "internal server error"},
+			expectedBody: rest.ErrorResponse{Message: "internal server error"},
 			expectedCode: http.StatusInternalServerError,
 		},
 		{
@@ -80,7 +80,7 @@ func TestLogin(t *testing.T) {
 			enc:          mocks.HashMock{},
 			body:         schemes.LoginInput{CPF: cpf.String(), Secret: secret.String()},
 			decoder:      tests.ErrorMessageDecoder{},
-			expectedBody: responses.ErrorResponse{Message: "cpf or secret are invalid"},
+			expectedBody: rest.ErrorResponse{Message: "cpf or secret are invalid"},
 			expectedCode: http.StatusBadRequest,
 		},
 		{
@@ -93,7 +93,7 @@ func TestLogin(t *testing.T) {
 			enc:          mocks.HashMock{Err: auth.ErrInvalidCredentials},
 			body:         schemes.LoginInput{CPF: cpf.String(), Secret: "12345678"},
 			decoder:      tests.ErrorMessageDecoder{},
-			expectedBody: responses.ErrorResponse{Message: "cpf or secret are invalid"},
+			expectedBody: rest.ErrorResponse{Message: "cpf or secret are invalid"},
 			expectedCode: http.StatusBadRequest,
 		},
 		{

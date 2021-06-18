@@ -13,7 +13,7 @@ import (
 
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
 	"github.com/thalissonfelipe/banking/pkg/gateways/http/account/schemes"
-	"github.com/thalissonfelipe/banking/pkg/gateways/http/responses"
+	"github.com/thalissonfelipe/banking/pkg/gateways/http/rest"
 	"github.com/thalissonfelipe/banking/pkg/tests"
 	"github.com/thalissonfelipe/banking/pkg/tests/fakes"
 	"github.com/thalissonfelipe/banking/pkg/tests/mocks"
@@ -39,7 +39,7 @@ func TestHandler_CreateAccount(t *testing.T) {
 			enc:          &mocks.HashMock{},
 			decoder:      tests.ErrorMessageDecoder{},
 			body:         schemes.CreateAccountInput{CPF: cpf.String(), Secret: secret.String()},
-			expectedBody: responses.ErrorResponse{Message: "missing name parameter"},
+			expectedBody: rest.ErrorResponse{Message: "missing name parameter"},
 			expectedCode: http.StatusBadRequest,
 		},
 		{
@@ -48,7 +48,7 @@ func TestHandler_CreateAccount(t *testing.T) {
 			enc:          &mocks.HashMock{},
 			decoder:      tests.ErrorMessageDecoder{},
 			body:         schemes.CreateAccountInput{Name: "Pedro", Secret: secret.String()},
-			expectedBody: responses.ErrorResponse{Message: "missing cpf parameter"},
+			expectedBody: rest.ErrorResponse{Message: "missing cpf parameter"},
 			expectedCode: http.StatusBadRequest,
 		},
 		{
@@ -57,7 +57,7 @@ func TestHandler_CreateAccount(t *testing.T) {
 			enc:          &mocks.HashMock{},
 			decoder:      tests.ErrorMessageDecoder{},
 			body:         schemes.CreateAccountInput{Name: "Pedro", CPF: cpf.String()},
-			expectedBody: responses.ErrorResponse{Message: "missing secret parameter"},
+			expectedBody: rest.ErrorResponse{Message: "missing secret parameter"},
 			expectedCode: http.StatusBadRequest,
 		},
 		{
@@ -66,7 +66,7 @@ func TestHandler_CreateAccount(t *testing.T) {
 			enc:          &mocks.HashMock{},
 			decoder:      tests.ErrorMessageDecoder{},
 			body:         map[string]interface{}{"name": 123456},
-			expectedBody: responses.ErrorResponse{Message: "invalid json"},
+			expectedBody: rest.ErrorResponse{Message: "invalid json"},
 			expectedCode: http.StatusBadRequest,
 		},
 		{
@@ -75,7 +75,7 @@ func TestHandler_CreateAccount(t *testing.T) {
 			enc:          &mocks.HashMock{},
 			decoder:      tests.ErrorMessageDecoder{},
 			body:         schemes.CreateAccountInput{Name: "Pedro", CPF: "123.456.789-00", Secret: secret.String()},
-			expectedBody: responses.ErrorResponse{Message: "invalid cpf"},
+			expectedBody: rest.ErrorResponse{Message: "invalid cpf"},
 			expectedCode: http.StatusBadRequest,
 		},
 		{
@@ -84,7 +84,7 @@ func TestHandler_CreateAccount(t *testing.T) {
 			enc:          &mocks.HashMock{},
 			decoder:      tests.ErrorMessageDecoder{},
 			body:         schemes.CreateAccountInput{Name: "Pedro", CPF: cpf.String(), Secret: "12345678"},
-			expectedBody: responses.ErrorResponse{Message: "invalid secret"},
+			expectedBody: rest.ErrorResponse{Message: "invalid secret"},
 			expectedCode: http.StatusBadRequest,
 		},
 		{
@@ -97,7 +97,7 @@ func TestHandler_CreateAccount(t *testing.T) {
 			enc:          &mocks.HashMock{},
 			decoder:      tests.ErrorMessageDecoder{},
 			body:         schemes.CreateAccountInput{Name: "Pedro", CPF: cpf.String(), Secret: secret.String()},
-			expectedBody: responses.ErrorResponse{Message: "account already exists"},
+			expectedBody: rest.ErrorResponse{Message: "account already exists"},
 			expectedCode: http.StatusConflict,
 		},
 		{
@@ -106,7 +106,7 @@ func TestHandler_CreateAccount(t *testing.T) {
 			enc:          &mocks.HashMock{},
 			decoder:      tests.ErrorMessageDecoder{},
 			body:         schemes.CreateAccountInput{Name: "Pedro", CPF: cpf.String(), Secret: secret.String()},
-			expectedBody: responses.ErrorResponse{Message: "internal server error"},
+			expectedBody: rest.ErrorResponse{Message: "internal server error"},
 			expectedCode: http.StatusInternalServerError,
 		},
 		{

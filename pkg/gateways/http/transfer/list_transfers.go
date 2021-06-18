@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/thalissonfelipe/banking/pkg/domain/vos"
-	"github.com/thalissonfelipe/banking/pkg/gateways/http/responses"
+	"github.com/thalissonfelipe/banking/pkg/gateways/http/rest"
 	"github.com/thalissonfelipe/banking/pkg/gateways/http/transfer/schemes"
 	"github.com/thalissonfelipe/banking/pkg/services/auth"
 )
@@ -26,7 +26,7 @@ func (h Handler) ListTransfers(w http.ResponseWriter, r *http.Request) {
 
 	transfers, err := h.usecase.ListTransfers(r.Context(), accountID)
 	if err != nil {
-		responses.SendError(w, http.StatusInternalServerError, responses.ErrInternalError)
+		rest.SendError(w, http.StatusInternalServerError, rest.ErrInternalError)
 
 		return
 	}
@@ -37,5 +37,5 @@ func (h Handler) ListTransfers(w http.ResponseWriter, r *http.Request) {
 		transfersResponse = append(transfersResponse, convertTransferToTransferListResponse(transfer))
 	}
 
-	responses.SendJSON(w, http.StatusOK, transfersResponse)
+	rest.SendJSON(w, http.StatusOK, transfersResponse)
 }

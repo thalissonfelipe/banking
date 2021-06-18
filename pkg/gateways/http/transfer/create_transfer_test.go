@@ -15,7 +15,7 @@ import (
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
 	"github.com/thalissonfelipe/banking/pkg/domain/transfer/usecase"
 	"github.com/thalissonfelipe/banking/pkg/domain/vos"
-	"github.com/thalissonfelipe/banking/pkg/gateways/http/responses"
+	"github.com/thalissonfelipe/banking/pkg/gateways/http/rest"
 	"github.com/thalissonfelipe/banking/pkg/gateways/http/transfer/schemes"
 	"github.com/thalissonfelipe/banking/pkg/services/auth"
 	"github.com/thalissonfelipe/banking/pkg/tests"
@@ -47,7 +47,7 @@ func TestHandler_CreateTransfer(t *testing.T) {
 			decoder:     tests.ErrorMessageDecoder{},
 			accOriginID: accOrigin.ID,
 			body:        schemes.CreateTransferInput{Amount: 100},
-			expectedBody: responses.ErrorResponse{
+			expectedBody: rest.ErrorResponse{
 				Message: "missing account destination id parameter",
 			},
 			expectedCode: http.StatusBadRequest,
@@ -59,7 +59,7 @@ func TestHandler_CreateTransfer(t *testing.T) {
 			decoder:      tests.ErrorMessageDecoder{},
 			accOriginID:  accOrigin.ID,
 			body:         schemes.CreateTransferInput{AccountDestinationID: accDest.ID.String()},
-			expectedBody: responses.ErrorResponse{Message: "missing amount parameter"},
+			expectedBody: rest.ErrorResponse{Message: "missing amount parameter"},
 			expectedCode: http.StatusBadRequest,
 		},
 		{
@@ -71,7 +71,7 @@ func TestHandler_CreateTransfer(t *testing.T) {
 			body: map[string]interface{}{
 				"amount": "100",
 			},
-			expectedBody: responses.ErrorResponse{Message: "invalid json"},
+			expectedBody: rest.ErrorResponse{Message: "invalid json"},
 			expectedCode: http.StatusBadRequest,
 		},
 		{
@@ -84,7 +84,7 @@ func TestHandler_CreateTransfer(t *testing.T) {
 				AccountDestinationID: accDest.ID.String(),
 				Amount:               100,
 			},
-			expectedBody: responses.ErrorResponse{Message: "account origin does not exist"},
+			expectedBody: rest.ErrorResponse{Message: "account origin does not exist"},
 			expectedCode: http.StatusNotFound,
 		},
 		{
@@ -99,7 +99,7 @@ func TestHandler_CreateTransfer(t *testing.T) {
 				AccountDestinationID: accDest.ID.String(),
 				Amount:               100,
 			},
-			expectedBody: responses.ErrorResponse{Message: "account destination does not exist"},
+			expectedBody: rest.ErrorResponse{Message: "account destination does not exist"},
 			expectedCode: http.StatusNotFound,
 		},
 		{
@@ -114,7 +114,7 @@ func TestHandler_CreateTransfer(t *testing.T) {
 				AccountDestinationID: accDest.ID.String(),
 				Amount:               100,
 			},
-			expectedBody: responses.ErrorResponse{Message: "insufficient funds"},
+			expectedBody: rest.ErrorResponse{Message: "insufficient funds"},
 			expectedCode: http.StatusBadRequest,
 		},
 		{
@@ -127,7 +127,7 @@ func TestHandler_CreateTransfer(t *testing.T) {
 				AccountDestinationID: accDest.ID.String(),
 				Amount:               100,
 			},
-			expectedBody: responses.ErrorResponse{Message: "internal server error"},
+			expectedBody: rest.ErrorResponse{Message: "internal server error"},
 			expectedCode: http.StatusInternalServerError,
 		},
 		{
@@ -140,7 +140,7 @@ func TestHandler_CreateTransfer(t *testing.T) {
 				AccountDestinationID: accOrigin.ID.String(),
 				Amount:               100,
 			},
-			expectedBody: responses.ErrorResponse{
+			expectedBody: rest.ErrorResponse{
 				Message: "account destination cannot be the account origin id",
 			},
 			expectedCode: http.StatusBadRequest,

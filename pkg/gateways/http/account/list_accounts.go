@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/thalissonfelipe/banking/pkg/gateways/http/account/schemes"
-	"github.com/thalissonfelipe/banking/pkg/gateways/http/responses"
+	"github.com/thalissonfelipe/banking/pkg/gateways/http/rest"
 )
 
 // ListAccounts returns all accounts
@@ -19,7 +19,7 @@ import (
 func (h Handler) ListAccounts(w http.ResponseWriter, r *http.Request) {
 	accounts, err := h.usecase.ListAccounts(r.Context())
 	if err != nil {
-		responses.SendError(w, http.StatusInternalServerError, responses.ErrInternalError)
+		rest.SendError(w, http.StatusInternalServerError, rest.ErrInternalError)
 
 		return
 	}
@@ -30,5 +30,5 @@ func (h Handler) ListAccounts(w http.ResponseWriter, r *http.Request) {
 		accountsResponse = append(accountsResponse, convertAccountToAccountListResponse(acc))
 	}
 
-	responses.SendJSON(w, http.StatusOK, accountsResponse)
+	rest.SendJSON(w, http.StatusOK, accountsResponse)
 }

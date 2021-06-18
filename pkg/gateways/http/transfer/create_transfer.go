@@ -7,7 +7,6 @@ import (
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
 	"github.com/thalissonfelipe/banking/pkg/domain/transfer"
 	"github.com/thalissonfelipe/banking/pkg/domain/vos"
-	"github.com/thalissonfelipe/banking/pkg/gateways/http/responses"
 	"github.com/thalissonfelipe/banking/pkg/gateways/http/rest"
 	"github.com/thalissonfelipe/banking/pkg/gateways/http/transfer/schemes"
 	"github.com/thalissonfelipe/banking/pkg/services/auth"
@@ -30,7 +29,7 @@ func (h Handler) CreateTransfer(w http.ResponseWriter, r *http.Request) {
 	var body schemes.CreateTransferInput
 
 	if err := rest.DecodeRequestBody(r, &body); err != nil {
-		responses.HandleBadRequestError(w, err)
+		rest.HandleBadRequestError(w, err)
 
 		return
 	}
@@ -40,7 +39,7 @@ func (h Handler) CreateTransfer(w http.ResponseWriter, r *http.Request) {
 	accountDestinationID := vos.ConvertStringToAccountID(body.AccountDestinationID)
 
 	if accountID == accountDestinationID {
-		responses.SendError(w, http.StatusBadRequest, responses.ErrDestinationIDEqToOriginID)
+		rest.SendError(w, http.StatusBadRequest, rest.ErrDestinationIDEqToOriginID)
 
 		return
 	}
@@ -50,12 +49,12 @@ func (h Handler) CreateTransfer(w http.ResponseWriter, r *http.Request) {
 	err := h.usecase.CreateTransfer(r.Context(), input)
 	if err != nil {
 		if errors.Is(err, entities.ErrAccountDoesNotExist) {
-			responses.SendError(w, http.StatusNotFound, responses.ErrAccountOriginNotFound)
+			rest.SendError(w, http.StatusNotFound, rest.ErrAccountOriginNotFound)
 
 			return
 		}
 
-		responses.HandleError(w, err)
+		rest.HandleError(w, err)
 
 		return
 	}
@@ -65,5 +64,5 @@ func (h Handler) CreateTransfer(w http.ResponseWriter, r *http.Request) {
 		AccountDestinationID: body.AccountDestinationID,
 		Amount:               body.Amount,
 	}
-	responses.SendJSON(w, http.StatusCreated, response)
+	rest.SendJSON(w, http.StatusCreated, response)
 }

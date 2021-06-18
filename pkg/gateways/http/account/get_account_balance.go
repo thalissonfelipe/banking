@@ -7,7 +7,7 @@ import (
 
 	"github.com/thalissonfelipe/banking/pkg/domain/vos"
 	"github.com/thalissonfelipe/banking/pkg/gateways/http/account/schemes"
-	"github.com/thalissonfelipe/banking/pkg/gateways/http/responses"
+	"github.com/thalissonfelipe/banking/pkg/gateways/http/rest"
 )
 
 // GetAccountBalance returns a balance by accountID
@@ -25,11 +25,11 @@ func (h Handler) GetAccountBalance(w http.ResponseWriter, r *http.Request) {
 
 	balance, err := h.usecase.GetAccountBalanceByID(r.Context(), accountID)
 	if err != nil {
-		responses.HandleError(w, err)
+		rest.HandleError(w, err)
 
 		return
 	}
 
 	response := schemes.BalanceResponse{Balance: balance}
-	responses.SendJSON(w, http.StatusOK, response)
+	rest.SendJSON(w, http.StatusOK, response)
 }

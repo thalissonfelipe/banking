@@ -1,6 +1,6 @@
 package schemes
 
-import "github.com/thalissonfelipe/banking/pkg/gateways/http/responses"
+import "github.com/thalissonfelipe/banking/pkg/gateways/http/rest"
 
 type LoginResponse struct {
 	Token string `json:"token"`
@@ -13,11 +13,11 @@ type LoginInput struct {
 
 func (r LoginInput) IsValid() error {
 	if r.CPF == "" {
-		return responses.ErrMissingCPFParameter
+		return rest.ErrMissingCPFParameter
 	}
 
 	if r.Secret == "" {
-		return responses.ErrMissingSecretParameter
+		return rest.ErrMissingSecretParameter
 	}
 
 	return nil

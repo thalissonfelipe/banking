@@ -1,6 +1,6 @@
 package schemes
 
-import "github.com/thalissonfelipe/banking/pkg/gateways/http/responses"
+import "github.com/thalissonfelipe/banking/pkg/gateways/http/rest"
 
 type AccountListResponse struct {
 	ID        string `json:"id"`
@@ -28,15 +28,15 @@ type CreateAccountResponse struct {
 
 func (r CreateAccountInput) IsValid() error {
 	if r.Name == "" {
-		return responses.ErrMissingNameParameter
+		return rest.ErrMissingNameParameter
 	}
 
 	if r.CPF == "" {
-		return responses.ErrMissingCPFParameter
+		return rest.ErrMissingCPFParameter
 	}
 
 	if r.Secret == "" {
-		return responses.ErrMissingSecretParameter
+		return rest.ErrMissingSecretParameter
 	}
 
 	return nil

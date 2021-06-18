@@ -4,13 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-
-	"github.com/thalissonfelipe/banking/pkg/gateways/http/responses"
 )
 
 func DecodeRequestBody(r *http.Request, dest interface{}) error {
 	if err := json.NewDecoder(r.Body).Decode(&dest); err != nil {
-		return responses.ErrInvalidJSON
+		return ErrInvalidJSON
 	}
 
 	v, ok := dest.(interface{ IsValid() error })

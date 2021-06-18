@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"github.com/thalissonfelipe/banking/pkg/gateways/http/auth/schemes"
-	"github.com/thalissonfelipe/banking/pkg/gateways/http/responses"
 	"github.com/thalissonfelipe/banking/pkg/gateways/http/rest"
 	"github.com/thalissonfelipe/banking/pkg/services/auth"
 )
@@ -26,7 +25,7 @@ func (h Handler) Login(w http.ResponseWriter, r *http.Request) {
 
 	err := rest.DecodeRequestBody(r, &body)
 	if err != nil {
-		responses.HandleBadRequestError(w, err)
+		rest.HandleBadRequestError(w, err)
 
 		return
 	}
@@ -38,11 +37,11 @@ func (h Handler) Login(w http.ResponseWriter, r *http.Request) {
 
 	token, err := h.authService.Autheticate(r.Context(), input)
 	if err != nil {
-		responses.HandleError(w, err)
+		rest.HandleError(w, err)
 
 		return
 	}
 
 	response := schemes.LoginResponse{Token: token}
-	responses.SendJSON(w, http.StatusOK, response)
+	rest.SendJSON(w, http.StatusOK, response)
 }

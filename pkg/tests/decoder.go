@@ -7,7 +7,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/thalissonfelipe/banking/pkg/gateways/http/responses"
+	"github.com/thalissonfelipe/banking/pkg/gateways/http/rest"
 )
 
 type Decoder interface {
@@ -17,7 +17,7 @@ type Decoder interface {
 type ErrorMessageDecoder struct{}
 
 func (ErrorMessageDecoder) Decode(t *testing.T, body *bytes.Buffer) interface{} {
-	var errMessage responses.ErrorResponse
+	var errMessage rest.ErrorResponse
 
 	err := json.NewDecoder(body).Decode(&errMessage)
 	require.NoError(t, err)

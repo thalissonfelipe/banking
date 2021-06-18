@@ -6,7 +6,6 @@ import (
 	"github.com/thalissonfelipe/banking/pkg/domain/account"
 	"github.com/thalissonfelipe/banking/pkg/domain/vos"
 	"github.com/thalissonfelipe/banking/pkg/gateways/http/account/schemes"
-	"github.com/thalissonfelipe/banking/pkg/gateways/http/responses"
 	"github.com/thalissonfelipe/banking/pkg/gateways/http/rest"
 )
 
@@ -29,21 +28,21 @@ func (h Handler) CreateAccount(w http.ResponseWriter, r *http.Request) {
 	var body schemes.CreateAccountInput
 
 	if err := rest.DecodeRequestBody(r, &body); err != nil {
-		responses.HandleBadRequestError(w, err)
+		rest.HandleBadRequestError(w, err)
 
 		return
 	}
 
 	cpf, err := vos.NewCPF(body.CPF)
 	if err != nil {
-		responses.SendError(w, http.StatusBadRequest, err)
+		rest.SendError(w, http.StatusBadRequest, err)
 
 		return
 	}
 
 	secret, err := vos.NewSecret(body.Secret)
 	if err != nil {
-		responses.SendError(w, http.StatusBadRequest, err)
+		rest.SendError(w, http.StatusBadRequest, err)
 
 		return
 	}
@@ -52,11 +51,11 @@ func (h Handler) CreateAccount(w http.ResponseWriter, r *http.Request) {
 
 	acc, err := h.usecase.CreateAccount(r.Context(), input)
 	if err != nil {
-		responses.HandleError(w, err)
+		rest.HandleError(w, err)
 
 		return
 	}
 
 	accResponse := convertAccountToCreateAccountResponse(acc)
-	responses.SendJSON(w, http.StatusCreated, accResponse)
+	rest.SendJSON(w, http.StatusCreated, accResponse)
 }

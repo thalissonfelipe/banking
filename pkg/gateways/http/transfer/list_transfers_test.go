@@ -14,7 +14,7 @@ import (
 
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
 	"github.com/thalissonfelipe/banking/pkg/domain/transfer/usecase"
-	"github.com/thalissonfelipe/banking/pkg/gateways/http/responses"
+	"github.com/thalissonfelipe/banking/pkg/gateways/http/rest"
 	"github.com/thalissonfelipe/banking/pkg/gateways/http/transfer/schemes"
 	"github.com/thalissonfelipe/banking/pkg/services/auth"
 	"github.com/thalissonfelipe/banking/pkg/tests"
@@ -55,7 +55,7 @@ func TestHandler_ListTransfers(t *testing.T) {
 			name:         "should return an error if usecase fails",
 			repo:         &mocks.TransferRepositoryMock{Err: testdata.ErrUsecaseFails},
 			decoder:      tests.ErrorMessageDecoder{},
-			expectedBody: responses.ErrorResponse{Message: "internal server error"},
+			expectedBody: rest.ErrorResponse{Message: "internal server error"},
 			expectedCode: http.StatusInternalServerError,
 		},
 	}

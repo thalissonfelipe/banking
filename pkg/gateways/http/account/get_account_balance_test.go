@@ -15,7 +15,7 @@ import (
 
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
 	"github.com/thalissonfelipe/banking/pkg/gateways/http/account/schemes"
-	"github.com/thalissonfelipe/banking/pkg/gateways/http/responses"
+	"github.com/thalissonfelipe/banking/pkg/gateways/http/rest"
 	"github.com/thalissonfelipe/banking/pkg/tests"
 	"github.com/thalissonfelipe/banking/pkg/tests/fakes"
 	"github.com/thalissonfelipe/banking/pkg/tests/mocks"
@@ -67,7 +67,7 @@ func TestHandler_GetAccountBalance(t *testing.T) {
 			},
 			requestURI:   fmt.Sprintf("/accounts/%s/balance", acc.ID),
 			decoder:      tests.ErrorMessageDecoder{},
-			expectedBody: responses.ErrorResponse{Message: "account does not exist"},
+			expectedBody: rest.ErrorResponse{Message: "account does not exist"},
 			expectedCode: http.StatusNotFound,
 		},
 		{
@@ -77,7 +77,7 @@ func TestHandler_GetAccountBalance(t *testing.T) {
 			},
 			requestURI:   fmt.Sprintf("/accounts/%s/balance", acc.ID),
 			decoder:      tests.ErrorMessageDecoder{},
-			expectedBody: responses.ErrorResponse{Message: "internal server error"},
+			expectedBody: rest.ErrorResponse{Message: "internal server error"},
 			expectedCode: http.StatusInternalServerError,
 		},
 	}
