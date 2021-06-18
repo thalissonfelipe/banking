@@ -8,27 +8,34 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/mongo/readconcern"
+	"go.mongodb.org/mongo-driver/mongo/writeconcern"
 
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
 	"github.com/thalissonfelipe/banking/pkg/domain/vos"
 )
 
 func (r Repository) CreateTransfer(ctx context.Context, transfer *entities.Transfer) error {
+	wc := writeconcern.New(writeconcern.WMajority())
+	rc := readconcern.Snapshot()
+	txnOpts := options.Transaction().SetWriteConcern(wc).SetReadConcern(rc)
+
 	transfersCollection := r.db.Collection("transfers")
 	accountCollection := r.db.Collection("accounts")
 
 	callback := func(sc mongo.SessionContext) (interface{}, error) {
-		err := r.updateBalance(ctx, accountCollection, transfer.AccountOriginID, -transfer.Amount)
+		err := r.updateBalance(sc, accountCollection, transfer.AccountOriginID, -transfer.Amount)
 		if err != nil {
 			return nil, err
 		}
 
-		err = r.updateBalance(ctx, accountCollection, transfer.AccountDestinationID, transfer.Amount)
+		err = r.updateBalance(sc, accountCollection, transfer.AccountDestinationID, transfer.Amount)
 		if err != nil {
 			return nil, err
 		}
 
-		err = r.createTransfer(ctx, transfersCollection, transfer)
+		err = r.createTransfer(sc, transfersCollection, transfer)
 		if err != nil {
 			return nil, err
 		}
@@ -43,7 +50,7 @@ func (r Repository) CreateTransfer(ctx context.Context, transfer *entities.Trans
 
 	defer session.EndSession(ctx)
 
-	_, err = session.WithTransaction(ctx, callback)
+	_, err = session.WithTransaction(ctx, callback, txnOpts)
 	if err != nil {
 		return fmt.Errorf("could not run session.WithTransaction: %w", err)
 	}

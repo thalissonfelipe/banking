@@ -44,7 +44,7 @@ func SetupMongoDB() *MongoDBDocker {
 	if err = pool.Retry(func() error {
 		ctx := context.Background()
 
-		client, err = mongo.Connect(ctx, options.Client().ApplyURI(connString))
+		client, err = mongo.Connect(ctx, options.Client().ApplyURI(connString).SetReplicaSet("rs"))
 		if err != nil {
 			return fmt.Errorf("could not connect with mongodb: %w", err)
 		}
