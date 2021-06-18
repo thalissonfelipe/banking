@@ -8,12 +8,12 @@ import (
 )
 
 type accountAdpater struct {
-	ID        vos.ID     `bson:"id"`
-	Name      string     `bson:"name"`
-	CPF       vos.CPF    `bson:"cpf"`
-	Secret    vos.Secret `bson:"secret"`
-	Balance   int        `bson:"balance"`
-	CreatedAt time.Time  `bson:"created_at"`
+	ID        vos.AccountID `bson:"id"`
+	Name      string        `bson:"name"`
+	CPF       vos.CPF       `bson:"cpf"`
+	Secret    vos.Secret    `bson:"secret"`
+	Balance   int           `bson:"balance"`
+	CreatedAt time.Time     `bson:"created_at"`
 }
 
 func (a accountAdpater) convertToDomainAccount() *entities.Account {

@@ -13,7 +13,7 @@ import (
 	"github.com/thalissonfelipe/banking/pkg/domain/vos"
 )
 
-func (r Repository) GetBalanceByID(ctx context.Context, accountID vos.ID) (int, error) {
+func (r Repository) GetBalanceByID(ctx context.Context, accountID vos.AccountID) (int, error) {
 	opts := options.FindOne().SetProjection(bson.M{"balance": 1})
 
 	var account accountAdpater

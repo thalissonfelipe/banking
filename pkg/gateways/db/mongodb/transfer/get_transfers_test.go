@@ -18,7 +18,7 @@ func TestRepository_GetTransfers(t *testing.T) {
 	defer dockertest.DropCollection(t, db.Collection("transfers"))
 	defer dockertest.DropCollection(t, db.Collection("accounts"))
 
-	transfers, err := r.GetTransfers(context.Background(), vos.NewID())
+	transfers, err := r.GetTransfers(context.Background(), vos.NewAccountID())
 	assert.NoError(t, err)
 	assert.Len(t, transfers, 0)
 
@@ -32,7 +32,7 @@ func TestRepository_GetTransfers(t *testing.T) {
 	assert.NoError(t, err)
 
 	// still should return an empty slice because the account origin id does not exist.
-	transfers, err = r.GetTransfers(context.Background(), vos.NewID())
+	transfers, err = r.GetTransfers(context.Background(), vos.NewAccountID())
 	assert.NoError(t, err)
 	assert.Len(t, transfers, 0)
 

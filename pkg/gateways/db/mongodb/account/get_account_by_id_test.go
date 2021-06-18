@@ -16,7 +16,7 @@ func TestRepostory_GetAccountByID(t *testing.T) {
 
 	defer dockertest.DropCollection(t, db.Collection("accounts"))
 
-	account, err := r.GetAccountByID(context.Background(), vos.NewID())
+	account, err := r.GetAccountByID(context.Background(), vos.NewAccountID())
 	assert.Nil(t, account)
 	assert.ErrorIs(t, err, entities.ErrAccountDoesNotExist)
 

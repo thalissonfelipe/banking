@@ -12,7 +12,7 @@ import (
 	"github.com/thalissonfelipe/banking/pkg/domain/vos"
 )
 
-func (r Repository) GetAccountByID(ctx context.Context, id vos.ID) (*entities.Account, error) {
+func (r Repository) GetAccountByID(ctx context.Context, id vos.AccountID) (*entities.Account, error) {
 	var account accountAdpater
 
 	err := r.db.Collection("accounts").FindOne(ctx, bson.M{"id": id}).Decode(&account)

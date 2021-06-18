@@ -51,7 +51,7 @@ func (r Repository) CreateTransfer(ctx context.Context, transfer *entities.Trans
 	return nil
 }
 
-func (r Repository) updateBalance(ctx context.Context, coll *mongo.Collection, id vos.ID, amount int) error {
+func (r Repository) updateBalance(ctx context.Context, coll *mongo.Collection, id vos.AccountID, amount int) error {
 	filter := bson.M{"id": id}
 	update := bson.D{primitive.E{Key: "$inc", Value: bson.D{primitive.E{Key: "balance", Value: amount}}}}
 

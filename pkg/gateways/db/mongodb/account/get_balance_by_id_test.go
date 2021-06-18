@@ -16,7 +16,7 @@ func TestRepository_GetBalanceByID(t *testing.T) {
 
 	defer dockertest.DropCollection(t, db.Collection("accounts"))
 
-	balance, err := r.GetBalanceByID(context.Background(), vos.NewID())
+	balance, err := r.GetBalanceByID(context.Background(), vos.NewAccountID())
 	assert.Zero(t, balance)
 	assert.ErrorIs(t, err, entities.ErrAccountDoesNotExist)
 
