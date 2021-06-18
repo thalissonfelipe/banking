@@ -12,7 +12,7 @@ Banking is a REST API that allows users to create accounts and to perform transa
 
 ## Libraries
 
-- [gorilla/mux](https://github.com/gorilla/mux)
+- [chi](https://github.com/go-chi/chi)
 - [jwt-go](https://github.com/dgrijalva/jwt-go)
 - [uuid](https://github.com/google/uuid)
 - [pgx](https://github.com/jackc/pgx)
@@ -22,10 +22,12 @@ Banking is a REST API that allows users to create accounts and to perform transa
 - [bcrypt](https://pkg.go.dev/golang.org/x/crypto@v0.0.0-20210513164829-c07d793c2f9a/bcrypt)
 - [cli](https://github.com/urfave/cli)
 - [testify](https://github.com/stretchr/testify)
+- [dockertest](https://github.com/ory/dockertest)
+- [swag](https://github.com/swaggo/swag)
 
 ## Getting Started
 
-To get started quickly, you must have `Docker` and `make` installed in your machine to start the application easily.
+To get started quickly, you must have `docker`, `docker-compose` and `make` installed in your machine to start the application easily.
 
 1. If you want to configure your own API and database settings, create an .env file in the root folder and fill it out following the .env.example file as a template. Be aware that if you change the default portgres configuration, you may need to configure something manually within the Docker container.
 
@@ -34,8 +36,8 @@ To get started quickly, you must have `Docker` and `make` installed in your mach
     make dev-docker
     ```
 
-3. (Optional) Run the following command if you want to start the application locally. This options requires Go.
-    ```shell
+3. (Optional) Run the following command if you want to start the application locally. This option requires Go. Also, since your application will run locally and the postgres database inside docker, you need to set the database variables directly in the docker-compose.yml file, or export the variables using the keyword export, or fill the .env file as stated on step one (recommended).
+    ```shell   
     make dev-local
     ```
 The server will be listening on `0.0.0.0:5000`.
@@ -55,6 +57,8 @@ The server will be listening on `0.0.0.0:5000`.
 - **POST /transfers**
     - Performs a new transfer between accounts. The user must be authenticated to use this endpoint.
 
+Once the server is started, you can go to http://localhost:5000/swagger/index.html to see more details about each endpoint.
+
 ## Tests
 
 To run the tests:
@@ -65,18 +69,18 @@ make test
 
 ## TODO
 
-- [ ] Improve endpoints documentation.
-- [ ] Add swagger.
+- [x] Improve endpoints documentation.
+- [x] Add swagger.
 - [ ] Add logger.
-- [ ] Add integration tests.
+- [x] Add integration tests.
 - [ ] Add coverage tests.
-- [ ] Add unit tests for repository methods.
+- [x] Add unit tests for repository methods.
 - [x] Fix json responses (the names are capitalized).
 - [ ] Add endpoint to deposit money (the default balance is 0, so it's not possible to perform transaction since the user does not have funds).
-- [ ] Add Github Actions.
+- [x] Add Github Actions.
 - [x] Add prefix endpoint (must start with /api/v1/ or something like that).
 - [ ] Add common pkg to centralize some functions, errors, constants...
 - [x] Change id saved in the bank to be a UUID type (currently the id is being saved as a string).
 - [x] Move created_at timestamp to PostgreSQL responsability.
 - [ ] Add CORS middleware.
-- [ ] Change the error response of the login route (return only one http status and one message to avoid enumeration attacks, an ideia is to use http status 400 and something like "Invalid cpf and/or secret.").
+- [x] Change the error response of the login route (return only one http status and one message to avoid enumeration attacks, an ideia is to use http status 400 and something like "Invalid cpf and/or secret.").
