@@ -60,30 +60,30 @@ func (s AccountUsecaseMock) CreateAccount(
 	return &acc, nil
 }
 
-func (s AccountUsecaseMock) GetAccountByID(ctx context.Context, accountID vos.AccountID) (*entities.Account, error) {
+func (s AccountUsecaseMock) GetAccountByID(ctx context.Context, accountID vos.AccountID) (entities.Account, error) {
 	if s.Err != nil {
-		return nil, entities.ErrInternalError
+		return entities.Account{}, entities.ErrInternalError
 	}
 
 	for _, acc := range s.Accounts {
 		if acc.ID == accountID {
-			return &acc, nil
+			return acc, nil
 		}
 	}
 
-	return nil, entities.ErrAccountDoesNotExist
+	return entities.Account{}, entities.ErrAccountDoesNotExist
 }
 
-func (s AccountUsecaseMock) GetAccountByCPF(ctx context.Context, cpf vos.CPF) (*entities.Account, error) {
+func (s AccountUsecaseMock) GetAccountByCPF(ctx context.Context, cpf vos.CPF) (entities.Account, error) {
 	if s.Err != nil {
-		return nil, entities.ErrInternalError
+		return entities.Account{}, entities.ErrInternalError
 	}
 
 	for _, acc := range s.Accounts {
 		if acc.CPF == cpf {
-			return &acc, nil
+			return acc, nil
 		}
 	}
 
-	return nil, entities.ErrAccountDoesNotExist
+	return entities.Account{}, entities.ErrAccountDoesNotExist
 }

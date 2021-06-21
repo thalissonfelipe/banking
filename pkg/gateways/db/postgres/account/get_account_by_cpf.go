@@ -17,7 +17,7 @@ from accounts
 where cpf=$1
 `
 
-func (r Repository) GetAccountByCPF(ctx context.Context, cpf vos.CPF) (*entities.Account, error) {
+func (r Repository) GetAccountByCPF(ctx context.Context, cpf vos.CPF) (entities.Account, error) {
 	var account entities.Account
 
 	err := r.db.QueryRow(ctx, getAccountByCPFQuery, cpf).Scan(
@@ -29,12 +29,12 @@ func (r Repository) GetAccountByCPF(ctx context.Context, cpf vos.CPF) (*entities
 		&account.CreatedAt,
 	)
 	if err == nil {
-		return &account, nil
+		return account, nil
 	}
 
 	if errors.Is(err, pgx.ErrNoRows) {
-		return nil, entities.ErrAccountDoesNotExist
+		return entities.Account{}, entities.ErrAccountDoesNotExist
 	}
 
-	return nil, fmt.Errorf("unexpected error occurred on get account by cpf query: %w", err)
+	return entities.Account{}, fmt.Errorf("unexpected error occurred on get account by cpf query: %w", err)
 }

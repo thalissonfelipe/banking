@@ -53,30 +53,30 @@ func (s *AccountRepositoryMock) CreateAccount(ctx context.Context, account *enti
 	return nil
 }
 
-func (s AccountRepositoryMock) GetAccountByCPF(ctx context.Context, cpf vos.CPF) (*entities.Account, error) {
+func (s AccountRepositoryMock) GetAccountByCPF(ctx context.Context, cpf vos.CPF) (entities.Account, error) {
 	if s.Err != nil {
-		return nil, s.Err
+		return entities.Account{}, s.Err
 	}
 
 	for _, acc := range s.Accounts {
 		if acc.CPF == cpf {
-			return &acc, nil
+			return acc, nil
 		}
 	}
 
-	return nil, entities.ErrAccountDoesNotExist
+	return entities.Account{}, entities.ErrAccountDoesNotExist
 }
 
-func (s AccountRepositoryMock) GetAccountByID(ctx context.Context, id vos.AccountID) (*entities.Account, error) {
+func (s AccountRepositoryMock) GetAccountByID(ctx context.Context, id vos.AccountID) (entities.Account, error) {
 	if s.Err != nil {
-		return nil, s.Err
+		return entities.Account{}, s.Err
 	}
 
 	for _, acc := range s.Accounts {
 		if acc.ID == id {
-			return &acc, nil
+			return acc, nil
 		}
 	}
 
-	return nil, entities.ErrAccountDoesNotExist
+	return entities.Account{}, entities.ErrAccountDoesNotExist
 }

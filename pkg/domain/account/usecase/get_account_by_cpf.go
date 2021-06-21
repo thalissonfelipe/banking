@@ -9,15 +9,15 @@ import (
 	"github.com/thalissonfelipe/banking/pkg/domain/vos"
 )
 
-func (a Account) GetAccountByCPF(ctx context.Context, cpf vos.CPF) (*entities.Account, error) {
+func (a Account) GetAccountByCPF(ctx context.Context, cpf vos.CPF) (entities.Account, error) {
 	acc, err := a.repository.GetAccountByCPF(ctx, cpf)
 	if err == nil {
 		return acc, nil
 	}
 
 	if errors.Is(err, entities.ErrAccountDoesNotExist) {
-		return nil, fmt.Errorf("account does not exist: %w", err)
+		return entities.Account{}, fmt.Errorf("account does not exist: %w", err)
 	}
 
-	return nil, entities.ErrInternalError
+	return entities.Account{}, entities.ErrInternalError
 }

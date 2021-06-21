@@ -17,7 +17,7 @@ from accounts
 where id=$1
 `
 
-func (r Repository) GetAccountByID(ctx context.Context, id vos.AccountID) (*entities.Account, error) {
+func (r Repository) GetAccountByID(ctx context.Context, id vos.AccountID) (entities.Account, error) {
 	var account entities.Account
 
 	err := r.db.QueryRow(ctx, getAccountByIDQuery, id).Scan(
@@ -29,12 +29,12 @@ func (r Repository) GetAccountByID(ctx context.Context, id vos.AccountID) (*enti
 		&account.CreatedAt,
 	)
 	if err == nil {
-		return &account, nil
+		return account, nil
 	}
 
 	if errors.Is(err, pgx.ErrNoRows) {
-		return nil, entities.ErrAccountDoesNotExist
+		return entities.Account{}, entities.ErrAccountDoesNotExist
 	}
 
-	return nil, fmt.Errorf("unexpected error occurred on get account by id query: %w", err)
+	return entities.Account{}, fmt.Errorf("unexpected error occurred on get account by id query: %w", err)
 }
