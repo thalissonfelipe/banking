@@ -4,27 +4,16 @@ import (
 	"context"
 	"errors"
 
+	"github.com/google/uuid"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	"github.com/google/uuid"
 	"github.com/thalissonfelipe/banking/pkg/domain/account"
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
 	"github.com/thalissonfelipe/banking/pkg/domain/vos"
 	proto "github.com/thalissonfelipe/banking/proto/banking"
 )
-
-type Server struct {
-	usecase account.Usecase
-	proto.UnimplementedBankingServiceServer
-}
-
-func NewServer(usecase account.Usecase) *Server {
-	return &Server{
-		usecase: usecase,
-	}
-}
 
 func (s Server) GetAccounts(ctx context.Context, _ *proto.ListAccountsRequest) (*proto.ListAccountsResponse, error) {
 	accounts, err := s.usecase.ListAccounts(ctx)
