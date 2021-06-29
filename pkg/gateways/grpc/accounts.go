@@ -59,6 +59,44 @@ func (s Server) GetAccountBalance(ctx context.Context, request *proto.GetAccount
 	return &proto.GetAccountBalanceResponse{Balance: int64(balance)}, nil
 }
 
+func (s Server) CreateAccount(ctx context.Context, request *proto.CreateAccountRequest) (*proto.CreateAccountResponse, error) {
+	// TODO: refact
+	if request.Name == "" {
+		return nil, status.Error(codes.InvalidArgument, "missing name parameter")
+	}
+
+	if request.Cpf == "" {
+		return nil, status.Error(codes.InvalidArgument, "missing cpf parameter")
+	}
+
+	if request.Secret == "" {
+		return nil, status.Error(codes.InvalidArgument, "missing secret parameter")
+	}
+
+	cpf, err := vos.NewCPF(request.Cpf)
+	if err != nil {
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	secret, err := vos.NewSecret(request.Secret)
+	if err != nil {
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	input := account.NewCreateAccountInput(request.Name, cpf, secret)
+
+	account, err := s.usecase.CreateAccount(ctx, input)
+	if err != nil {
+		if errors.Is(err, entities.ErrAccountAlreadyExists) {
+			return nil, status.Error(codes.AlreadyExists, "account already exists")
+		}
+
+		return nil, status.Error(codes.Internal, "internal server error")
+	}
+
+	return &proto.CreateAccountResponse{Id: account.ID.String()}, nil
+}
+
 func domainToGRPC(account entities.Account) *proto.Account {
 	return &proto.Account{
 		Id:        account.ID.String(),
