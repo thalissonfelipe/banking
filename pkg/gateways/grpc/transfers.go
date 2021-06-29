@@ -2,6 +2,7 @@ package grpc
 
 import (
 	"context"
+	"errors"
 
 	"github.com/google/uuid"
 	"google.golang.org/grpc/codes"
@@ -10,6 +11,7 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
+	"github.com/thalissonfelipe/banking/pkg/domain/transfer"
 	"github.com/thalissonfelipe/banking/pkg/domain/vos"
 	"github.com/thalissonfelipe/banking/pkg/services/auth"
 	proto "github.com/thalissonfelipe/banking/proto/banking"
@@ -40,6 +42,54 @@ func (s Server) GetTransfers(ctx context.Context, _ *proto.ListTransfersRequest)
 	}
 
 	return &proto.ListTransfersResponse{Transfers: response}, nil
+}
+
+func (s Server) CreateTransfer(ctx context.Context, request *proto.CreateTransferRequest) (*proto.CreateTransferResponse, error) {
+	meta, ok := metadata.FromIncomingContext(ctx)
+	if !ok {
+		return nil, status.Error(codes.Unauthenticated, "missing context metadata")
+	}
+
+	token := meta["authorization"][0]
+
+	accounOriginID, err := uuid.Parse(auth.GetIDFromToken(token))
+	if err != nil {
+		return nil, status.Error(codes.InvalidArgument, "invalid account origin id")
+	}
+
+	accounDestinationID, err := uuid.Parse(request.AccountDestinationId)
+	if err != nil {
+		return nil, status.Error(codes.InvalidArgument, "invalid account destination id")
+	}
+
+	if accounOriginID == accounDestinationID {
+		return nil, status.Error(codes.InvalidArgument, "account destination id must be differente from account origin id")
+	}
+
+	input := transfer.NewTransferInput(
+		vos.AccountID(accounOriginID),
+		vos.AccountID(accounDestinationID),
+		int(request.Amount),
+	)
+
+	err = s.transferUsecase.CreateTransfer(ctx, input)
+	if err != nil {
+		if errors.Is(err, entities.ErrAccountDoesNotExist) {
+			return nil, status.Error(codes.NotFound, "account origin does not exist")
+		}
+
+		if errors.Is(err, entities.ErrAccountDestinationDoesNotExist) {
+			return nil, status.Error(codes.NotFound, "account destination does not exist")
+		}
+
+		if errors.Is(err, entities.ErrInsufficientFunds) {
+			return nil, status.Error(codes.InvalidArgument, "insufficient funds")
+		}
+
+		return nil, status.Error(codes.Internal, "internal server error")
+	}
+
+	return &proto.CreateTransferResponse{}, nil
 }
 
 func domainTransferToGRPC(transfer entities.Transfer) *proto.Transfer {
