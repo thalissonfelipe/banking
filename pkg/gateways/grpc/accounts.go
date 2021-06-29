@@ -18,10 +18,10 @@ import (
 func (s Server) GetAccounts(ctx context.Context, _ *proto.ListAccountsRequest) (*proto.ListAccountsResponse, error) {
 	accounts, err := s.accountUsecase.ListAccounts(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, "internal server error")
+		return nil, status.Errorf(codes.Internal, "internal server error")
 	}
 
-	var response []*proto.Account
+	response := make([]*proto.Account, 0)
 
 	for _, acc := range accounts {
 		response = append(response, domainAccountToGRPC(acc))
@@ -30,46 +30,48 @@ func (s Server) GetAccounts(ctx context.Context, _ *proto.ListAccountsRequest) (
 	return &proto.ListAccountsResponse{Accounts: response}, nil
 }
 
-func (s Server) GetAccountBalance(ctx context.Context, request *proto.GetAccountBalanceRequest) (*proto.GetAccountBalanceResponse, error) {
+func (s Server) GetAccountBalance(
+	ctx context.Context, request *proto.GetAccountBalanceRequest) (*proto.GetAccountBalanceResponse, error) {
 	accountID, err := uuid.Parse(request.AccountId)
 	if err != nil {
-		return nil, status.Error(codes.InvalidArgument, "invalid account id")
+		return nil, status.Errorf(codes.InvalidArgument, "invalid account id")
 	}
 
 	balance, err := s.accountUsecase.GetAccountBalanceByID(ctx, vos.AccountID(accountID))
 	if err != nil {
 		if errors.Is(err, entities.ErrAccountDoesNotExist) {
-			return nil, status.Error(codes.NotFound, "account does not exist")
+			return nil, status.Errorf(codes.NotFound, "account does not exist")
 		}
 
-		return nil, status.Error(codes.Internal, "internal server error")
+		return nil, status.Errorf(codes.Internal, "internal server error")
 	}
 
 	return &proto.GetAccountBalanceResponse{Balance: int64(balance)}, nil
 }
 
-func (s Server) CreateAccount(ctx context.Context, request *proto.CreateAccountRequest) (*proto.CreateAccountResponse, error) {
+func (s Server) CreateAccount(
+	ctx context.Context, request *proto.CreateAccountRequest) (*proto.CreateAccountResponse, error) {
 	// TODO: refact
 	if request.Name == "" {
-		return nil, status.Error(codes.InvalidArgument, "missing name parameter")
+		return nil, status.Errorf(codes.InvalidArgument, "missing name parameter")
 	}
 
 	if request.Cpf == "" {
-		return nil, status.Error(codes.InvalidArgument, "missing cpf parameter")
+		return nil, status.Errorf(codes.InvalidArgument, "missing cpf parameter")
 	}
 
 	if request.Secret == "" {
-		return nil, status.Error(codes.InvalidArgument, "missing secret parameter")
+		return nil, status.Errorf(codes.InvalidArgument, "missing secret parameter")
 	}
 
 	cpf, err := vos.NewCPF(request.Cpf)
 	if err != nil {
-		return nil, status.Error(codes.InvalidArgument, err.Error())
+		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
 
 	secret, err := vos.NewSecret(request.Secret)
 	if err != nil {
-		return nil, status.Error(codes.InvalidArgument, err.Error())
+		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
 
 	input := account.NewCreateAccountInput(request.Name, cpf, secret)
@@ -77,10 +79,10 @@ func (s Server) CreateAccount(ctx context.Context, request *proto.CreateAccountR
 	account, err := s.accountUsecase.CreateAccount(ctx, input)
 	if err != nil {
 		if errors.Is(err, entities.ErrAccountAlreadyExists) {
-			return nil, status.Error(codes.AlreadyExists, "account already exists")
+			return nil, status.Errorf(codes.AlreadyExists, "account already exists")
 		}
 
-		return nil, status.Error(codes.Internal, "internal server error")
+		return nil, status.Errorf(codes.Internal, "internal server error")
 	}
 
 	return &proto.CreateAccountResponse{Id: account.ID.String()}, nil

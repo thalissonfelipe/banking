@@ -17,25 +17,26 @@ import (
 	proto "github.com/thalissonfelipe/banking/proto/banking"
 )
 
-func (s Server) GetTransfers(ctx context.Context, _ *proto.ListTransfersRequest) (*proto.ListTransfersResponse, error) {
+func (s Server) GetTransfers(
+	ctx context.Context, _ *proto.ListTransfersRequest) (*proto.ListTransfersResponse, error) {
 	meta, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
-		return nil, status.Error(codes.Unauthenticated, "missing context metadata")
+		return nil, status.Errorf(codes.Unauthenticated, "missing context metadata")
 	}
 
 	token := meta["authorization"][0]
 
 	accountID, err := uuid.Parse(auth.GetIDFromToken(token))
 	if err != nil {
-		return nil, status.Error(codes.InvalidArgument, "invalid account id")
+		return nil, status.Errorf(codes.InvalidArgument, "invalid account id")
 	}
 
 	transfers, err := s.transferUsecase.ListTransfers(ctx, vos.AccountID(accountID))
 	if err != nil {
-		return nil, status.Error(codes.Internal, "internal server error")
+		return nil, status.Errorf(codes.Internal, "internal server error")
 	}
 
-	var response []*proto.Transfer
+	response := make([]*proto.Transfer, 0)
 
 	for _, tr := range transfers {
 		response = append(response, domainTransferToGRPC(tr))
@@ -44,38 +45,41 @@ func (s Server) GetTransfers(ctx context.Context, _ *proto.ListTransfersRequest)
 	return &proto.ListTransfersResponse{Transfers: response}, nil
 }
 
-func (s Server) CreateTransfer(ctx context.Context, request *proto.CreateTransferRequest) (*proto.CreateTransferResponse, error) {
+func (s Server) CreateTransfer(
+	ctx context.Context, request *proto.CreateTransferRequest) (*proto.CreateTransferResponse, error) {
 	if request.AccountDestinationId == "" {
-		return nil, status.Error(codes.InvalidArgument, "missing account destination id parameter")
+		return nil, status.Errorf(codes.InvalidArgument, "missing account destination id parameter")
 	}
 
 	if request.Amount == 0 {
-		return nil, status.Error(codes.InvalidArgument, "missing amount parameter")
+		return nil, status.Errorf(codes.InvalidArgument, "missing amount parameter")
 	}
 
 	if request.Amount < 0 {
-		return nil, status.Error(codes.InvalidArgument, "amount must be bigger than 0")
+		return nil, status.Errorf(codes.InvalidArgument, "amount must be bigger than 0")
 	}
 
 	meta, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
-		return nil, status.Error(codes.Unauthenticated, "missing context metadata")
+		return nil, status.Errorf(codes.Unauthenticated, "missing context metadata")
 	}
 
 	token := meta["authorization"][0]
 
 	accounOriginID, err := uuid.Parse(auth.GetIDFromToken(token))
 	if err != nil {
-		return nil, status.Error(codes.InvalidArgument, "invalid account origin id")
+		return nil, status.Errorf(codes.InvalidArgument, "invalid account origin id")
 	}
 
 	accounDestinationID, err := uuid.Parse(request.AccountDestinationId)
 	if err != nil {
-		return nil, status.Error(codes.InvalidArgument, "invalid account destination id")
+		return nil, status.Errorf(codes.InvalidArgument, "invalid account destination id")
 	}
 
 	if accounOriginID == accounDestinationID {
-		return nil, status.Error(codes.InvalidArgument, "account destination id must be differente from account origin id")
+		return nil, status.Errorf(
+			codes.InvalidArgument,
+			"account destination id must be different from account origin id")
 	}
 
 	input := transfer.NewTransferInput(
@@ -87,18 +91,18 @@ func (s Server) CreateTransfer(ctx context.Context, request *proto.CreateTransfe
 	err = s.transferUsecase.CreateTransfer(ctx, input)
 	if err != nil {
 		if errors.Is(err, entities.ErrAccountDoesNotExist) {
-			return nil, status.Error(codes.NotFound, "account origin does not exist")
+			return nil, status.Errorf(codes.NotFound, "account origin does not exist")
 		}
 
 		if errors.Is(err, entities.ErrAccountDestinationDoesNotExist) {
-			return nil, status.Error(codes.NotFound, "account destination does not exist")
+			return nil, status.Errorf(codes.NotFound, "account destination does not exist")
 		}
 
 		if errors.Is(err, entities.ErrInsufficientFunds) {
-			return nil, status.Error(codes.InvalidArgument, "insufficient funds")
+			return nil, status.Errorf(codes.InvalidArgument, "insufficient funds")
 		}
 
-		return nil, status.Error(codes.Internal, "internal server error")
+		return nil, status.Errorf(codes.Internal, "internal server error")
 	}
 
 	return &proto.CreateTransferResponse{}, nil
