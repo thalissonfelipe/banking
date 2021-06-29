@@ -100,13 +100,14 @@ func main() {
 		log.Fatalf("Failed to setup tls: %v", err)
 	}
 
-	lis, err := net.Listen("tcp", ":9000")
+	lis, err := net.Listen("tcp", "127.0.0.1:9000")
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
 
 	acc := entities.NewAccount("Felipe", testdata.GetValidCPF(), testdata.GetValidSecret())
-	acc.Balance = 1000
+	amount := 100
+	acc.Balance = amount
 	accRepo := &InMemoryAccountDatabase{Accounts: []entities.Account{acc}}
 	trRepo := &InMemoryTransferDatabase{}
 	enc := &InMemoryEncrypter{}
