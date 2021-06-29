@@ -23,6 +23,7 @@ import "google/protobuf/timestamp.proto";
 service BankingService {
   rpc GetAccounts(ListAccountsRequest) returns (ListAccountsResponse) {};
   rpc GetAccountBalance(GetAccountBalanceRequest) returns (GetAccountBalanceResponse) {};
+  rpc CreateAccount(CreateAccountRequest) returns (CreateAccountResponse) {};
 }
 
 message ListAccountsRequest {}
@@ -45,4 +46,14 @@ message Account {
     string cpf = 3;
     int64 balance = 4;
     google.protobuf.Timestamp created_at = 5;
+}
+
+message CreateAccountRequest {
+    string name = 1;
+    string cpf = 2;
+    string secret = 3;
+}
+
+message CreateAccountResponse {
+    string id = 1;
 }
