@@ -3,11 +3,12 @@ package grpc
 import (
 	"context"
 
-	"github.com/thalissonfelipe/banking/pkg/services/auth"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
+
+	"github.com/thalissonfelipe/banking/pkg/services/auth"
 )
 
 // jwtMethods is an array of methods that need authentication validation.

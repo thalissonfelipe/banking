@@ -16,7 +16,7 @@ import (
 )
 
 func (s Server) GetAccounts(ctx context.Context, _ *proto.ListAccountsRequest) (*proto.ListAccountsResponse, error) {
-	accounts, err := s.usecase.ListAccounts(ctx)
+	accounts, err := s.accountUsecase.ListAccounts(ctx)
 	if err != nil {
 		return nil, status.Error(codes.Internal, "internal server error")
 	}
@@ -24,7 +24,7 @@ func (s Server) GetAccounts(ctx context.Context, _ *proto.ListAccountsRequest) (
 	var response []*proto.Account
 
 	for _, acc := range accounts {
-		response = append(response, domainToGRPC(acc))
+		response = append(response, domainAccountToGRPC(acc))
 	}
 
 	return &proto.ListAccountsResponse{Accounts: response}, nil
@@ -36,7 +36,7 @@ func (s Server) GetAccountBalance(ctx context.Context, request *proto.GetAccount
 		return nil, status.Error(codes.InvalidArgument, "invalid account id")
 	}
 
-	balance, err := s.usecase.GetAccountBalanceByID(ctx, vos.AccountID(accountID))
+	balance, err := s.accountUsecase.GetAccountBalanceByID(ctx, vos.AccountID(accountID))
 	if err != nil {
 		if errors.Is(err, entities.ErrAccountDoesNotExist) {
 			return nil, status.Error(codes.NotFound, "account does not exist")
@@ -74,7 +74,7 @@ func (s Server) CreateAccount(ctx context.Context, request *proto.CreateAccountR
 
 	input := account.NewCreateAccountInput(request.Name, cpf, secret)
 
-	account, err := s.usecase.CreateAccount(ctx, input)
+	account, err := s.accountUsecase.CreateAccount(ctx, input)
 	if err != nil {
 		if errors.Is(err, entities.ErrAccountAlreadyExists) {
 			return nil, status.Error(codes.AlreadyExists, "account already exists")
@@ -86,7 +86,7 @@ func (s Server) CreateAccount(ctx context.Context, request *proto.CreateAccountR
 	return &proto.CreateAccountResponse{Id: account.ID.String()}, nil
 }
 
-func domainToGRPC(account entities.Account) *proto.Account {
+func domainAccountToGRPC(account entities.Account) *proto.Account {
 	return &proto.Account{
 		Id:        account.ID.String(),
 		Name:      account.Name,
