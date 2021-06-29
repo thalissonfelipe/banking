@@ -5,16 +5,25 @@ import (
 
 	"github.com/google/uuid"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/thalissonfelipe/banking/pkg/domain/entities"
 	"github.com/thalissonfelipe/banking/pkg/domain/vos"
+	"github.com/thalissonfelipe/banking/pkg/services/auth"
 	proto "github.com/thalissonfelipe/banking/proto/banking"
 )
 
-func (s Server) GetTransfers(ctx context.Context, request *proto.ListTransfersRequest) (*proto.ListTransfersResponse, error) {
-	accountID, err := uuid.Parse(request.AccountId)
+func (s Server) GetTransfers(ctx context.Context, _ *proto.ListTransfersRequest) (*proto.ListTransfersResponse, error) {
+	meta, ok := metadata.FromIncomingContext(ctx)
+	if !ok {
+		return nil, status.Error(codes.Unauthenticated, "missing context metadata")
+	}
+
+	token := meta["authorization"][0]
+
+	accountID, err := uuid.Parse(auth.GetIDFromToken(token))
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid account id")
 	}
