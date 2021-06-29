@@ -45,6 +45,18 @@ func (s Server) GetTransfers(ctx context.Context, _ *proto.ListTransfersRequest)
 }
 
 func (s Server) CreateTransfer(ctx context.Context, request *proto.CreateTransferRequest) (*proto.CreateTransferResponse, error) {
+	if request.AccountDestinationId == "" {
+		return nil, status.Error(codes.InvalidArgument, "missing account destination id parameter")
+	}
+
+	if request.Amount == 0 {
+		return nil, status.Error(codes.InvalidArgument, "missing amount parameter")
+	}
+
+	if request.Amount < 0 {
+		return nil, status.Error(codes.InvalidArgument, "amount must be bigger than 0")
+	}
+
 	meta, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
 		return nil, status.Error(codes.Unauthenticated, "missing context metadata")
