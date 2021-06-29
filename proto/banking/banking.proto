@@ -28,6 +28,7 @@ service BankingService {
   rpc Login(LoginRequest) returns (LoginResponse) {};
 
   rpc GetTransfers(ListTransfersRequest) returns (ListTransfersResponse) {};
+  rpc CreateTransfer(CreateTransferRequest) returns (CreateTransferResponse) {};
 }
 
 message ListAccountsRequest {}
@@ -83,3 +84,10 @@ message Transfer {
     int64 amount = 3;
     google.protobuf.Timestamp created_at = 4;
 }
+
+message CreateTransferRequest {
+    string account_destination_id = 1;
+    int64 amount = 2;
+}
+
+message CreateTransferResponse {}
