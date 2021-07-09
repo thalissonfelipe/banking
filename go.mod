@@ -13,6 +13,7 @@ require (
 	github.com/go-openapi/spec v0.20.3 // indirect
 	github.com/go-openapi/swag v0.19.15 // indirect
 	github.com/golang-migrate/migrate/v4 v4.14.1
+	github.com/golang/protobuf v1.5.2
 	github.com/google/uuid v1.2.0
 	github.com/gotestyourself/gotestyourself v1.3.0 // indirect
 	github.com/jackc/pgconn v1.8.1
@@ -30,7 +31,9 @@ require (
 	github.com/swaggo/swag v1.7.0
 	github.com/urfave/cli/v2 v2.3.0
 	golang.org/x/crypto v0.0.0-20210513164829-c07d793c2f9a
-	golang.org/x/net v0.0.0-20210525063256-abc453219eb5 // indirect
-	golang.org/x/sys v0.0.0-20210601080250-7ecdf8ef093b // indirect
-	golang.org/x/tools v0.1.2 // indirect
+	golang.org/x/net v0.0.0-20210614182718-04defd469f4e // indirect
+	golang.org/x/sys v0.0.0-20210616094352-59db8d763f22 // indirect
+	google.golang.org/genproto v0.0.0-20210624195500-8bfb893ecb84 // indirect
+	google.golang.org/grpc v1.38.0
+	google.golang.org/protobuf v1.27.1
 )
