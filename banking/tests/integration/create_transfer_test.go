@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/thalissonfelipe/banking/banking/domain/vos"
-	"github.com/thalissonfelipe/banking/banking/gateways/http/transfer/schemes"
+	"github.com/thalissonfelipe/banking/banking/gateway/http/transfer/schemes"
 	"github.com/thalissonfelipe/banking/banking/tests/dockertest"
 	"github.com/thalissonfelipe/banking/banking/tests/fakes"
 	"github.com/thalissonfelipe/banking/banking/tests/testdata"

@@ -8,7 +8,7 @@ import (
 	"github.com/urfave/cli/v2"
 
 	"github.com/thalissonfelipe/banking/banking/config"
-	"github.com/thalissonfelipe/banking/banking/gateways/db/postgres"
+	"github.com/thalissonfelipe/banking/banking/gateway/db/postgres"
 )
 
 func main() {

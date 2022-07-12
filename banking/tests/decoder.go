@@ -7,7 +7,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/thalissonfelipe/banking/banking/gateways/http/rest"
+	"github.com/thalissonfelipe/banking/banking/gateway/http/rest"
 )
 
 type Decoder interface {

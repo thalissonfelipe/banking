@@ -9,8 +9,8 @@ import (
 	"github.com/jackc/pgx/v4"
 
 	"github.com/thalissonfelipe/banking/banking/config"
-	"github.com/thalissonfelipe/banking/banking/gateways/db/postgres"
-	h "github.com/thalissonfelipe/banking/banking/gateways/http"
+	"github.com/thalissonfelipe/banking/banking/gateway/db/postgres"
+	h "github.com/thalissonfelipe/banking/banking/gateway/http"
 	_ "github.com/thalissonfelipe/banking/docs/swagger"
 )
 

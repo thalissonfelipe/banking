@@ -12,7 +12,7 @@ import (
 	"github.com/thalissonfelipe/banking/banking/domain/entities"
 	trUsecase "github.com/thalissonfelipe/banking/banking/domain/transfer/usecase"
 	"github.com/thalissonfelipe/banking/banking/domain/vos"
-	grpcServer "github.com/thalissonfelipe/banking/banking/gateways/grpc"
+	grpcServer "github.com/thalissonfelipe/banking/banking/gateway/grpc"
 	"github.com/thalissonfelipe/banking/banking/services/auth"
 	"github.com/thalissonfelipe/banking/banking/tests/testdata"
 	proto "github.com/thalissonfelipe/banking/proto/banking"

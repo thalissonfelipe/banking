@@ -12,7 +12,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/thalissonfelipe/banking/banking/gateways/http/auth/schemes"
+	"github.com/thalissonfelipe/banking/banking/gateway/http/auth/schemes"
 	"github.com/thalissonfelipe/banking/banking/tests/testenv"
 )
 
