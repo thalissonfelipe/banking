@@ -8,13 +8,13 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 
-	accUsecase "github.com/thalissonfelipe/banking/pkg/domain/account/usecase"
-	"github.com/thalissonfelipe/banking/pkg/domain/entities"
-	trUsecase "github.com/thalissonfelipe/banking/pkg/domain/transfer/usecase"
-	"github.com/thalissonfelipe/banking/pkg/domain/vos"
-	grpcServer "github.com/thalissonfelipe/banking/pkg/gateways/grpc"
-	"github.com/thalissonfelipe/banking/pkg/services/auth"
-	"github.com/thalissonfelipe/banking/pkg/tests/testdata"
+	accUsecase "github.com/thalissonfelipe/banking/banking/domain/account/usecase"
+	"github.com/thalissonfelipe/banking/banking/domain/entities"
+	trUsecase "github.com/thalissonfelipe/banking/banking/domain/transfer/usecase"
+	"github.com/thalissonfelipe/banking/banking/domain/vos"
+	grpcServer "github.com/thalissonfelipe/banking/banking/gateways/grpc"
+	"github.com/thalissonfelipe/banking/banking/services/auth"
+	"github.com/thalissonfelipe/banking/banking/tests/testdata"
 	proto "github.com/thalissonfelipe/banking/proto/banking"
 )
 

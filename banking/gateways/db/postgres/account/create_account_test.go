@@ -1,0 +1,40 @@
+package account
+
+import (
+	"context"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+
+	"github.com/thalissonfelipe/banking/banking/domain/entities"
+	"github.com/thalissonfelipe/banking/banking/tests/testdata"
+)
+
+func TestRepository_CreateAccount(t *testing.T) {
+	db := pgDocker.DB
+	r := NewRepository(db)
+	ctx := context.Background()
+
+	acc := entities.NewAccount(
+		"Maria",
+		testdata.GetValidCPF(),
+		testdata.GetValidSecret(),
+	)
+
+	assert.Empty(t, acc.CreatedAt)
+
+	err := r.CreateAccount(ctx, &acc)
+	assert.NoError(t, err)
+	assert.NotEmpty(t, acc.CreatedAt)
+
+	// Should return an error if cpf already exists
+	err = r.CreateAccount(ctx, &acc)
+	assert.Equal(t, err, entities.ErrAccountAlreadyExists)
+
+	account, err := r.GetAccountByID(ctx, acc.ID)
+
+	assert.NoError(t, err)
+	assert.Equal(t, acc.Name, account.Name)
+	assert.Equal(t, acc.CPF, account.CPF)
+	assert.Equal(t, acc.Balance, account.Balance)
+}

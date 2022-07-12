@@ -8,10 +8,10 @@ import (
 
 	"github.com/jackc/pgx/v4"
 
+	"github.com/thalissonfelipe/banking/banking/config"
+	"github.com/thalissonfelipe/banking/banking/gateways/db/postgres"
+	h "github.com/thalissonfelipe/banking/banking/gateways/http"
 	_ "github.com/thalissonfelipe/banking/docs/swagger"
-	"github.com/thalissonfelipe/banking/pkg/config"
-	"github.com/thalissonfelipe/banking/pkg/gateways/db/postgres"
-	h "github.com/thalissonfelipe/banking/pkg/gateways/http"
 )
 
 // @title Swagger Banking API

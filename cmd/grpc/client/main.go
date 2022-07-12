@@ -10,7 +10,7 @@ import (
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/metadata"
 
-	"github.com/thalissonfelipe/banking/pkg/tests/testdata"
+	"github.com/thalissonfelipe/banking/banking/tests/testdata"
 	proto "github.com/thalissonfelipe/banking/proto/banking"
 )
 
