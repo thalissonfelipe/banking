@@ -8,10 +8,10 @@ import (
 
 func TestNewSecret(t *testing.T) {
 	testCases := []struct {
-		name           string
-		secret         string
-		expectedSecret string
-		expectedErr    error
+		name    string
+		secret  string
+		want    string
+		wantErr error
 	}{
 		{"secret must be valid", "aZ1234Ds", "aZ1234Ds", nil},
 		{"secret without uppercase characters", "az1234ds", "", ErrInvalidSecret},
@@ -24,9 +24,8 @@ func TestNewSecret(t *testing.T) {
 	for _, tt := range testCases {
 		t.Run(tt.name, func(t *testing.T) {
 			secret, err := NewSecret(tt.secret)
-
-			assert.Equal(t, tt.expectedSecret, secret.String())
-			assert.Equal(t, tt.expectedErr, err)
+			assert.ErrorIs(t, err, tt.wantErr)
+			assert.Equal(t, tt.want, secret.String())
 		})
 	}
 }

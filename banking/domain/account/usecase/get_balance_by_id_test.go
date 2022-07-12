@@ -13,9 +13,7 @@ import (
 )
 
 func TestUsecase_GetBalanceByAccountID(t *testing.T) {
-	accBalanceDefault := entities.NewAccount("Piter", testdata.GetValidCPF(), testdata.GetValidSecret())
-	accBalance100 := entities.NewAccount("Piter", testdata.GetValidCPF(), testdata.GetValidSecret())
-	accBalance100.Balance = 100
+	acc := entities.NewAccount("Piter", testdata.GetValidCPF(), testdata.GetValidSecret())
 
 	testCases := []struct {
 		name        string
@@ -25,11 +23,11 @@ func TestUsecase_GetBalanceByAccountID(t *testing.T) {
 		expectedErr error
 	}{
 		{
-			name: "should return a default balance",
+			name: "should return a balance successfully",
 			repoSetup: &mocks.AccountRepositoryMock{
-				Accounts: []entities.Account{accBalanceDefault},
+				Accounts: []entities.Account{acc},
 			},
-			accountID:   accBalanceDefault.ID,
+			accountID:   acc.ID,
 			expected:    entities.DefaultBalance,
 			expectedErr: nil,
 		},
@@ -39,15 +37,6 @@ func TestUsecase_GetBalanceByAccountID(t *testing.T) {
 			accountID:   vos.NewAccountID(),
 			expected:    entities.DefaultBalance,
 			expectedErr: entities.ErrAccountDoesNotExist,
-		},
-		{
-			name: "should return correct balance when balance is not default",
-			repoSetup: &mocks.AccountRepositoryMock{
-				Accounts: []entities.Account{accBalance100},
-			},
-			accountID:   accBalance100.ID,
-			expected:    100,
-			expectedErr: nil,
 		},
 	}
 

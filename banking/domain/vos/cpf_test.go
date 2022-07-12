@@ -8,10 +8,10 @@ import (
 
 func TestNewCPF(t *testing.T) {
 	testCases := []struct {
-		name        string
-		cpf         string
-		expectedCPF string
-		expectedErr error
+		name    string
+		cpf     string
+		want    string
+		wantErr error
 	}{
 		{"cpf must be valid #1", "648.446.967-93", "64844696793", nil},
 		{"cpf must be valid #2", "626.413.228-46", "62641322846", nil},
@@ -28,9 +28,8 @@ func TestNewCPF(t *testing.T) {
 	for _, tt := range testCases {
 		t.Run(tt.name, func(t *testing.T) {
 			cpf, err := NewCPF(tt.cpf)
-
-			assert.Equal(t, tt.expectedCPF, cpf.String())
-			assert.Equal(t, tt.expectedErr, err)
+			assert.ErrorIs(t, err, tt.wantErr)
+			assert.Equal(t, tt.want, cpf.String())
 		})
 	}
 }

@@ -14,7 +14,7 @@ select id, name, cpf, balance, created_at from accounts
 func (r Repository) GetAccounts(ctx context.Context) ([]entities.Account, error) {
 	rows, err := r.db.Query(ctx, getAccountsQuery)
 	if err != nil {
-		return nil, fmt.Errorf("unexpected error occurred on get accounts query: %w", err)
+		return nil, fmt.Errorf("db.Query: %w", err)
 	}
 	defer rows.Close()
 
@@ -31,14 +31,14 @@ func (r Repository) GetAccounts(ctx context.Context) ([]entities.Account, error)
 			&account.CreatedAt,
 		)
 		if err != nil {
-			return nil, fmt.Errorf("unexpected error occurred while scanning rows: %w", err)
+			return nil, fmt.Errorf("rows.Scan: %w", err)
 		}
 
 		accounts = append(accounts, account)
 	}
 
 	if err = rows.Err(); err != nil {
-		return nil, fmt.Errorf("unexpected error occurred while scanning rows: %w", err)
+		return nil, fmt.Errorf("rows.Scan: %w", err)
 	}
 
 	return accounts, nil

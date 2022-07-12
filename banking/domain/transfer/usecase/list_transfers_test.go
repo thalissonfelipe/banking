@@ -16,10 +16,10 @@ func TestUsecase_ListTransfers(t *testing.T) {
 	accountOriginID := vos.NewAccountID()
 
 	testCases := []struct {
-		name        string
-		repoSetup   func() *mocks.TransferRepositoryMock
-		accountID   vos.AccountID
-		expectedErr error
+		name      string
+		repoSetup func() *mocks.TransferRepositoryMock
+		accountID vos.AccountID
+		wantErr   bool
 	}{
 		{
 			name: "should return a list of transfers",
@@ -34,8 +34,8 @@ func TestUsecase_ListTransfers(t *testing.T) {
 					Transfers: []entities.Transfer{transfer},
 				}
 			},
-			accountID:   accountOriginID,
-			expectedErr: nil,
+			accountID: accountOriginID,
+			wantErr:   false,
 		},
 		{
 			name: "should return an error if something went wrong on repository",
@@ -44,8 +44,8 @@ func TestUsecase_ListTransfers(t *testing.T) {
 					Err: testdata.ErrRepositoryFailsToFetch,
 				}
 			},
-			accountID:   accountOriginID,
-			expectedErr: entities.ErrInternalError,
+			accountID: accountOriginID,
+			wantErr:   true,
 		},
 	}
 
@@ -56,7 +56,7 @@ func TestUsecase_ListTransfers(t *testing.T) {
 			_, err := usecase.ListTransfers(ctx, tt.accountID)
 
 			// TODO: add result validation
-			assert.Equal(t, err, tt.expectedErr)
+			assert.Equal(t, tt.wantErr, err != nil)
 		})
 	}
 }

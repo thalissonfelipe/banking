@@ -5,37 +5,43 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/thalissonfelipe/banking/banking/domain/entities"
 	"github.com/thalissonfelipe/banking/banking/tests/dockertest"
 	"github.com/thalissonfelipe/banking/banking/tests/testdata"
 )
 
-func TestRepository_GetAccountByCPF(t *testing.T) {
-	db := pgDocker.DB
-	r := NewRepository(db)
-	ctx := context.Background()
+func TestAccountRepository_GetAccountByCPF(t *testing.T) {
+	t.Run("should get account by cpf successfully", func(t *testing.T) {
+		db := pgDocker.DB
+		r := NewRepository(db)
+		ctx := context.Background()
 
-	defer dockertest.TruncateTables(ctx, db)
+		defer dockertest.TruncateTables(ctx, db)
 
-	_, err := r.GetAccountByCPF(ctx, testdata.GetValidCPF())
+		account := entities.NewAccount("name", testdata.GetValidCPF(), testdata.GetValidSecret())
 
-	assert.Equal(t, entities.ErrAccountDoesNotExist, err)
+		err := r.CreateAccount(ctx, &account)
+		require.NoError(t, err)
 
-	acc := entities.NewAccount(
-		"Maria",
-		testdata.GetValidCPF(),
-		testdata.GetValidSecret(),
-	)
+		got, err := r.GetAccountByCPF(ctx, account.CPF)
+		require.NoError(t, err)
 
-	err = r.CreateAccount(ctx, &acc)
-	assert.NoError(t, err)
+		assert.Equal(t, account.ID, got.ID)
+		assert.Equal(t, account.Name, got.Name)
+		assert.Equal(t, account.CPF, got.CPF)
+		assert.Equal(t, account.Balance, got.Balance)
+		assert.Equal(t, account.CreatedAt, got.CreatedAt)
+	})
 
-	got, err := r.GetAccountByCPF(ctx, acc.CPF)
-	assert.NoError(t, err)
-	assert.Equal(t, acc.ID, got.ID)
-	assert.Equal(t, acc.Name, got.Name)
-	assert.Equal(t, acc.CPF, got.CPF)
-	assert.Equal(t, acc.Balance, got.Balance)
-	assert.Equal(t, acc.CreatedAt, got.CreatedAt)
+	t.Run("should return an error if account does not exist", func(t *testing.T) {
+		db := pgDocker.DB
+		r := NewRepository(db)
+		ctx := context.Background()
+
+		account, err := r.GetAccountByCPF(ctx, testdata.GetValidCPF())
+		assert.ErrorIs(t, err, entities.ErrAccountDoesNotExist)
+		assert.Zero(t, account)
+	})
 }

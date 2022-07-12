@@ -25,18 +25,18 @@ func (r Repository) CreateAccount(ctx context.Context, account *entities.Account
 		account.Secret.String(),
 		account.Balance,
 	).Scan(&account.CreatedAt)
-	if err == nil {
-		return nil
+	if err != nil {
+		var pgErr *pgconn.PgError
+		if !errors.As(err, &pgErr) {
+			return fmt.Errorf("db.QueryRow.Scan: %w", err)
+		}
+
+		if pgErr.Code == pgerrcode.UniqueViolation {
+			return entities.ErrAccountAlreadyExists
+		}
+
+		return fmt.Errorf("db.QueryRow.Scan: %w", err)
 	}
 
-	var pgErr *pgconn.PgError
-	if !errors.As(err, &pgErr) {
-		return fmt.Errorf("unexpected error occurred on insert account query: %w", err)
-	}
-
-	if pgErr.Code == pgerrcode.UniqueViolation {
-		return entities.ErrAccountAlreadyExists
-	}
-
-	return fmt.Errorf("unexpected error occurred on insert account query: %w", err)
+	return nil
 }

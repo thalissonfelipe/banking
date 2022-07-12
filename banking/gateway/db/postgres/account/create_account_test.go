@@ -3,38 +3,51 @@ package account
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/thalissonfelipe/banking/banking/domain/entities"
+	"github.com/thalissonfelipe/banking/banking/tests/dockertest"
 	"github.com/thalissonfelipe/banking/banking/tests/testdata"
 )
 
-func TestRepository_CreateAccount(t *testing.T) {
-	db := pgDocker.DB
-	r := NewRepository(db)
-	ctx := context.Background()
+func TestAccountRepository_CreateAccount(t *testing.T) {
+	t.Run("should create an account successfully", func(t *testing.T) {
+		db := pgDocker.DB
+		r := NewRepository(db)
+		ctx := context.Background()
 
-	acc := entities.NewAccount(
-		"Maria",
-		testdata.GetValidCPF(),
-		testdata.GetValidSecret(),
-	)
+		defer dockertest.TruncateTables(ctx, db)
 
-	assert.Empty(t, acc.CreatedAt)
+		newAccount := entities.NewAccount("name", testdata.GetValidCPF(), testdata.GetValidSecret())
 
-	err := r.CreateAccount(ctx, &acc)
-	assert.NoError(t, err)
-	assert.NotEmpty(t, acc.CreatedAt)
+		err := r.CreateAccount(ctx, &newAccount)
+		require.NoError(t, err)
+		assert.True(t, newAccount.CreatedAt.Before(time.Now()))
 
-	// Should return an error if cpf already exists
-	err = r.CreateAccount(ctx, &acc)
-	assert.Equal(t, err, entities.ErrAccountAlreadyExists)
+		acc, err := r.GetAccountByID(ctx, newAccount.ID)
+		require.NoError(t, err)
 
-	account, err := r.GetAccountByID(ctx, acc.ID)
+		assert.Equal(t, newAccount.ID, acc.ID)
+		assert.Equal(t, newAccount.Name, acc.Name)
+		assert.Equal(t, newAccount.CPF, acc.CPF)
+		assert.Equal(t, newAccount.Balance, acc.Balance)
+		assert.Equal(t, newAccount.Secret, acc.Secret)
+	})
 
-	assert.NoError(t, err)
-	assert.Equal(t, acc.Name, account.Name)
-	assert.Equal(t, acc.CPF, account.CPF)
-	assert.Equal(t, acc.Balance, account.Balance)
+	t.Run("should return an error if account already exists", func(t *testing.T) {
+		db := pgDocker.DB
+		r := NewRepository(db)
+		ctx := context.Background()
+
+		acc := entities.NewAccount("name", testdata.GetValidCPF(), testdata.GetValidSecret())
+
+		err := r.CreateAccount(ctx, &acc)
+		require.NoError(t, err)
+
+		err = r.CreateAccount(ctx, &acc)
+		assert.ErrorIs(t, err, entities.ErrAccountAlreadyExists)
+	})
 }

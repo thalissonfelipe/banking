@@ -2,7 +2,6 @@ package usecase
 
 import (
 	"context"
-	"errors"
 	"fmt"
 
 	"github.com/thalissonfelipe/banking/banking/domain/account"
@@ -12,18 +11,14 @@ import (
 func (a Account) CreateAccount(ctx context.Context, input account.CreateAccountInput) (*entities.Account, error) {
 	err := input.Secret.Hash(a.encrypter)
 	if err != nil {
-		return nil, entities.ErrInternalError
+		return nil, fmt.Errorf("hashing secret: %w", err)
 	}
 
 	acc := entities.NewAccount(input.Name, input.CPF, input.Secret)
 
 	err = a.repository.CreateAccount(ctx, &acc)
 	if err != nil {
-		if errors.Is(err, entities.ErrAccountAlreadyExists) {
-			return nil, fmt.Errorf("account already exists: %w", err)
-		}
-
-		return nil, entities.ErrInternalError
+		return nil, fmt.Errorf("creating account: %w", err)
 	}
 
 	return &acc, nil

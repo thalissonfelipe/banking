@@ -19,12 +19,12 @@ func GetMigrationHandler(dbURL string) (*migrate.Migrate, error) {
 	// (see https://github.com/golang-migrate/migrate/issues/480#issuecomment-731518493)
 	source, err := httpfs.New(http.FS(migrations), "migrations")
 	if err != nil {
-		return nil, fmt.Errorf("could not create a migrate source driver from httpfs: %w", err)
+		return nil, fmt.Errorf("creating migrate source driver from httpfs: %w", err)
 	}
 
 	m, err := migrate.NewWithSourceInstance("httpfs", source, dbURL)
 	if err != nil {
-		return nil, fmt.Errorf("could not create a migrate instance: %w", err)
+		return nil, fmt.Errorf("creating migrate instance: %w", err)
 	}
 
 	return m, nil
@@ -38,7 +38,7 @@ func RunMigrations(dbURL string) error {
 	defer m.Close()
 
 	if err := m.Up(); err != nil && !errors.Is(err, migrate.ErrNoChange) {
-		return fmt.Errorf("could not apply up migrations: %w", err)
+		return fmt.Errorf("applying up migrations: %w", err)
 	}
 
 	return nil

@@ -70,5 +70,5 @@ func (c *CPF) Scan(value interface{}) error {
 		}
 	}
 
-	return fmt.Errorf("could not scan cpf: %w", err)
+	return fmt.Errorf("scan cpf: %w", err)
 }

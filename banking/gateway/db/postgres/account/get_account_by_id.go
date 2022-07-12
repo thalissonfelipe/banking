@@ -28,13 +28,13 @@ func (r Repository) GetAccountByID(ctx context.Context, id vos.AccountID) (entit
 		&account.Balance,
 		&account.CreatedAt,
 	)
-	if err == nil {
-		return account, nil
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return entities.Account{}, entities.ErrAccountDoesNotExist
+		}
+
+		return entities.Account{}, fmt.Errorf("db.QueryRow.Scan: %w", err)
 	}
 
-	if errors.Is(err, pgx.ErrNoRows) {
-		return entities.Account{}, entities.ErrAccountDoesNotExist
-	}
-
-	return entities.Account{}, fmt.Errorf("unexpected error occurred on get account by id query: %w", err)
+	return account, nil
 }

@@ -17,7 +17,7 @@ where account_origin_id=$1
 func (r Repository) GetTransfers(ctx context.Context, id vos.AccountID) ([]entities.Transfer, error) {
 	rows, err := r.db.Query(ctx, getTransfersQuery, id)
 	if err != nil {
-		return nil, fmt.Errorf("unexpected error occurred on get transfers query: %w", err)
+		return nil, fmt.Errorf("db.Query: %w", err)
 	}
 	defer rows.Close()
 
@@ -34,14 +34,14 @@ func (r Repository) GetTransfers(ctx context.Context, id vos.AccountID) ([]entit
 			&account.CreatedAt,
 		)
 		if err != nil {
-			return nil, fmt.Errorf("unexpected error occurred while scanning rows: %w", err)
+			return nil, fmt.Errorf("rows.Scan: %w", err)
 		}
 
 		transfers = append(transfers, account)
 	}
 
 	if err = rows.Err(); err != nil {
-		return nil, fmt.Errorf("unexpected error occurred while scanning rows: %w", err)
+		return nil, fmt.Errorf("rows.Scan: %w", err)
 	}
 
 	return transfers, nil

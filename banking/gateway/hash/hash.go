@@ -11,7 +11,7 @@ type Hash struct{}
 func (h Hash) Hash(secret string) ([]byte, error) {
 	hashedSecret, err := bcrypt.GenerateFromPassword([]byte(secret), bcrypt.DefaultCost)
 	if err != nil {
-		return nil, fmt.Errorf("could not hash secret: %w", err)
+		return nil, fmt.Errorf("generating hash from password: %w", err)
 	}
 
 	return hashedSecret, nil
@@ -20,7 +20,7 @@ func (h Hash) Hash(secret string) ([]byte, error) {
 func (h Hash) CompareHashAndSecret(hashedSecret, secret []byte) error {
 	err := bcrypt.CompareHashAndPassword(hashedSecret, secret)
 	if err != nil {
-		return fmt.Errorf("could not compare hash and secret: %w", err)
+		return fmt.Errorf("comparing hash and password: %w", err)
 	}
 
 	return nil

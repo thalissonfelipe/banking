@@ -36,16 +36,7 @@ func TestUsecase_CreateAccount(t *testing.T) {
 			expectedErr: nil,
 		},
 		{
-			name: "should return an error if repository fails to fetch account",
-			repoSetup: func() *mocks.AccountRepositoryMock {
-				return &mocks.AccountRepositoryMock{Err: testdata.ErrRepositoryFailsToFetch}
-			},
-			encSetup:    &mocks.HashMock{},
-			input:       validInput,
-			expectedErr: entities.ErrInternalError,
-		},
-		{
-			name: "should return an error if cpf already exists",
+			name: "should return an error if account already exists",
 			repoSetup: func() *mocks.AccountRepositoryMock {
 				acc := entities.NewAccount(validInput.Name, validInput.CPF, validInput.Secret)
 
@@ -56,15 +47,6 @@ func TestUsecase_CreateAccount(t *testing.T) {
 			input:       validInput,
 			encSetup:    &mocks.HashMock{},
 			expectedErr: entities.ErrAccountAlreadyExists,
-		},
-		{
-			name: "should return an error if hash secret fails",
-			repoSetup: func() *mocks.AccountRepositoryMock {
-				return &mocks.AccountRepositoryMock{}
-			},
-			input:       validInput,
-			encSetup:    &mocks.HashMock{Err: testdata.ErrHashFails},
-			expectedErr: entities.ErrInternalError,
 		},
 	}
 

@@ -81,13 +81,13 @@ func (s *Secret) Scan(value interface{}) error {
 		}
 	}
 
-	return fmt.Errorf("could not scan secret: %w", err)
+	return fmt.Errorf("scan secret: %w", err)
 }
 
 func (s *Secret) Hash(encrypter encrypter.Encrypter) error {
 	hashedSecret, err := encrypter.Hash(s.value)
 	if err != nil {
-		return fmt.Errorf("could not encrypt secret: %w", err)
+		return fmt.Errorf("hashing secret: %w", err)
 	}
 
 	s.value = string(hashedSecret)

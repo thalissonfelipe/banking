@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"golang.org/x/crypto/bcrypt"
 
 	"github.com/thalissonfelipe/banking/banking/domain/account/usecase"
 	"github.com/thalissonfelipe/banking/banking/domain/entities"
@@ -40,25 +41,18 @@ func TestAuthenticate(t *testing.T) {
 			expectedErr: vos.ErrInvalidCPF,
 		},
 		{
-			name:        "should return an error if usecase fails to fetch account",
-			repo:        &mocks.AccountRepositoryMock{Err: testdata.ErrRepositoryFailsToFetch},
-			enc:         &mocks.HashMock{},
-			input:       AuthenticateInput{CPF: cpf.String(), Secret: secret.String()},
-			expectedErr: entities.ErrInternalError,
-		},
-		{
 			name: "should return an error if secret does not match",
 			repo: &mocks.AccountRepositoryMock{
 				Accounts: []entities.Account{
 					entities.NewAccount("Pedro", cpf, secret),
 				},
 			},
-			enc:         &mocks.HashMock{Err: ErrInvalidCredentials},
+			enc:         &mocks.HashMock{Err: bcrypt.ErrMismatchedHashAndPassword},
 			input:       AuthenticateInput{CPF: cpf.String(), Secret: secret.String()},
 			expectedErr: ErrInvalidCredentials,
 		},
 		{
-			name: "should return nil if authenticated succeeds",
+			name: "should return no error if authenticated succeeds",
 			repo: &mocks.AccountRepositoryMock{
 				Accounts: []entities.Account{
 					entities.NewAccount("Pedro", cpf, secret),

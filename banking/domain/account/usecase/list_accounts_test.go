@@ -15,35 +15,34 @@ func TestUsecase_ListAccounts(t *testing.T) {
 	acc := entities.NewAccount("Piter", testdata.GetValidCPF(), testdata.GetValidSecret())
 
 	testCases := []struct {
-		name        string
-		repoSetup   *mocks.AccountRepositoryMock
-		expected    []entities.Account
-		expectedErr error
+		name      string
+		repoSetup *mocks.AccountRepositoryMock
+		want      []entities.Account
+		wantErr   bool
 	}{
 		{
 			name: "should return a list of accounts",
 			repoSetup: &mocks.AccountRepositoryMock{
 				Accounts: []entities.Account{acc},
 			},
-			expected:    []entities.Account{acc},
-			expectedErr: nil,
+			want:    []entities.Account{acc},
+			wantErr: false,
 		},
 		{
-			name:        "should return an error if something went wrong on repository",
-			repoSetup:   &mocks.AccountRepositoryMock{Err: testdata.ErrRepositoryFailsToFetch},
-			expected:    nil,
-			expectedErr: entities.ErrInternalError,
+			name:      "should return an error if something went wrong on repository",
+			repoSetup: &mocks.AccountRepositoryMock{Err: assert.AnError},
+			want:      nil,
+			wantErr:   true,
 		},
 	}
 
 	for _, tt := range testCases {
 		t.Run(tt.name, func(t *testing.T) {
-			ctx := context.Background()
 			usecase := NewAccountUsecase(tt.repoSetup, nil)
-			result, err := usecase.ListAccounts(ctx)
 
-			assert.Equal(t, tt.expected, result)
-			assert.ErrorIs(t, err, tt.expectedErr)
+			accounts, err := usecase.ListAccounts(context.Background())
+			assert.Equal(t, tt.wantErr, err != nil)
+			assert.Equal(t, tt.want, accounts)
 		})
 	}
 }

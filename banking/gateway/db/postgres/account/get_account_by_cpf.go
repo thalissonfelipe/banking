@@ -28,13 +28,13 @@ func (r Repository) GetAccountByCPF(ctx context.Context, cpf vos.CPF) (entities.
 		&account.Balance,
 		&account.CreatedAt,
 	)
-	if err == nil {
-		return account, nil
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return entities.Account{}, entities.ErrAccountDoesNotExist
+		}
+
+		return entities.Account{}, fmt.Errorf("db.QueryRow.Scan: %w", err)
 	}
 
-	if errors.Is(err, pgx.ErrNoRows) {
-		return entities.Account{}, entities.ErrAccountDoesNotExist
-	}
-
-	return entities.Account{}, fmt.Errorf("unexpected error occurred on get account by cpf query: %w", err)
+	return account, nil
 }

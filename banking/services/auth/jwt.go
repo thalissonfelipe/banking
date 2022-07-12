@@ -1,11 +1,10 @@
 package auth
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
-
-	"github.com/thalissonfelipe/banking/banking/domain/entities"
 )
 
 var (
@@ -30,7 +29,7 @@ func NewToken(accountOriginID string) (string, error) {
 
 	tokenString, err := token.SignedString(jwtKey)
 	if err != nil {
-		return "", entities.ErrInternalError
+		return "", fmt.Errorf("getting signed token: %w", err)
 	}
 
 	return tokenString, nil
