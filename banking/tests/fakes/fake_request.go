@@ -12,7 +12,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/thalissonfelipe/banking/banking/gateway/http/auth/schemes"
+	"github.com/thalissonfelipe/banking/banking/gateway/http/auth/schema"
 	"github.com/thalissonfelipe/banking/banking/tests/testenv"
 )
 
@@ -37,14 +37,14 @@ func FakeRequest(method, path string, requestBody interface{}) *http.Request {
 }
 
 func FakeAuthorizedRequest(t *testing.T, method, path, cpf, secret string, requestBody interface{}) *http.Request {
-	loginBody := schemes.LoginInput{CPF: cpf, Secret: secret}
+	loginBody := schema.LoginInput{CPF: cpf, Secret: secret}
 	request := FakeRequest(http.MethodPost, testenv.ServerURL+"/api/v1/login", loginBody)
 	resp, err := http.DefaultClient.Do(request)
 	require.NoError(t, err)
 
 	defer resp.Body.Close()
 
-	var respBody schemes.LoginResponse
+	var respBody schema.LoginResponse
 	err = json.NewDecoder(resp.Body).Decode(&respBody)
 	require.NoError(t, err)
 

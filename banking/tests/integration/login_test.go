@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/thalissonfelipe/banking/banking/gateway/http/auth/schemes"
+	"github.com/thalissonfelipe/banking/banking/gateway/http/auth/schema"
 	"github.com/thalissonfelipe/banking/banking/tests/dockertest"
 	"github.com/thalissonfelipe/banking/banking/tests/fakes"
 	"github.com/thalissonfelipe/banking/banking/tests/testdata"
@@ -29,7 +29,7 @@ func TestIntegration_Login(t *testing.T) {
 				secret := testdata.GetValidSecret()
 				acc := createAccount(t, testdata.GetValidCPF(), secret, 0)
 
-				reqBody := schemes.LoginInput{CPF: acc.CPF.String(), Secret: secret.String()}
+				reqBody := schema.LoginInput{CPF: acc.CPF.String(), Secret: secret.String()}
 				request := fakes.FakeRequest(http.MethodPost, testenv.ServerURL+"/api/v1/login", reqBody)
 
 				return request
@@ -39,7 +39,7 @@ func TestIntegration_Login(t *testing.T) {
 		{
 			name: "should return status code 400 if account does not exist",
 			requestSetup: func() *http.Request {
-				reqBody := schemes.LoginInput{
+				reqBody := schema.LoginInput{
 					CPF:    testdata.GetValidCPF().String(),
 					Secret: testdata.GetValidSecret().String(),
 				}
@@ -54,7 +54,7 @@ func TestIntegration_Login(t *testing.T) {
 			requestSetup: func() *http.Request {
 				acc := createAccount(t, testdata.GetValidCPF(), testdata.GetValidSecret(), 0)
 
-				reqBody := schemes.LoginInput{CPF: acc.CPF.String(), Secret: "12345678"}
+				reqBody := schema.LoginInput{CPF: acc.CPF.String(), Secret: "12345678"}
 				request := fakes.FakeRequest(http.MethodPost, testenv.ServerURL+"/api/v1/login", reqBody)
 
 				return request

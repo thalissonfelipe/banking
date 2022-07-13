@@ -12,7 +12,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/thalissonfelipe/banking/banking/gateway/http/auth/schemes"
+	"github.com/thalissonfelipe/banking/banking/gateway/http/auth/schema"
 	"github.com/thalissonfelipe/banking/banking/gateway/http/rest"
 	"github.com/thalissonfelipe/banking/banking/services"
 	"github.com/thalissonfelipe/banking/banking/services/auth"
@@ -40,15 +40,15 @@ func TestAuthHandler_Login(t *testing.T) {
 					return "token", nil
 				},
 			},
-			body:         schemes.LoginInput{CPF: cpf.String(), Secret: secret.String()},
+			body:         schema.LoginInput{CPF: cpf.String(), Secret: secret.String()},
 			decoder:      responseBodyDecoder{},
-			expectedBody: schemes.LoginResponse{},
+			expectedBody: schema.LoginResponse{},
 			expectedCode: http.StatusOK,
 		},
 		{
 			name:         "should return status code 400 if cpf was not provided",
 			auth:         &AuthMock{},
-			body:         schemes.LoginInput{Secret: secret.String()},
+			body:         schema.LoginInput{Secret: secret.String()},
 			decoder:      tests.ErrorMessageDecoder{},
 			expectedBody: rest.ErrorResponse{Message: "missing cpf parameter"},
 			expectedCode: http.StatusBadRequest,
@@ -56,7 +56,7 @@ func TestAuthHandler_Login(t *testing.T) {
 		{
 			name:         "should return status code 400 if secret was not provided",
 			auth:         &AuthMock{},
-			body:         schemes.LoginInput{CPF: cpf.String()},
+			body:         schema.LoginInput{CPF: cpf.String()},
 			decoder:      tests.ErrorMessageDecoder{},
 			expectedBody: rest.ErrorResponse{Message: "missing secret parameter"},
 			expectedCode: http.StatusBadRequest,
@@ -78,7 +78,7 @@ func TestAuthHandler_Login(t *testing.T) {
 					return "", assert.AnError
 				},
 			},
-			body:         schemes.LoginInput{CPF: cpf.String(), Secret: secret.String()},
+			body:         schema.LoginInput{CPF: cpf.String(), Secret: secret.String()},
 			decoder:      tests.ErrorMessageDecoder{},
 			expectedBody: rest.ErrorResponse{Message: "internal server error"},
 			expectedCode: http.StatusInternalServerError,
@@ -90,7 +90,7 @@ func TestAuthHandler_Login(t *testing.T) {
 					return "", auth.ErrInvalidCredentials
 				},
 			},
-			body:         schemes.LoginInput{CPF: cpf.String(), Secret: secret.String()},
+			body:         schema.LoginInput{CPF: cpf.String(), Secret: secret.String()},
 			decoder:      tests.ErrorMessageDecoder{},
 			expectedBody: rest.ErrorResponse{Message: "cpf or secret are invalid"},
 			expectedCode: http.StatusBadRequest,
@@ -123,7 +123,7 @@ func TestAuthHandler_Login(t *testing.T) {
 type responseBodyDecoder struct{}
 
 func (responseBodyDecoder) Decode(t *testing.T, body *bytes.Buffer) interface{} {
-	var result schemes.LoginResponse
+	var result schema.LoginResponse
 
 	err := json.NewDecoder(body).Decode(&result)
 	require.NoError(t, err)

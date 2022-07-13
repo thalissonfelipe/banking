@@ -1,9 +1,13 @@
-package schemes
+package schema
 
 import "github.com/thalissonfelipe/banking/banking/gateway/http/rest"
 
 type LoginResponse struct {
 	Token string `json:"token"`
+}
+
+func MapToLoginResponse(token string) LoginResponse {
+	return LoginResponse{Token: token}
 }
 
 type LoginInput struct {
