@@ -28,7 +28,7 @@ func TestNewAccount(t *testing.T) {
 				Name:    "name",
 				CPF:     cpf,
 				Secret:  secret,
-				Balance: 0,
+				Balance: 100,
 			},
 			wantErr: nil,
 		},

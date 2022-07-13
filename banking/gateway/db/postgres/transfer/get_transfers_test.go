@@ -29,7 +29,6 @@ func TestRepository_GetTransfers(t *testing.T) {
 
 	accOrigin, err := entities.NewAccount("origin", testdata.GetValidCPF().String(), testdata.GetValidSecret().String())
 	require.NoError(t, err)
-	accOrigin.Balance = 100
 
 	accDest, err := entities.NewAccount("dest", testdata.GetValidCPF().String(), testdata.GetValidSecret().String())
 	require.NoError(t, err)

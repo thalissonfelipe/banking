@@ -46,7 +46,7 @@ func TestAccountHandler_CreateAccount(t *testing.T) {
 			},
 			decoder:      createdAccountDecoder{},
 			body:         schemes.CreateAccountInput{Name: "name", CPF: cpf.String(), Secret: secret.String()},
-			expectedBody: schemes.CreateAccountResponse{Name: "name", CPF: cpf.String(), Balance: 0},
+			expectedBody: schemes.CreateAccountResponse{Name: "name", CPF: cpf.String(), Balance: 100},
 			expectedCode: http.StatusCreated,
 		},
 		{

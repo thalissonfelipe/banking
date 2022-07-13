@@ -34,10 +34,6 @@ func TestTransferHandler_CreateTransfer(t *testing.T) {
 	accDest, err := entities.NewAccount("dest", cpf.String(), secret.String())
 	require.NoError(t, err)
 
-	accOriginWithBalance, err := entities.NewAccount("origin2", cpf.String(), secret.String())
-	require.NoError(t, err)
-	accOriginWithBalance.Balance = 200
-
 	testCases := []struct {
 		name         string
 		usecase      transfer.Usecase
@@ -55,13 +51,13 @@ func TestTransferHandler_CreateTransfer(t *testing.T) {
 				},
 			},
 			decoder:     createdTransferDecoder{},
-			accOriginID: accOriginWithBalance.ID,
+			accOriginID: accOrigin.ID,
 			body: schemes.CreateTransferInput{
 				AccountDestinationID: accDest.ID.String(),
 				Amount:               100,
 			},
 			expectedBody: schemes.CreateTransferResponse{
-				AccountOriginID:      accOriginWithBalance.ID.String(),
+				AccountOriginID:      accOrigin.ID.String(),
 				AccountDestinationID: accDest.ID.String(),
 				Amount:               100,
 			},

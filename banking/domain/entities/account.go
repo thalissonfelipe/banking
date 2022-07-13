@@ -16,7 +16,7 @@ type Account struct {
 	CreatedAt time.Time
 }
 
-const DefaultBalance = 0
+const defaultBalance = 100
 
 var (
 	// ErrAccountDoesNotExist occurs when an account does not exist.
@@ -41,6 +41,6 @@ func NewAccount(name, cpfStr, secretStr string) (Account, error) {
 		Name:    name,
 		CPF:     cpf,
 		Secret:  secret,
-		Balance: DefaultBalance,
+		Balance: defaultBalance,
 	}, nil
 }

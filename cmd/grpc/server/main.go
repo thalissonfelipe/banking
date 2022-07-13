@@ -110,8 +110,6 @@ func main() {
 		log.Fatalf("failed to create account: %v", err)
 	}
 
-	amount := 100
-	acc.Balance = amount
 	accRepo := &InMemoryAccountDatabase{Accounts: []entities.Account{acc}}
 	trRepo := &InMemoryTransferDatabase{}
 	enc := &InMemoryEncrypter{}
