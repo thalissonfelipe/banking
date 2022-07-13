@@ -17,7 +17,7 @@ import (
 	"github.com/thalissonfelipe/banking/banking/domain/transfer"
 	"github.com/thalissonfelipe/banking/banking/domain/vos"
 	"github.com/thalissonfelipe/banking/banking/gateway/http/rest"
-	"github.com/thalissonfelipe/banking/banking/gateway/http/transfer/schemes"
+	"github.com/thalissonfelipe/banking/banking/gateway/http/transfer/schema"
 	"github.com/thalissonfelipe/banking/banking/services/auth"
 	"github.com/thalissonfelipe/banking/banking/tests"
 	"github.com/thalissonfelipe/banking/banking/tests/fakes"
@@ -44,7 +44,7 @@ func TestTransferHandler_ListTransfers(t *testing.T) {
 				},
 			},
 			decoder:      listTransfersDecoder{},
-			expectedBody: []schemes.TransferListResponse{convertTransferToTransferListResponse(transfers[0])},
+			expectedBody: schema.MapToListTransfersResponse(transfers),
 			expectedCode: http.StatusOK,
 		},
 		{
@@ -88,7 +88,7 @@ func TestTransferHandler_ListTransfers(t *testing.T) {
 type listTransfersDecoder struct{}
 
 func (listTransfersDecoder) Decode(t *testing.T, body *bytes.Buffer) interface{} {
-	var result []schemes.TransferListResponse
+	var result schema.ListTransfersResponse
 
 	err := json.NewDecoder(body).Decode(&result)
 	require.NoError(t, err)

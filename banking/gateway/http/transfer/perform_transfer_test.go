@@ -17,7 +17,7 @@ import (
 	"github.com/thalissonfelipe/banking/banking/domain/transfer"
 	"github.com/thalissonfelipe/banking/banking/domain/vos"
 	"github.com/thalissonfelipe/banking/banking/gateway/http/rest"
-	"github.com/thalissonfelipe/banking/banking/gateway/http/transfer/schemes"
+	"github.com/thalissonfelipe/banking/banking/gateway/http/transfer/schema"
 	"github.com/thalissonfelipe/banking/banking/services/auth"
 	"github.com/thalissonfelipe/banking/banking/tests"
 	"github.com/thalissonfelipe/banking/banking/tests/fakes"
@@ -52,11 +52,11 @@ func TestTransferHandler_PerformTransfer(t *testing.T) {
 			},
 			decoder:     createdTransferDecoder{},
 			accOriginID: accOrigin.ID,
-			body: schemes.PerformTransferInput{
+			body: schema.PerformTransferInput{
 				AccountDestinationID: accDest.ID.String(),
 				Amount:               100,
 			},
-			expectedBody: schemes.PerformTransferResponse{
+			expectedBody: schema.PerformTransferResponse{
 				AccountOriginID:      accOrigin.ID.String(),
 				AccountDestinationID: accDest.ID.String(),
 				Amount:               100,
@@ -68,7 +68,7 @@ func TestTransferHandler_PerformTransfer(t *testing.T) {
 			usecase:     &UsecaseMock{},
 			decoder:     tests.ErrorMessageDecoder{},
 			accOriginID: accOrigin.ID,
-			body:        schemes.PerformTransferInput{Amount: 100},
+			body:        schema.PerformTransferInput{Amount: 100},
 			expectedBody: rest.ErrorResponse{
 				Message: "missing account destination id parameter",
 			},
@@ -79,7 +79,7 @@ func TestTransferHandler_PerformTransfer(t *testing.T) {
 			usecase:      &UsecaseMock{},
 			decoder:      tests.ErrorMessageDecoder{},
 			accOriginID:  accOrigin.ID,
-			body:         schemes.PerformTransferInput{AccountDestinationID: accDest.ID.String()},
+			body:         schema.PerformTransferInput{AccountDestinationID: accDest.ID.String()},
 			expectedBody: rest.ErrorResponse{Message: "missing amount parameter"},
 			expectedCode: http.StatusBadRequest,
 		},
@@ -103,7 +103,7 @@ func TestTransferHandler_PerformTransfer(t *testing.T) {
 			},
 			decoder:     tests.ErrorMessageDecoder{},
 			accOriginID: accOrigin.ID,
-			body: schemes.PerformTransferInput{
+			body: schema.PerformTransferInput{
 				AccountDestinationID: accDest.ID.String(),
 				Amount:               100,
 			},
@@ -119,7 +119,7 @@ func TestTransferHandler_PerformTransfer(t *testing.T) {
 			},
 			decoder:     tests.ErrorMessageDecoder{},
 			accOriginID: accOrigin.ID,
-			body: schemes.PerformTransferInput{
+			body: schema.PerformTransferInput{
 				AccountDestinationID: accDest.ID.String(),
 				Amount:               100,
 			},
@@ -135,7 +135,7 @@ func TestTransferHandler_PerformTransfer(t *testing.T) {
 			},
 			decoder:     tests.ErrorMessageDecoder{},
 			accOriginID: accOrigin.ID,
-			body: schemes.PerformTransferInput{
+			body: schema.PerformTransferInput{
 				AccountDestinationID: accDest.ID.String(),
 				Amount:               100,
 			},
@@ -147,7 +147,7 @@ func TestTransferHandler_PerformTransfer(t *testing.T) {
 			usecase:     &UsecaseMock{},
 			decoder:     tests.ErrorMessageDecoder{},
 			accOriginID: accOrigin.ID,
-			body: schemes.PerformTransferInput{
+			body: schema.PerformTransferInput{
 				AccountDestinationID: accOrigin.ID.String(),
 				Amount:               100,
 			},
@@ -165,7 +165,7 @@ func TestTransferHandler_PerformTransfer(t *testing.T) {
 			},
 			decoder:     tests.ErrorMessageDecoder{},
 			accOriginID: accOrigin.ID,
-			body: schemes.PerformTransferInput{
+			body: schema.PerformTransferInput{
 				AccountDestinationID: accDest.ID.String(),
 				Amount:               100,
 			},
@@ -199,7 +199,7 @@ func TestTransferHandler_PerformTransfer(t *testing.T) {
 type createdTransferDecoder struct{}
 
 func (createdTransferDecoder) Decode(t *testing.T, body *bytes.Buffer) interface{} {
-	var result schemes.PerformTransferResponse
+	var result schema.PerformTransferResponse
 
 	err := json.NewDecoder(body).Decode(&result)
 	require.NoError(t, err)

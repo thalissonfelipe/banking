@@ -1,6 +1,8 @@
 package transfer
 
 import (
+	"strings"
+
 	"github.com/go-chi/chi/v5"
 
 	"github.com/thalissonfelipe/banking/banking/domain/transfer"
@@ -25,4 +27,8 @@ func NewHandler(r chi.Router, usecase transfer.Usecase) *Handler {
 	})
 
 	return &handler
+}
+
+func getTokenFromHeader(authHeader string) string {
+	return strings.Split(authHeader, "Bearer ")[1]
 }
