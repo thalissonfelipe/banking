@@ -8,7 +8,7 @@ import (
 )
 
 func (a Account) GetAccountBalanceByID(ctx context.Context, accountID vos.AccountID) (int, error) {
-	balance, err := a.repository.GetBalanceByID(ctx, accountID)
+	balance, err := a.repository.GetAccountBalanceByID(ctx, accountID)
 	if err != nil {
 		return 0, fmt.Errorf("getting balance by id: %w", err)
 	}

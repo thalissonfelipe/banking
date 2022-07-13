@@ -8,7 +8,7 @@ import (
 )
 
 func (a Account) ListAccounts(ctx context.Context) ([]entities.Account, error) {
-	accounts, err := a.repository.GetAccounts(ctx)
+	accounts, err := a.repository.ListAccounts(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("listing accounts: %w", err)
 	}

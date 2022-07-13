@@ -27,7 +27,7 @@ func TestAccountUsecase_ListAccounts(t *testing.T) {
 		{
 			name: "should return a list of accounts",
 			repo: &RepositoryMock{
-				GetAccountsFunc: func(context.Context) ([]entities.Account, error) {
+				ListAccountsFunc: func(context.Context) ([]entities.Account, error) {
 					return accounts, nil
 				},
 			},
@@ -37,7 +37,7 @@ func TestAccountUsecase_ListAccounts(t *testing.T) {
 		{
 			name: "should return an error if repo fails to get accounts",
 			repo: &RepositoryMock{
-				GetAccountsFunc: func(context.Context) ([]entities.Account, error) {
+				ListAccountsFunc: func(context.Context) ([]entities.Account, error) {
 					return nil, assert.AnError
 				},
 			},

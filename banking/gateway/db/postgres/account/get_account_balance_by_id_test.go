@@ -13,7 +13,7 @@ import (
 	"github.com/thalissonfelipe/banking/banking/tests/testdata"
 )
 
-func TestAccountRepository_GetBalanceByID(t *testing.T) {
+func TestAccountRepository_GetAccountBalanceByID(t *testing.T) {
 	t.Run("should get balance successfully", func(t *testing.T) {
 		db := pgDocker.DB
 		r := NewRepository(db)
@@ -30,7 +30,7 @@ func TestAccountRepository_GetBalanceByID(t *testing.T) {
 		err = r.CreateAccount(ctx, &want)
 		require.NoError(t, err)
 
-		balance, err := r.GetBalanceByID(ctx, want.ID)
+		balance, err := r.GetAccountBalanceByID(ctx, want.ID)
 		require.NoError(t, err)
 		assert.Equal(t, wantBalance, balance)
 	})
@@ -40,7 +40,7 @@ func TestAccountRepository_GetBalanceByID(t *testing.T) {
 		r := NewRepository(db)
 		ctx := context.Background()
 
-		balance, err := r.GetBalanceByID(ctx, vos.NewAccountID())
+		balance, err := r.GetAccountBalanceByID(ctx, vos.NewAccountID())
 		assert.ErrorIs(t, err, entities.ErrAccountNotFound)
 		assert.Zero(t, balance)
 	})

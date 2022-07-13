@@ -50,11 +50,11 @@ func TestTransferRepository_PerformTransfer(t *testing.T) {
 	assert.Equal(t, transfer.AccountDestinationID, transfers[0].AccountDestinationID)
 	assert.Equal(t, transfer.Amount, transfers[0].Amount)
 
-	originBalance, err := accRepository.GetBalanceByID(ctx, accOrigin.ID)
+	originBalance, err := accRepository.GetAccountBalanceByID(ctx, accOrigin.ID)
 	require.NoError(t, err)
 	assert.Equal(t, 50, originBalance)
 
-	destinationBalance, err := accRepository.GetBalanceByID(ctx, accDest.ID)
+	destinationBalance, err := accRepository.GetAccountBalanceByID(ctx, accDest.ID)
 	require.NoError(t, err)
 	assert.Equal(t, 150, destinationBalance)
 }

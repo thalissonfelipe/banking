@@ -12,14 +12,14 @@ import (
 	"github.com/thalissonfelipe/banking/banking/tests/testdata"
 )
 
-func TestAccountRepository_GetAccounts(t *testing.T) {
+func TestAccountRepository_ListAccounts(t *testing.T) {
 	db := pgDocker.DB
 	r := NewRepository(db)
 	ctx := context.Background()
 
 	defer dockertest.TruncateTables(ctx, db)
 
-	accounts, err := r.GetAccounts(ctx)
+	accounts, err := r.ListAccounts(ctx)
 	require.NoError(t, err)
 	assert.Len(t, accounts, 0)
 
@@ -29,7 +29,7 @@ func TestAccountRepository_GetAccounts(t *testing.T) {
 	err = r.CreateAccount(ctx, &want)
 	require.NoError(t, err)
 
-	accounts, err = r.GetAccounts(ctx)
+	accounts, err = r.ListAccounts(ctx)
 	require.NoError(t, err)
 
 	assert.Len(t, accounts, 1)

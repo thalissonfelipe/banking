@@ -24,11 +24,11 @@ type InMemoryAccountDatabase struct {
 	Accounts []entities.Account
 }
 
-func (i InMemoryAccountDatabase) GetAccounts(ctx context.Context) ([]entities.Account, error) {
+func (i InMemoryAccountDatabase) ListAccounts(ctx context.Context) ([]entities.Account, error) {
 	return i.Accounts, nil
 }
 
-func (i InMemoryAccountDatabase) GetBalanceByID(ctx context.Context, id vos.AccountID) (int, error) {
+func (i InMemoryAccountDatabase) GetAccountBalanceByID(ctx context.Context, id vos.AccountID) (int, error) {
 	for _, acc := range i.Accounts {
 		if acc.ID == id {
 			return acc.Balance, nil

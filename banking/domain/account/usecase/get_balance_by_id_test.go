@@ -23,7 +23,7 @@ func TestAccountUsecase_GetBalanceByAccountID(t *testing.T) {
 		{
 			name: "should return an account balance successfully",
 			repo: &RepositoryMock{
-				GetBalanceByIDFunc: func(context.Context, vos.AccountID) (int, error) {
+				GetAccountBalanceByIDFunc: func(context.Context, vos.AccountID) (int, error) {
 					return wantBalance, nil
 				},
 			},
@@ -33,7 +33,7 @@ func TestAccountUsecase_GetBalanceByAccountID(t *testing.T) {
 		{
 			name: "should return an error if account does not exist",
 			repo: &RepositoryMock{
-				GetBalanceByIDFunc: func(context.Context, vos.AccountID) (int, error) {
+				GetAccountBalanceByIDFunc: func(context.Context, vos.AccountID) (int, error) {
 					return 0, entities.ErrAccountNotFound
 				},
 			},

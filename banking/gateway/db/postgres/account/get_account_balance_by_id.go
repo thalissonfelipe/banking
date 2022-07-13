@@ -15,7 +15,7 @@ const getBalanceQuery = `
 select balance from accounts where id=$1
 `
 
-func (r Repository) GetBalanceByID(ctx context.Context, id vos.AccountID) (int, error) {
+func (r Repository) GetAccountBalanceByID(ctx context.Context, id vos.AccountID) (int, error) {
 	var balance int
 
 	err := r.db.QueryRow(ctx, getBalanceQuery, id).Scan(&balance)

@@ -8,6 +8,8 @@ import (
 //go:generate moq -pkg usecase -out repository_mock.gen.go .. Repository
 //go:generate moq -pkg usecase -out encrypter_mock.gen.go ../../encrypter Encrypter
 
+var _ account.Usecase = (*Account)(nil)
+
 type Account struct {
 	repository account.Repository
 	encrypter  encrypter.Encrypter
