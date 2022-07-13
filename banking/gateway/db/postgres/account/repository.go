@@ -3,10 +3,10 @@ package account
 import (
 	"github.com/jackc/pgx/v4"
 
-	"github.com/thalissonfelipe/banking/banking/domain/account"
+	"github.com/thalissonfelipe/banking/banking/domain/entity"
 )
 
-var _ account.Repository = (*Repository)(nil)
+var _ entity.AccountRepository = (*Repository)(nil)
 
 type Repository struct {
 	db *pgx.Conn

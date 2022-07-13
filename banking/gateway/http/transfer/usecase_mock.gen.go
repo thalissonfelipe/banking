@@ -6,26 +6,26 @@ package transfer
 import (
 	"context"
 	"github.com/thalissonfelipe/banking/banking/domain/entity"
-	"github.com/thalissonfelipe/banking/banking/domain/transfer"
+	"github.com/thalissonfelipe/banking/banking/domain/usecases"
 	"github.com/thalissonfelipe/banking/banking/domain/vos"
 	"sync"
 )
 
-// UsecaseMock is a mock implementation of Usecase.
+// UsecaseMock is a mock implementation of usecases.Transfer.
 //
-// 	func TestSomethingThatUsesUsecase(t *testing.T) {
+// 	func TestSomethingThatUsesTransfer(t *testing.T) {
 //
-// 		// make and configure a mocked Usecase
-// 		mockedUsecase := &UsecaseMock{
+// 		// make and configure a mocked usecases.Transfer
+// 		mockedTransfer := &UsecaseMock{
 // 			ListTransfersFunc: func(contextMoqParam context.Context, accountID vos.AccountID) ([]entity.Transfer, error) {
 // 				panic("mock out the ListTransfers method")
 // 			},
-// 			PerformTransferFunc: func(contextMoqParam context.Context, performTransferInput transfer.PerformTransferInput) error {
+// 			PerformTransferFunc: func(contextMoqParam context.Context, performTransferInput usecases.PerformTransferInput) error {
 // 				panic("mock out the PerformTransfer method")
 // 			},
 // 		}
 //
-// 		// use mockedUsecase in code that requires Usecase
+// 		// use mockedTransfer in code that requires usecases.Transfer
 // 		// and then make assertions.
 //
 // 	}
@@ -34,7 +34,7 @@ type UsecaseMock struct {
 	ListTransfersFunc func(contextMoqParam context.Context, accountID vos.AccountID) ([]entity.Transfer, error)
 
 	// PerformTransferFunc mocks the PerformTransfer method.
-	PerformTransferFunc func(contextMoqParam context.Context, performTransferInput transfer.PerformTransferInput) error
+	PerformTransferFunc func(contextMoqParam context.Context, performTransferInput usecases.PerformTransferInput) error
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -50,7 +50,7 @@ type UsecaseMock struct {
 			// ContextMoqParam is the contextMoqParam argument value.
 			ContextMoqParam context.Context
 			// PerformTransferInput is the performTransferInput argument value.
-			PerformTransferInput transfer.PerformTransferInput
+			PerformTransferInput usecases.PerformTransferInput
 		}
 	}
 	lockListTransfers   sync.RWMutex
@@ -60,7 +60,7 @@ type UsecaseMock struct {
 // ListTransfers calls ListTransfersFunc.
 func (mock *UsecaseMock) ListTransfers(contextMoqParam context.Context, accountID vos.AccountID) ([]entity.Transfer, error) {
 	if mock.ListTransfersFunc == nil {
-		panic("UsecaseMock.ListTransfersFunc: method is nil but Usecase.ListTransfers was just called")
+		panic("UsecaseMock.ListTransfersFunc: method is nil but Transfer.ListTransfers was just called")
 	}
 	callInfo := struct {
 		ContextMoqParam context.Context
@@ -77,7 +77,7 @@ func (mock *UsecaseMock) ListTransfers(contextMoqParam context.Context, accountI
 
 // ListTransfersCalls gets all the calls that were made to ListTransfers.
 // Check the length with:
-//     len(mockedUsecase.ListTransfersCalls())
+//     len(mockedTransfer.ListTransfersCalls())
 func (mock *UsecaseMock) ListTransfersCalls() []struct {
 	ContextMoqParam context.Context
 	AccountID       vos.AccountID
@@ -93,13 +93,13 @@ func (mock *UsecaseMock) ListTransfersCalls() []struct {
 }
 
 // PerformTransfer calls PerformTransferFunc.
-func (mock *UsecaseMock) PerformTransfer(contextMoqParam context.Context, performTransferInput transfer.PerformTransferInput) error {
+func (mock *UsecaseMock) PerformTransfer(contextMoqParam context.Context, performTransferInput usecases.PerformTransferInput) error {
 	if mock.PerformTransferFunc == nil {
-		panic("UsecaseMock.PerformTransferFunc: method is nil but Usecase.PerformTransfer was just called")
+		panic("UsecaseMock.PerformTransferFunc: method is nil but Transfer.PerformTransfer was just called")
 	}
 	callInfo := struct {
 		ContextMoqParam      context.Context
-		PerformTransferInput transfer.PerformTransferInput
+		PerformTransferInput usecases.PerformTransferInput
 	}{
 		ContextMoqParam:      contextMoqParam,
 		PerformTransferInput: performTransferInput,
@@ -112,14 +112,14 @@ func (mock *UsecaseMock) PerformTransfer(contextMoqParam context.Context, perfor
 
 // PerformTransferCalls gets all the calls that were made to PerformTransfer.
 // Check the length with:
-//     len(mockedUsecase.PerformTransferCalls())
+//     len(mockedTransfer.PerformTransferCalls())
 func (mock *UsecaseMock) PerformTransferCalls() []struct {
 	ContextMoqParam      context.Context
-	PerformTransferInput transfer.PerformTransferInput
+	PerformTransferInput usecases.PerformTransferInput
 } {
 	var calls []struct {
 		ContextMoqParam      context.Context
-		PerformTransferInput transfer.PerformTransferInput
+		PerformTransferInput usecases.PerformTransferInput
 	}
 	mock.lockPerformTransfer.RLock()
 	calls = mock.calls.PerformTransfer

@@ -1,4 +1,4 @@
-package usecase
+package transfer
 
 import (
 	"context"
@@ -6,10 +6,10 @@ import (
 	"fmt"
 
 	"github.com/thalissonfelipe/banking/banking/domain/entity"
-	"github.com/thalissonfelipe/banking/banking/domain/transfer"
+	"github.com/thalissonfelipe/banking/banking/domain/usecases"
 )
 
-func (t Transfer) PerformTransfer(ctx context.Context, input transfer.PerformTransferInput) error {
+func (t Transfer) PerformTransfer(ctx context.Context, input usecases.PerformTransferInput) error {
 	accOrigin, err := t.accountUsecase.GetAccountByID(ctx, input.AccountOriginID)
 	if err != nil {
 		return fmt.Errorf("getting origin account by id: %w", err)

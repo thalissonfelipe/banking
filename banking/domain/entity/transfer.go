@@ -1,6 +1,7 @@
 package entity
 
 import (
+	"context"
 	"errors"
 	"time"
 
@@ -9,6 +10,9 @@ import (
 	"github.com/thalissonfelipe/banking/banking/domain/vos"
 )
 
+// ErrInsufficientFunds occurs when an account does not have sufficient funds.
+var ErrInsufficientFunds = errors.New("insufficient funds")
+
 type Transfer struct {
 	ID                   uuid.UUID
 	AccountOriginID      vos.AccountID
@@ -16,9 +20,6 @@ type Transfer struct {
 	Amount               int
 	CreatedAt            time.Time
 }
-
-// ErrInsufficientFunds occurs when an account does not have sufficient funds.
-var ErrInsufficientFunds = errors.New("insufficient funds")
 
 func NewTransfer(accOriginID, accDestID vos.AccountID, amount, accOriginBalance int) (Transfer, error) {
 	if (accOriginBalance - amount) < 0 {
@@ -31,4 +32,9 @@ func NewTransfer(accOriginID, accDestID vos.AccountID, amount, accOriginBalance 
 		AccountDestinationID: accDestID,
 		Amount:               amount,
 	}, nil
+}
+
+type TransferRepository interface {
+	ListTransfers(context.Context, vos.AccountID) ([]Transfer, error)
+	PerformTransfer(context.Context, *Transfer) error
 }

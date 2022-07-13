@@ -14,7 +14,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/thalissonfelipe/banking/banking/domain/entity"
-	"github.com/thalissonfelipe/banking/banking/domain/transfer"
+	"github.com/thalissonfelipe/banking/banking/domain/usecases"
 	"github.com/thalissonfelipe/banking/banking/domain/vos"
 	"github.com/thalissonfelipe/banking/banking/gateway/http/rest"
 	"github.com/thalissonfelipe/banking/banking/gateway/http/transfer/schema"
@@ -36,7 +36,7 @@ func TestTransferHandler_PerformTransfer(t *testing.T) {
 
 	testCases := []struct {
 		name         string
-		usecase      transfer.Usecase
+		usecase      usecases.Transfer
 		decoder      tests.Decoder
 		accOriginID  vos.AccountID
 		body         interface{}
@@ -46,7 +46,7 @@ func TestTransferHandler_PerformTransfer(t *testing.T) {
 		{
 			name: "should perform a transfer successfully",
 			usecase: &UsecaseMock{
-				PerformTransferFunc: func(context.Context, transfer.PerformTransferInput) error {
+				PerformTransferFunc: func(context.Context, usecases.PerformTransferInput) error {
 					return nil
 				},
 			},
@@ -97,7 +97,7 @@ func TestTransferHandler_PerformTransfer(t *testing.T) {
 		{
 			name: "should return status 404 if acc origin does not exist",
 			usecase: &UsecaseMock{
-				PerformTransferFunc: func(context.Context, transfer.PerformTransferInput) error {
+				PerformTransferFunc: func(context.Context, usecases.PerformTransferInput) error {
 					return entity.ErrAccountNotFound
 				},
 			},
@@ -113,7 +113,7 @@ func TestTransferHandler_PerformTransfer(t *testing.T) {
 		{
 			name: "should return status 404 if acc dest does not exist",
 			usecase: &UsecaseMock{
-				PerformTransferFunc: func(context.Context, transfer.PerformTransferInput) error {
+				PerformTransferFunc: func(context.Context, usecases.PerformTransferInput) error {
 					return entity.ErrAccountDestinationNotFound
 				},
 			},
@@ -129,7 +129,7 @@ func TestTransferHandler_PerformTransfer(t *testing.T) {
 		{
 			name: "should return status 400 if acc origin has insufficient funds",
 			usecase: &UsecaseMock{
-				PerformTransferFunc: func(context.Context, transfer.PerformTransferInput) error {
+				PerformTransferFunc: func(context.Context, usecases.PerformTransferInput) error {
 					return entity.ErrInsufficientFunds
 				},
 			},
@@ -159,7 +159,7 @@ func TestTransferHandler_PerformTransfer(t *testing.T) {
 		{
 			name: "should return status 500 if usecase fails",
 			usecase: &UsecaseMock{
-				PerformTransferFunc: func(context.Context, transfer.PerformTransferInput) error {
+				PerformTransferFunc: func(context.Context, usecases.PerformTransferInput) error {
 					return assert.AnError
 				},
 			},

@@ -1,4 +1,4 @@
-package usecase
+package transfer
 
 import (
 	"context"
@@ -7,9 +7,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/thalissonfelipe/banking/banking/domain/account"
 	"github.com/thalissonfelipe/banking/banking/domain/entity"
-	"github.com/thalissonfelipe/banking/banking/domain/transfer"
+	"github.com/thalissonfelipe/banking/banking/domain/usecases"
 	"github.com/thalissonfelipe/banking/banking/domain/vos"
 	"github.com/thalissonfelipe/banking/banking/tests/testdata"
 )
@@ -23,9 +22,9 @@ func TestTransferUsecase_PerformTransfer(t *testing.T) {
 
 	testCases := []struct {
 		name       string
-		repo       transfer.Repository
-		accUsecase account.Usecase
-		input      transfer.PerformTransferInput
+		repo       entity.TransferRepository
+		accUsecase usecases.Account
+		input      usecases.PerformTransferInput
 		wantErr    error
 	}{
 		{
@@ -44,7 +43,7 @@ func TestTransferUsecase_PerformTransfer(t *testing.T) {
 					return accDest, nil
 				},
 			},
-			input:   transfer.NewPerformTransferInput(accOrigin.ID, accDest.ID, 100),
+			input:   usecases.NewPerformTransferInput(accOrigin.ID, accDest.ID, 100),
 			wantErr: nil,
 		},
 		{
@@ -59,7 +58,7 @@ func TestTransferUsecase_PerformTransfer(t *testing.T) {
 					return accDest, nil
 				},
 			},
-			input:   transfer.NewPerformTransferInput(accOrigin.ID, accDest.ID, accOrigin.Balance+1),
+			input:   usecases.NewPerformTransferInput(accOrigin.ID, accDest.ID, accOrigin.Balance+1),
 			wantErr: entity.ErrInsufficientFunds,
 		},
 		{
@@ -70,7 +69,7 @@ func TestTransferUsecase_PerformTransfer(t *testing.T) {
 					return entity.Account{}, entity.ErrAccountNotFound
 				},
 			},
-			input:   transfer.NewPerformTransferInput(accOrigin.ID, accDest.ID, accOrigin.Balance),
+			input:   usecases.NewPerformTransferInput(accOrigin.ID, accDest.ID, accOrigin.Balance),
 			wantErr: entity.ErrAccountNotFound,
 		},
 		{
@@ -85,7 +84,7 @@ func TestTransferUsecase_PerformTransfer(t *testing.T) {
 					return entity.Account{}, entity.ErrAccountNotFound
 				},
 			},
-			input:   transfer.NewPerformTransferInput(accOrigin.ID, accDest.ID, accOrigin.Balance),
+			input:   usecases.NewPerformTransferInput(accOrigin.ID, accDest.ID, accOrigin.Balance),
 			wantErr: entity.ErrAccountDestinationNotFound,
 		},
 		{
@@ -96,7 +95,7 @@ func TestTransferUsecase_PerformTransfer(t *testing.T) {
 					return entity.Account{}, assert.AnError
 				},
 			},
-			input:   transfer.NewPerformTransferInput(accOrigin.ID, accDest.ID, accOrigin.Balance),
+			input:   usecases.NewPerformTransferInput(accOrigin.ID, accDest.ID, accOrigin.Balance),
 			wantErr: assert.AnError,
 		},
 		{
@@ -115,7 +114,7 @@ func TestTransferUsecase_PerformTransfer(t *testing.T) {
 					return accDest, nil
 				},
 			},
-			input:   transfer.NewPerformTransferInput(accOrigin.ID, accDest.ID, accOrigin.Balance),
+			input:   usecases.NewPerformTransferInput(accOrigin.ID, accDest.ID, accOrigin.Balance),
 			wantErr: assert.AnError,
 		},
 	}

@@ -8,10 +8,9 @@ import (
 	"github.com/stretchr/testify/require"
 	"golang.org/x/crypto/bcrypt"
 
-	"github.com/thalissonfelipe/banking/banking/domain/account"
-	"github.com/thalissonfelipe/banking/banking/domain/account/usecase"
 	"github.com/thalissonfelipe/banking/banking/domain/encrypter"
 	"github.com/thalissonfelipe/banking/banking/domain/entity"
+	"github.com/thalissonfelipe/banking/banking/domain/usecases/account"
 	"github.com/thalissonfelipe/banking/banking/domain/vos"
 	"github.com/thalissonfelipe/banking/banking/tests/testdata"
 )
@@ -25,7 +24,7 @@ func TestAuth_Authenticate(t *testing.T) {
 
 	testCases := []struct {
 		name    string
-		repo    account.Repository
+		repo    entity.AccountRepository
 		enc     encrypter.Encrypter
 		cpf     string
 		secret  string
@@ -87,7 +86,7 @@ func TestAuth_Authenticate(t *testing.T) {
 
 	for _, tt := range testCases {
 		t.Run(tt.name, func(t *testing.T) {
-			accUsecase := usecase.NewAccountUsecase(tt.repo, tt.enc)
+			accUsecase := account.NewAccountUsecase(tt.repo, tt.enc)
 			service := NewAuth(accUsecase, tt.enc)
 
 			_, err := service.Autheticate(context.Background(), tt.cpf, tt.secret)

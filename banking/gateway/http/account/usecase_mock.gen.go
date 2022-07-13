@@ -10,12 +10,12 @@ import (
 	"sync"
 )
 
-// UsecaseMock is a mock implementation of Usecase.
+// UsecaseMock is a mock implementation of usecases.Account.
 //
-// 	func TestSomethingThatUsesUsecase(t *testing.T) {
+// 	func TestSomethingThatUsesAccount(t *testing.T) {
 //
-// 		// make and configure a mocked Usecase
-// 		mockedUsecase := &UsecaseMock{
+// 		// make and configure a mocked usecases.Account
+// 		mockedAccount := &UsecaseMock{
 // 			CreateAccountFunc: func(contextMoqParam context.Context, account *entity.Account) error {
 // 				panic("mock out the CreateAccount method")
 // 			},
@@ -33,7 +33,7 @@ import (
 // 			},
 // 		}
 //
-// 		// use mockedUsecase in code that requires Usecase
+// 		// use mockedAccount in code that requires usecases.Account
 // 		// and then make assertions.
 //
 // 	}
@@ -99,7 +99,7 @@ type UsecaseMock struct {
 // CreateAccount calls CreateAccountFunc.
 func (mock *UsecaseMock) CreateAccount(contextMoqParam context.Context, account *entity.Account) error {
 	if mock.CreateAccountFunc == nil {
-		panic("UsecaseMock.CreateAccountFunc: method is nil but Usecase.CreateAccount was just called")
+		panic("UsecaseMock.CreateAccountFunc: method is nil but Account.CreateAccount was just called")
 	}
 	callInfo := struct {
 		ContextMoqParam context.Context
@@ -116,7 +116,7 @@ func (mock *UsecaseMock) CreateAccount(contextMoqParam context.Context, account 
 
 // CreateAccountCalls gets all the calls that were made to CreateAccount.
 // Check the length with:
-//     len(mockedUsecase.CreateAccountCalls())
+//     len(mockedAccount.CreateAccountCalls())
 func (mock *UsecaseMock) CreateAccountCalls() []struct {
 	ContextMoqParam context.Context
 	Account         *entity.Account
@@ -134,7 +134,7 @@ func (mock *UsecaseMock) CreateAccountCalls() []struct {
 // GetAccountBalanceByID calls GetAccountBalanceByIDFunc.
 func (mock *UsecaseMock) GetAccountBalanceByID(contextMoqParam context.Context, accountID vos.AccountID) (int, error) {
 	if mock.GetAccountBalanceByIDFunc == nil {
-		panic("UsecaseMock.GetAccountBalanceByIDFunc: method is nil but Usecase.GetAccountBalanceByID was just called")
+		panic("UsecaseMock.GetAccountBalanceByIDFunc: method is nil but Account.GetAccountBalanceByID was just called")
 	}
 	callInfo := struct {
 		ContextMoqParam context.Context
@@ -151,7 +151,7 @@ func (mock *UsecaseMock) GetAccountBalanceByID(contextMoqParam context.Context, 
 
 // GetAccountBalanceByIDCalls gets all the calls that were made to GetAccountBalanceByID.
 // Check the length with:
-//     len(mockedUsecase.GetAccountBalanceByIDCalls())
+//     len(mockedAccount.GetAccountBalanceByIDCalls())
 func (mock *UsecaseMock) GetAccountBalanceByIDCalls() []struct {
 	ContextMoqParam context.Context
 	AccountID       vos.AccountID
@@ -169,7 +169,7 @@ func (mock *UsecaseMock) GetAccountBalanceByIDCalls() []struct {
 // GetAccountByCPF calls GetAccountByCPFFunc.
 func (mock *UsecaseMock) GetAccountByCPF(contextMoqParam context.Context, cPF vos.CPF) (entity.Account, error) {
 	if mock.GetAccountByCPFFunc == nil {
-		panic("UsecaseMock.GetAccountByCPFFunc: method is nil but Usecase.GetAccountByCPF was just called")
+		panic("UsecaseMock.GetAccountByCPFFunc: method is nil but Account.GetAccountByCPF was just called")
 	}
 	callInfo := struct {
 		ContextMoqParam context.Context
@@ -186,7 +186,7 @@ func (mock *UsecaseMock) GetAccountByCPF(contextMoqParam context.Context, cPF vo
 
 // GetAccountByCPFCalls gets all the calls that were made to GetAccountByCPF.
 // Check the length with:
-//     len(mockedUsecase.GetAccountByCPFCalls())
+//     len(mockedAccount.GetAccountByCPFCalls())
 func (mock *UsecaseMock) GetAccountByCPFCalls() []struct {
 	ContextMoqParam context.Context
 	CPF             vos.CPF
@@ -204,7 +204,7 @@ func (mock *UsecaseMock) GetAccountByCPFCalls() []struct {
 // GetAccountByID calls GetAccountByIDFunc.
 func (mock *UsecaseMock) GetAccountByID(contextMoqParam context.Context, accountID vos.AccountID) (entity.Account, error) {
 	if mock.GetAccountByIDFunc == nil {
-		panic("UsecaseMock.GetAccountByIDFunc: method is nil but Usecase.GetAccountByID was just called")
+		panic("UsecaseMock.GetAccountByIDFunc: method is nil but Account.GetAccountByID was just called")
 	}
 	callInfo := struct {
 		ContextMoqParam context.Context
@@ -221,7 +221,7 @@ func (mock *UsecaseMock) GetAccountByID(contextMoqParam context.Context, account
 
 // GetAccountByIDCalls gets all the calls that were made to GetAccountByID.
 // Check the length with:
-//     len(mockedUsecase.GetAccountByIDCalls())
+//     len(mockedAccount.GetAccountByIDCalls())
 func (mock *UsecaseMock) GetAccountByIDCalls() []struct {
 	ContextMoqParam context.Context
 	AccountID       vos.AccountID
@@ -239,7 +239,7 @@ func (mock *UsecaseMock) GetAccountByIDCalls() []struct {
 // ListAccounts calls ListAccountsFunc.
 func (mock *UsecaseMock) ListAccounts(contextMoqParam context.Context) ([]entity.Account, error) {
 	if mock.ListAccountsFunc == nil {
-		panic("UsecaseMock.ListAccountsFunc: method is nil but Usecase.ListAccounts was just called")
+		panic("UsecaseMock.ListAccountsFunc: method is nil but Account.ListAccounts was just called")
 	}
 	callInfo := struct {
 		ContextMoqParam context.Context
@@ -254,7 +254,7 @@ func (mock *UsecaseMock) ListAccounts(contextMoqParam context.Context) ([]entity
 
 // ListAccountsCalls gets all the calls that were made to ListAccounts.
 // Check the length with:
-//     len(mockedUsecase.ListAccountsCalls())
+//     len(mockedAccount.ListAccountsCalls())
 func (mock *UsecaseMock) ListAccountsCalls() []struct {
 	ContextMoqParam context.Context
 } {

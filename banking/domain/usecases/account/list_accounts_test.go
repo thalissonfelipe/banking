@@ -1,4 +1,4 @@
-package usecase
+package account
 
 import (
 	"context"
@@ -7,7 +7,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/thalissonfelipe/banking/banking/domain/account"
 	"github.com/thalissonfelipe/banking/banking/domain/entity"
 	"github.com/thalissonfelipe/banking/banking/tests/testdata"
 )
@@ -20,7 +19,7 @@ func TestAccountUsecase_ListAccounts(t *testing.T) {
 
 	testCases := []struct {
 		name    string
-		repo    account.Repository
+		repo    entity.AccountRepository
 		want    []entity.Account
 		wantErr error
 	}{

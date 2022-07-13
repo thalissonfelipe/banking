@@ -5,22 +5,21 @@ package auth
 
 import (
 	"context"
-	"github.com/thalissonfelipe/banking/banking/domain/account"
 	"github.com/thalissonfelipe/banking/banking/domain/entity"
 	"github.com/thalissonfelipe/banking/banking/domain/vos"
 	"sync"
 )
 
-// Ensure, that RepositoryMock does implement account.Repository.
+// Ensure, that RepositoryMock does implement entity.AccountRepository.
 // If this is not the case, regenerate this file with moq.
-var _ account.Repository = &RepositoryMock{}
+var _ entity.AccountRepository = &RepositoryMock{}
 
-// RepositoryMock is a mock implementation of account.Repository.
+// RepositoryMock is a mock implementation of entity.AccountRepository.
 //
-// 	func TestSomethingThatUsesRepository(t *testing.T) {
+// 	func TestSomethingThatUsesAccountRepository(t *testing.T) {
 //
-// 		// make and configure a mocked account.Repository
-// 		mockedRepository := &RepositoryMock{
+// 		// make and configure a mocked entity.AccountRepository
+// 		mockedAccountRepository := &RepositoryMock{
 // 			CreateAccountFunc: func(contextMoqParam context.Context, account *entity.Account) error {
 // 				panic("mock out the CreateAccount method")
 // 			},
@@ -38,7 +37,7 @@ var _ account.Repository = &RepositoryMock{}
 // 			},
 // 		}
 //
-// 		// use mockedRepository in code that requires account.Repository
+// 		// use mockedAccountRepository in code that requires entity.AccountRepository
 // 		// and then make assertions.
 //
 // 	}
@@ -104,7 +103,7 @@ type RepositoryMock struct {
 // CreateAccount calls CreateAccountFunc.
 func (mock *RepositoryMock) CreateAccount(contextMoqParam context.Context, account *entity.Account) error {
 	if mock.CreateAccountFunc == nil {
-		panic("RepositoryMock.CreateAccountFunc: method is nil but Repository.CreateAccount was just called")
+		panic("RepositoryMock.CreateAccountFunc: method is nil but AccountRepository.CreateAccount was just called")
 	}
 	callInfo := struct {
 		ContextMoqParam context.Context
@@ -121,7 +120,7 @@ func (mock *RepositoryMock) CreateAccount(contextMoqParam context.Context, accou
 
 // CreateAccountCalls gets all the calls that were made to CreateAccount.
 // Check the length with:
-//     len(mockedRepository.CreateAccountCalls())
+//     len(mockedAccountRepository.CreateAccountCalls())
 func (mock *RepositoryMock) CreateAccountCalls() []struct {
 	ContextMoqParam context.Context
 	Account         *entity.Account
@@ -139,7 +138,7 @@ func (mock *RepositoryMock) CreateAccountCalls() []struct {
 // GetAccountBalanceByID calls GetAccountBalanceByIDFunc.
 func (mock *RepositoryMock) GetAccountBalanceByID(contextMoqParam context.Context, accountID vos.AccountID) (int, error) {
 	if mock.GetAccountBalanceByIDFunc == nil {
-		panic("RepositoryMock.GetAccountBalanceByIDFunc: method is nil but Repository.GetAccountBalanceByID was just called")
+		panic("RepositoryMock.GetAccountBalanceByIDFunc: method is nil but AccountRepository.GetAccountBalanceByID was just called")
 	}
 	callInfo := struct {
 		ContextMoqParam context.Context
@@ -156,7 +155,7 @@ func (mock *RepositoryMock) GetAccountBalanceByID(contextMoqParam context.Contex
 
 // GetAccountBalanceByIDCalls gets all the calls that were made to GetAccountBalanceByID.
 // Check the length with:
-//     len(mockedRepository.GetAccountBalanceByIDCalls())
+//     len(mockedAccountRepository.GetAccountBalanceByIDCalls())
 func (mock *RepositoryMock) GetAccountBalanceByIDCalls() []struct {
 	ContextMoqParam context.Context
 	AccountID       vos.AccountID
@@ -174,7 +173,7 @@ func (mock *RepositoryMock) GetAccountBalanceByIDCalls() []struct {
 // GetAccountByCPF calls GetAccountByCPFFunc.
 func (mock *RepositoryMock) GetAccountByCPF(contextMoqParam context.Context, cPF vos.CPF) (entity.Account, error) {
 	if mock.GetAccountByCPFFunc == nil {
-		panic("RepositoryMock.GetAccountByCPFFunc: method is nil but Repository.GetAccountByCPF was just called")
+		panic("RepositoryMock.GetAccountByCPFFunc: method is nil but AccountRepository.GetAccountByCPF was just called")
 	}
 	callInfo := struct {
 		ContextMoqParam context.Context
@@ -191,7 +190,7 @@ func (mock *RepositoryMock) GetAccountByCPF(contextMoqParam context.Context, cPF
 
 // GetAccountByCPFCalls gets all the calls that were made to GetAccountByCPF.
 // Check the length with:
-//     len(mockedRepository.GetAccountByCPFCalls())
+//     len(mockedAccountRepository.GetAccountByCPFCalls())
 func (mock *RepositoryMock) GetAccountByCPFCalls() []struct {
 	ContextMoqParam context.Context
 	CPF             vos.CPF
@@ -209,7 +208,7 @@ func (mock *RepositoryMock) GetAccountByCPFCalls() []struct {
 // GetAccountByID calls GetAccountByIDFunc.
 func (mock *RepositoryMock) GetAccountByID(contextMoqParam context.Context, accountID vos.AccountID) (entity.Account, error) {
 	if mock.GetAccountByIDFunc == nil {
-		panic("RepositoryMock.GetAccountByIDFunc: method is nil but Repository.GetAccountByID was just called")
+		panic("RepositoryMock.GetAccountByIDFunc: method is nil but AccountRepository.GetAccountByID was just called")
 	}
 	callInfo := struct {
 		ContextMoqParam context.Context
@@ -226,7 +225,7 @@ func (mock *RepositoryMock) GetAccountByID(contextMoqParam context.Context, acco
 
 // GetAccountByIDCalls gets all the calls that were made to GetAccountByID.
 // Check the length with:
-//     len(mockedRepository.GetAccountByIDCalls())
+//     len(mockedAccountRepository.GetAccountByIDCalls())
 func (mock *RepositoryMock) GetAccountByIDCalls() []struct {
 	ContextMoqParam context.Context
 	AccountID       vos.AccountID
@@ -244,7 +243,7 @@ func (mock *RepositoryMock) GetAccountByIDCalls() []struct {
 // ListAccounts calls ListAccountsFunc.
 func (mock *RepositoryMock) ListAccounts(contextMoqParam context.Context) ([]entity.Account, error) {
 	if mock.ListAccountsFunc == nil {
-		panic("RepositoryMock.ListAccountsFunc: method is nil but Repository.ListAccounts was just called")
+		panic("RepositoryMock.ListAccountsFunc: method is nil but AccountRepository.ListAccounts was just called")
 	}
 	callInfo := struct {
 		ContextMoqParam context.Context
@@ -259,7 +258,7 @@ func (mock *RepositoryMock) ListAccounts(contextMoqParam context.Context) ([]ent
 
 // ListAccountsCalls gets all the calls that were made to ListAccounts.
 // Check the length with:
-//     len(mockedRepository.ListAccountsCalls())
+//     len(mockedAccountRepository.ListAccountsCalls())
 func (mock *RepositoryMock) ListAccountsCalls() []struct {
 	ContextMoqParam context.Context
 } {

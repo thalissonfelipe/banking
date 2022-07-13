@@ -14,7 +14,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/thalissonfelipe/banking/banking/domain/entity"
-	"github.com/thalissonfelipe/banking/banking/domain/transfer"
+	"github.com/thalissonfelipe/banking/banking/domain/usecases"
 	"github.com/thalissonfelipe/banking/banking/domain/vos"
 	"github.com/thalissonfelipe/banking/banking/gateway/http/rest"
 	"github.com/thalissonfelipe/banking/banking/gateway/http/transfer/schema"
@@ -31,7 +31,7 @@ func TestTransferHandler_ListTransfers(t *testing.T) {
 
 	testCases := []struct {
 		name         string
-		usecase      transfer.Usecase
+		usecase      usecases.Transfer
 		decoder      tests.Decoder
 		expectedBody interface{}
 		expectedCode int

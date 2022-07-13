@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/thalissonfelipe/banking/banking/domain/entity"
-	"github.com/thalissonfelipe/banking/banking/domain/transfer"
+	"github.com/thalissonfelipe/banking/banking/domain/usecases"
 	"github.com/thalissonfelipe/banking/banking/domain/vos"
 	"github.com/thalissonfelipe/banking/banking/gateway/http/rest"
 	"github.com/thalissonfelipe/banking/banking/gateway/http/transfer/schema"
@@ -44,7 +44,7 @@ func (h Handler) PerformTransfer(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	input := transfer.NewPerformTransferInput(accountID, accountDestinationID, body.Amount)
+	input := usecases.NewPerformTransferInput(accountID, accountDestinationID, body.Amount)
 
 	err := h.usecase.PerformTransfer(r.Context(), input)
 	if err != nil {

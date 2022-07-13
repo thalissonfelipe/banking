@@ -3,10 +3,10 @@ package transfer
 import (
 	"github.com/jackc/pgx/v4"
 
-	"github.com/thalissonfelipe/banking/banking/domain/transfer"
+	"github.com/thalissonfelipe/banking/banking/domain/entity"
 )
 
-var _ transfer.Repository = (*Repository)(nil)
+var _ entity.TransferRepository = (*Repository)(nil)
 
 type Repository struct {
 	db *pgx.Conn

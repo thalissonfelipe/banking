@@ -11,7 +11,7 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/thalissonfelipe/banking/banking/domain/entity"
-	"github.com/thalissonfelipe/banking/banking/domain/transfer"
+	"github.com/thalissonfelipe/banking/banking/domain/usecases"
 	"github.com/thalissonfelipe/banking/banking/domain/vos"
 	"github.com/thalissonfelipe/banking/banking/services/auth"
 	proto "github.com/thalissonfelipe/banking/proto/banking"
@@ -82,7 +82,7 @@ func (s Server) CreateTransfer(
 			"account destination id must be different from account origin id")
 	}
 
-	input := transfer.NewPerformTransferInput(
+	input := usecases.NewPerformTransferInput(
 		vos.AccountID(accounOriginID),
 		vos.AccountID(accounDestinationID),
 		int(request.Amount),

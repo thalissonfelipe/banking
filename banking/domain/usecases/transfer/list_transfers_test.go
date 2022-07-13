@@ -1,4 +1,4 @@
-package usecase
+package transfer
 
 import (
 	"context"
@@ -8,7 +8,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/thalissonfelipe/banking/banking/domain/entity"
-	"github.com/thalissonfelipe/banking/banking/domain/transfer"
 	"github.com/thalissonfelipe/banking/banking/domain/vos"
 )
 
@@ -20,7 +19,7 @@ func TestTransferUsecase_ListTransfers(t *testing.T) {
 
 	testCases := []struct {
 		name    string
-		repo    transfer.Repository
+		repo    entity.TransferRepository
 		wantErr error
 	}{
 		{

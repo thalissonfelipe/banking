@@ -1,4 +1,4 @@
-package transfer
+package usecases
 
 import (
 	"context"
@@ -7,7 +7,7 @@ import (
 	"github.com/thalissonfelipe/banking/banking/domain/vos"
 )
 
-type Usecase interface {
+type Transfer interface {
 	ListTransfers(context.Context, vos.AccountID) ([]entity.Transfer, error)
 	PerformTransfer(context.Context, PerformTransferInput) error
 }

@@ -12,8 +12,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/thalissonfelipe/banking/banking/domain/account"
 	"github.com/thalissonfelipe/banking/banking/domain/entity"
+	"github.com/thalissonfelipe/banking/banking/domain/usecases"
 	"github.com/thalissonfelipe/banking/banking/gateway/http/account/schema"
 	"github.com/thalissonfelipe/banking/banking/gateway/http/rest"
 	"github.com/thalissonfelipe/banking/banking/tests"
@@ -29,7 +29,7 @@ func TestAccountHandler_ListAccounts(t *testing.T) {
 
 	testCases := []struct {
 		name         string
-		usecase      account.Usecase
+		usecase      usecases.Account
 		expectedBody interface{}
 		decoder      tests.Decoder
 		expectedCode int

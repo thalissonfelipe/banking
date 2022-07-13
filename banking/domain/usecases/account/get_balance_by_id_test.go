@@ -1,4 +1,4 @@
-package usecase
+package account
 
 import (
 	"context"
@@ -6,7 +6,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/thalissonfelipe/banking/banking/domain/account"
 	"github.com/thalissonfelipe/banking/banking/domain/entity"
 	"github.com/thalissonfelipe/banking/banking/domain/vos"
 )
@@ -16,7 +15,7 @@ func TestAccountUsecase_GetAccountBalanceByID(t *testing.T) {
 
 	testCases := []struct {
 		name    string
-		repo    account.Repository
+		repo    entity.AccountRepository
 		want    int
 		wantErr error
 	}{
