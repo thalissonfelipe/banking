@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/thalissonfelipe/banking/banking/gateway/http/account/schemes"
+	"github.com/thalissonfelipe/banking/banking/gateway/http/account/schema"
 	"github.com/thalissonfelipe/banking/banking/tests/dockertest"
 	"github.com/thalissonfelipe/banking/banking/tests/fakes"
 	"github.com/thalissonfelipe/banking/banking/tests/testdata"
@@ -20,13 +20,13 @@ import (
 func TestIntegration_CreateAccount(t *testing.T) {
 	testCases := []struct {
 		name           string
-		bodySetup      func() schemes.CreateAccountInput
+		bodySetup      func() schema.CreateAccountInput
 		expectedStatus int
 	}{
 		{
 			name: "should return status code 201 if account was created successfully",
-			bodySetup: func() schemes.CreateAccountInput {
-				body := schemes.CreateAccountInput{
+			bodySetup: func() schema.CreateAccountInput {
+				body := schema.CreateAccountInput{
 					Name:   "Felipe",
 					CPF:    testdata.GetValidCPF().String(),
 					Secret: testdata.GetValidSecret().String(),
@@ -38,8 +38,8 @@ func TestIntegration_CreateAccount(t *testing.T) {
 		},
 		{
 			name: "should return status code 400 if name was not provided",
-			bodySetup: func() schemes.CreateAccountInput {
-				body := schemes.CreateAccountInput{
+			bodySetup: func() schema.CreateAccountInput {
+				body := schema.CreateAccountInput{
 					Name:   "",
 					CPF:    testdata.GetValidCPF().String(),
 					Secret: testdata.GetValidSecret().String(),
@@ -50,8 +50,8 @@ func TestIntegration_CreateAccount(t *testing.T) {
 			expectedStatus: http.StatusBadRequest,
 		},
 		{
-			bodySetup: func() schemes.CreateAccountInput {
-				body := schemes.CreateAccountInput{
+			bodySetup: func() schema.CreateAccountInput {
+				body := schema.CreateAccountInput{
 					Name:   "Felipe",
 					CPF:    "",
 					Secret: testdata.GetValidSecret().String(),
@@ -63,8 +63,8 @@ func TestIntegration_CreateAccount(t *testing.T) {
 		},
 		{
 			name: "should return status code 400 if secret was not provided",
-			bodySetup: func() schemes.CreateAccountInput {
-				body := schemes.CreateAccountInput{
+			bodySetup: func() schema.CreateAccountInput {
+				body := schema.CreateAccountInput{
 					Name:   "Felipe",
 					CPF:    testdata.GetValidCPF().String(),
 					Secret: "",
@@ -76,8 +76,8 @@ func TestIntegration_CreateAccount(t *testing.T) {
 		},
 		{
 			name: "should return status code 400 if cpf provided was not valid",
-			bodySetup: func() schemes.CreateAccountInput {
-				body := schemes.CreateAccountInput{
+			bodySetup: func() schema.CreateAccountInput {
+				body := schema.CreateAccountInput{
 					Name:   "Felipe",
 					CPF:    "123.456.789-00",
 					Secret: testdata.GetValidSecret().String(),
@@ -89,8 +89,8 @@ func TestIntegration_CreateAccount(t *testing.T) {
 		},
 		{
 			name: "should return status code 400 if secret provided was not valid",
-			bodySetup: func() schemes.CreateAccountInput {
-				body := schemes.CreateAccountInput{
+			bodySetup: func() schema.CreateAccountInput {
+				body := schema.CreateAccountInput{
 					Name:   "Felipe",
 					CPF:    testdata.GetValidCPF().String(),
 					Secret: "12345678",
@@ -102,10 +102,10 @@ func TestIntegration_CreateAccount(t *testing.T) {
 		},
 		{
 			name: "should return status code 409 if account already exists",
-			bodySetup: func() schemes.CreateAccountInput {
+			bodySetup: func() schema.CreateAccountInput {
 				acc := createAccount(t, testdata.GetValidCPF(), testdata.GetValidSecret(), 0)
 
-				body := schemes.CreateAccountInput{
+				body := schema.CreateAccountInput{
 					Name:   "Felipe",
 					CPF:    acc.CPF.String(),
 					Secret: testdata.GetValidSecret().String(),

@@ -14,7 +14,7 @@ import (
 
 	"github.com/thalissonfelipe/banking/banking/domain/account"
 	"github.com/thalissonfelipe/banking/banking/domain/entities"
-	"github.com/thalissonfelipe/banking/banking/gateway/http/account/schemes"
+	"github.com/thalissonfelipe/banking/banking/gateway/http/account/schema"
 	"github.com/thalissonfelipe/banking/banking/gateway/http/rest"
 	"github.com/thalissonfelipe/banking/banking/tests"
 	"github.com/thalissonfelipe/banking/banking/tests/fakes"
@@ -24,6 +24,8 @@ import (
 func TestAccountHandler_ListAccounts(t *testing.T) {
 	acc, err := entities.NewAccount("name", testdata.GetValidCPF().String(), testdata.GetValidSecret().String())
 	require.NoError(t, err)
+
+	accounts := []entities.Account{acc}
 
 	testCases := []struct {
 		name         string
@@ -36,10 +38,10 @@ func TestAccountHandler_ListAccounts(t *testing.T) {
 			name: "should return a list of accounts successfully",
 			usecase: &UsecaseMock{
 				ListAccountsFunc: func(context.Context) ([]entities.Account, error) {
-					return []entities.Account{acc}, nil
+					return accounts, nil
 				},
 			},
-			expectedBody: []schemes.AccountListResponse{convertAccountToAccountListResponse(acc)},
+			expectedBody: schema.MapToListAccountsResponse(accounts),
 			expectedCode: http.StatusOK,
 			decoder:      listAccountsSuccessDecoder{},
 		},
@@ -78,7 +80,7 @@ func TestAccountHandler_ListAccounts(t *testing.T) {
 type listAccountsSuccessDecoder struct{}
 
 func (listAccountsSuccessDecoder) Decode(t *testing.T, body *bytes.Buffer) interface{} {
-	var result []schemes.AccountListResponse
+	var result schema.ListAccountsResponse
 
 	err := json.NewDecoder(body).Decode(&result)
 	require.NoError(t, err)

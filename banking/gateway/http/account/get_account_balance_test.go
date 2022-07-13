@@ -16,7 +16,7 @@ import (
 	"github.com/thalissonfelipe/banking/banking/domain/account"
 	"github.com/thalissonfelipe/banking/banking/domain/entities"
 	"github.com/thalissonfelipe/banking/banking/domain/vos"
-	"github.com/thalissonfelipe/banking/banking/gateway/http/account/schemes"
+	"github.com/thalissonfelipe/banking/banking/gateway/http/account/schema"
 	"github.com/thalissonfelipe/banking/banking/gateway/http/rest"
 	"github.com/thalissonfelipe/banking/banking/tests"
 	"github.com/thalissonfelipe/banking/banking/tests/fakes"
@@ -44,7 +44,7 @@ func TestAccountHandler_GetAccountBalance(t *testing.T) {
 			},
 			requestURI:   fmt.Sprintf("/accounts/%s/balance", acc.ID),
 			decoder:      balanceResponseDecoder{},
-			expectedBody: schemes.BalanceResponse{Balance: 100},
+			expectedBody: schema.BalanceResponse{Balance: 100},
 			expectedCode: http.StatusOK,
 		},
 		{
@@ -100,7 +100,7 @@ func TestAccountHandler_GetAccountBalance(t *testing.T) {
 type balanceResponseDecoder struct{}
 
 func (balanceResponseDecoder) Decode(t *testing.T, body *bytes.Buffer) interface{} {
-	var result schemes.BalanceResponse
+	var result schema.BalanceResponse
 
 	err := json.NewDecoder(body).Decode(&result)
 	require.NoError(t, err)

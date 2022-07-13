@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/thalissonfelipe/banking/banking/domain/entities"
-	"github.com/thalissonfelipe/banking/banking/gateway/http/account/schemes"
+	"github.com/thalissonfelipe/banking/banking/gateway/http/account/schema"
 	"github.com/thalissonfelipe/banking/banking/gateway/http/rest"
 )
 
@@ -24,7 +24,7 @@ import (
 // @Failure 500 {object} responses.ErrorResponse
 // @Router /accounts [POST].
 func (h Handler) CreateAccount(w http.ResponseWriter, r *http.Request) {
-	var body schemes.CreateAccountInput
+	var body schema.CreateAccountInput
 
 	if err := rest.DecodeRequestBody(r, &body); err != nil {
 		rest.HandleBadRequestError(w, err)
@@ -46,6 +46,5 @@ func (h Handler) CreateAccount(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	accResponse := convertAccountToCreateAccountResponse(&account)
-	rest.SendJSON(w, http.StatusCreated, accResponse)
+	rest.SendJSON(w, http.StatusCreated, schema.MapToCreateAccountResponse(account))
 }

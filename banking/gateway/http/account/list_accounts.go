@@ -3,7 +3,7 @@ package account
 import (
 	"net/http"
 
-	"github.com/thalissonfelipe/banking/banking/gateway/http/account/schemes"
+	"github.com/thalissonfelipe/banking/banking/gateway/http/account/schema"
 	"github.com/thalissonfelipe/banking/banking/gateway/http/rest"
 )
 
@@ -13,7 +13,7 @@ import (
 // @Description List all accounts.
 // @Accept json
 // @Produce json
-// @Success 200 {array} accountResponse
+// @Success 200 {array} schema.ListAccountsResponse
 // @Failure 500 {object} responses.ErrorResponse
 // @Router /accounts [GET].
 func (h Handler) ListAccounts(w http.ResponseWriter, r *http.Request) {
@@ -24,11 +24,5 @@ func (h Handler) ListAccounts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	accountsResponse := make([]schemes.AccountListResponse, 0)
-
-	for _, acc := range accounts {
-		accountsResponse = append(accountsResponse, convertAccountToAccountListResponse(acc))
-	}
-
-	rest.SendJSON(w, http.StatusOK, accountsResponse)
+	rest.SendJSON(w, http.StatusOK, schema.MapToListAccountsResponse(accounts))
 }
