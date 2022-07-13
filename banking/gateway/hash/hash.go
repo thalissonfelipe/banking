@@ -3,8 +3,11 @@ package hash
 import (
 	"fmt"
 
+	"github.com/thalissonfelipe/banking/banking/domain/encrypter"
 	"golang.org/x/crypto/bcrypt"
 )
+
+var _ encrypter.Encrypter = (*Hash)(nil)
 
 type Hash struct{}
 
