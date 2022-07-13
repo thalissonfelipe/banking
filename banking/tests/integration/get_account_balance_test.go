@@ -55,8 +55,6 @@ func TestIntegration_GetAccountBalance(t *testing.T) {
 			_, err = io.Copy(&body, resp.Body)
 			require.NoError(t, err)
 
-			t.Log(body.String())
-
 			assert.Equal(t, tt.expectedStatus, resp.StatusCode)
 
 			dockertest.TruncateTables(context.Background(), testenv.DB)

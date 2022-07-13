@@ -9,35 +9,36 @@ import (
 	"github.com/thalissonfelipe/banking/banking/domain/account"
 	"github.com/thalissonfelipe/banking/banking/domain/entities"
 	"github.com/thalissonfelipe/banking/banking/domain/vos"
+	"github.com/thalissonfelipe/banking/banking/tests/testdata"
 )
 
-func TestAccountUsecase_GetBalanceByAccountID(t *testing.T) {
-	wantBalance := 100
+func TestAccountUsecase_GetAccountByID(t *testing.T) {
+	acc := entities.NewAccount("Piter", testdata.GetValidCPF(), testdata.GetValidSecret())
 
 	testCases := []struct {
 		name    string
 		repo    account.Repository
-		want    int
+		want    entities.Account
 		wantErr error
 	}{
 		{
-			name: "should return an account balance successfully",
+			name: "should return an account successfully",
 			repo: &RepositoryMock{
-				GetBalanceByIDFunc: func(context.Context, vos.AccountID) (int, error) {
-					return wantBalance, nil
+				GetAccountByIDFunc: func(context.Context, vos.AccountID) (entities.Account, error) {
+					return acc, nil
 				},
 			},
-			want:    wantBalance,
+			want:    acc,
 			wantErr: nil,
 		},
 		{
 			name: "should return an error if account does not exist",
 			repo: &RepositoryMock{
-				GetBalanceByIDFunc: func(context.Context, vos.AccountID) (int, error) {
-					return 0, entities.ErrAccountDoesNotExist
+				GetAccountByIDFunc: func(context.Context, vos.AccountID) (entities.Account, error) {
+					return entities.Account{}, entities.ErrAccountDoesNotExist
 				},
 			},
-			want:    0,
+			want:    entities.Account{},
 			wantErr: entities.ErrAccountDoesNotExist,
 		},
 	}
@@ -46,9 +47,9 @@ func TestAccountUsecase_GetBalanceByAccountID(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			usecase := NewAccountUsecase(tt.repo, nil)
 
-			balance, err := usecase.GetAccountBalanceByID(context.Background(), vos.NewAccountID())
+			account, err := usecase.GetAccountByID(context.Background(), vos.NewAccountID())
 			assert.ErrorIs(t, err, tt.wantErr)
-			assert.Equal(t, tt.want, balance)
+			assert.Equal(t, tt.want, account)
 		})
 	}
 }

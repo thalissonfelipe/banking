@@ -2,6 +2,7 @@ package transfer
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -13,47 +14,43 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/thalissonfelipe/banking/banking/domain/entities"
-	"github.com/thalissonfelipe/banking/banking/domain/transfer/usecase"
+	"github.com/thalissonfelipe/banking/banking/domain/transfer"
+	"github.com/thalissonfelipe/banking/banking/domain/vos"
 	"github.com/thalissonfelipe/banking/banking/gateway/http/rest"
 	"github.com/thalissonfelipe/banking/banking/gateway/http/transfer/schemes"
 	"github.com/thalissonfelipe/banking/banking/services/auth"
 	"github.com/thalissonfelipe/banking/banking/tests"
 	"github.com/thalissonfelipe/banking/banking/tests/fakes"
-	"github.com/thalissonfelipe/banking/banking/tests/mocks"
-	"github.com/thalissonfelipe/banking/banking/tests/testdata"
 )
 
-func TestHandler_ListTransfers(t *testing.T) {
-	accOrigin := entities.NewAccount("Pedro", testdata.GetValidCPF(), testdata.GetValidSecret())
-	accDest := entities.NewAccount("Maria", testdata.GetValidCPF(), testdata.GetValidSecret())
-	transfer := entities.NewTransfer(accOrigin.ID, accDest.ID, 100)
+func TestTransferHandler_ListTransfers(t *testing.T) {
+	transfers := []entities.Transfer{entities.NewTransfer(vos.NewAccountID(), vos.NewAccountID(), 100)}
 
 	testCases := []struct {
 		name         string
-		repo         *mocks.TransferRepositoryMock
+		usecase      transfer.Usecase
 		decoder      tests.Decoder
 		expectedBody interface{}
 		expectedCode int
 	}{
 		{
-			name:         "should return a empty list of transfers",
-			repo:         &mocks.TransferRepositoryMock{},
-			decoder:      listTransfersDecoder{},
-			expectedBody: []schemes.TransferListResponse{},
-			expectedCode: http.StatusOK,
-		},
-		{
 			name: "should return a list of transfers",
-			repo: &mocks.TransferRepositoryMock{
-				Transfers: []entities.Transfer{transfer},
+			usecase: &UsecaseMock{
+				ListTransfersFunc: func(context.Context, vos.AccountID) ([]entities.Transfer, error) {
+					return transfers, nil
+				},
 			},
 			decoder:      listTransfersDecoder{},
-			expectedBody: []schemes.TransferListResponse{convertTransferToTransferListResponse(transfer)},
+			expectedBody: []schemes.TransferListResponse{convertTransferToTransferListResponse(transfers[0])},
 			expectedCode: http.StatusOK,
 		},
 		{
-			name:         "should return an error if usecase fails",
-			repo:         &mocks.TransferRepositoryMock{Err: testdata.ErrUsecaseFails},
+			name: "should return an error if usecase fails",
+			usecase: &UsecaseMock{
+				ListTransfersFunc: func(context.Context, vos.AccountID) ([]entities.Transfer, error) {
+					return nil, assert.AnError
+				},
+			},
 			decoder:      tests.ErrorMessageDecoder{},
 			expectedBody: rest.ErrorResponse{Message: "internal server error"},
 			expectedCode: http.StatusInternalServerError,
@@ -63,14 +60,15 @@ func TestHandler_ListTransfers(t *testing.T) {
 	for _, tt := range testCases {
 		t.Run(tt.name, func(t *testing.T) {
 			r := chi.NewRouter()
-			accUsecase := &mocks.AccountUsecaseMock{}
-			trUsecase := usecase.NewTransferUsecase(tt.repo, accUsecase)
-			handler := NewHandler(r, trUsecase)
+			handler := NewHandler(r, tt.usecase)
+
+			token, err := auth.NewToken(transfers[0].AccountOriginID.String())
+			require.NoError(t, err)
 
 			request := fakes.FakeRequest(http.MethodGet, "/transfers", nil)
-			token, _ := auth.NewToken(accOrigin.ID.String())
 			bearerToken := fmt.Sprintf("Bearer %s", token)
 			request.Header.Add("Authorization", bearerToken)
+
 			response := httptest.NewRecorder()
 
 			http.HandlerFunc(handler.ListTransfers).ServeHTTP(response, request)

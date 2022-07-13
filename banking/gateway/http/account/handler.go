@@ -6,6 +6,8 @@ import (
 	"github.com/thalissonfelipe/banking/banking/domain/account"
 )
 
+//go:generate moq -pkg account -skip-ensure -out usecase_mock.gen.go ../../../domain/account Usecase
+
 type Handler struct {
 	usecase account.Usecase
 }

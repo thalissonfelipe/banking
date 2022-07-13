@@ -10,8 +10,8 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func (a Auth) Autheticate(ctx context.Context, input AuthenticateInput) (string, error) {
-	cpf, err := vos.NewCPF(input.CPF)
+func (a Auth) Autheticate(ctx context.Context, cpfStr, secretStr string) (string, error) {
+	cpf, err := vos.NewCPF(cpfStr)
 	if err != nil {
 		return "", fmt.Errorf("new cpf: %w", err)
 	}
@@ -26,7 +26,7 @@ func (a Auth) Autheticate(ctx context.Context, input AuthenticateInput) (string,
 	}
 
 	hashedSecret := []byte(acc.Secret.String())
-	secret := []byte(input.Secret)
+	secret := []byte(secretStr)
 
 	err = a.encrypter.CompareHashAndSecret(hashedSecret, secret)
 	if err != nil {

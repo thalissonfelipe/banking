@@ -25,7 +25,7 @@ func HandleError(w http.ResponseWriter, err error) {
 		SendError(w, http.StatusNotFound, ErrAccountDestinationNotFound)
 	case errors.Is(err, entities.ErrAccountAlreadyExists):
 		SendError(w, http.StatusConflict, ErrAccountAlreadyExists)
-	case errors.Is(err, entities.ErrInternalError):
+	default:
 		SendError(w, http.StatusInternalServerError, ErrInternalError)
 	}
 }

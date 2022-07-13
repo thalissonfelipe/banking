@@ -2,6 +2,7 @@ package account
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -11,44 +12,43 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/thalissonfelipe/banking/banking/domain/account"
 	"github.com/thalissonfelipe/banking/banking/domain/entities"
 	"github.com/thalissonfelipe/banking/banking/gateway/http/account/schemes"
 	"github.com/thalissonfelipe/banking/banking/gateway/http/rest"
 	"github.com/thalissonfelipe/banking/banking/tests"
 	"github.com/thalissonfelipe/banking/banking/tests/fakes"
-	"github.com/thalissonfelipe/banking/banking/tests/mocks"
 	"github.com/thalissonfelipe/banking/banking/tests/testdata"
 )
 
-func TestHandler_ListAccounts(t *testing.T) {
+func TestAccountHandler_ListAccounts(t *testing.T) {
 	acc := entities.NewAccount("Pedro", testdata.GetValidCPF(), testdata.GetValidSecret())
 
 	testCases := []struct {
 		name         string
-		usecase      *mocks.AccountUsecaseMock
+		usecase      account.Usecase
 		expectedBody interface{}
 		decoder      tests.Decoder
 		expectedCode int
 	}{
 		{
-			name:         "should return 200 and an empty slice of accounts",
-			usecase:      &mocks.AccountUsecaseMock{},
-			expectedBody: []schemes.AccountListResponse{},
-			expectedCode: http.StatusOK,
-			decoder:      listAccountsSuccessDecoder{},
-		},
-		{
-			name: "should return 200 and an slice of accounts",
-			usecase: &mocks.AccountUsecaseMock{
-				Accounts: []entities.Account{acc},
+			name: "should return a list of accounts successfully",
+			usecase: &UsecaseMock{
+				ListAccountsFunc: func(context.Context) ([]entities.Account, error) {
+					return []entities.Account{acc}, nil
+				},
 			},
 			expectedBody: []schemes.AccountListResponse{convertAccountToAccountListResponse(acc)},
-			decoder:      listAccountsSuccessDecoder{},
 			expectedCode: http.StatusOK,
+			decoder:      listAccountsSuccessDecoder{},
 		},
 		{
-			name:         "should return 500 and error message if something went wrong",
-			usecase:      &mocks.AccountUsecaseMock{Err: testdata.ErrRepositoryFailsToFetch},
+			name: "should return 500 if usecase fails",
+			usecase: &UsecaseMock{
+				ListAccountsFunc: func(context.Context) ([]entities.Account, error) {
+					return nil, assert.AnError
+				},
+			},
 			expectedBody: rest.ErrorResponse{Message: "internal server error"},
 			decoder:      tests.ErrorMessageDecoder{},
 			expectedCode: http.StatusInternalServerError,

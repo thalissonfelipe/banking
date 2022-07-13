@@ -29,8 +29,6 @@ func TestIntegration_GetAccounts(t *testing.T) {
 	_, err = io.Copy(&body, resp.Body)
 	require.NoError(t, err)
 
-	t.Log(body.String())
-
 	assert.Equal(t, nil, err)
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
 }

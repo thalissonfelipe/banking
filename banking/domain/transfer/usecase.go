@@ -7,7 +7,7 @@ import (
 	"github.com/thalissonfelipe/banking/banking/domain/vos"
 )
 
-type UseCase interface {
+type Usecase interface {
 	ListTransfers(ctx context.Context, accountID vos.AccountID) ([]entities.Transfer, error)
 	CreateTransfer(ctx context.Context, input CreateTransferInput) error
 }

@@ -4,32 +4,29 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestNewToken(t *testing.T) {
-	t.Run("should create a token successfully", func(t *testing.T) {
-		token, err := NewToken("account_id")
-
-		assert.Nil(t, err)
-		assert.NotNil(t, token)
-	})
+	token, err := NewToken("account_id")
+	require.NoError(t, err)
+	assert.NotEmpty(t, token)
 }
 
 func TestIsValidToken(t *testing.T) {
-	t.Run("should return nil when token is valid", func(t *testing.T) {
-		token, _ := NewToken("account_id")
-		err := IsValidToken(token)
+	token, err := NewToken("account_id")
+	require.NoError(t, err)
 
-		assert.Nil(t, err)
-	})
+	err = IsValidToken(token)
+	assert.NoError(t, err)
 }
 
 func TestGetIDFromToken(t *testing.T) {
-	t.Run("should get id from token", func(t *testing.T) {
-		accountID := "account_id"
-		token, _ := NewToken(accountID)
-		id := GetIDFromToken(token)
+	want := "account_id"
 
-		assert.Equal(t, accountID, id)
-	})
+	token, err := NewToken(want)
+	require.NoError(t, err)
+
+	got := GetIDFromToken(token)
+	assert.Equal(t, want, got)
 }

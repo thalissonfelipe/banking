@@ -7,56 +7,44 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/thalissonfelipe/banking/banking/domain/entities"
+	"github.com/thalissonfelipe/banking/banking/domain/transfer"
 	"github.com/thalissonfelipe/banking/banking/domain/vos"
-	"github.com/thalissonfelipe/banking/banking/tests/mocks"
-	"github.com/thalissonfelipe/banking/banking/tests/testdata"
 )
 
-func TestUsecase_ListTransfers(t *testing.T) {
-	accountOriginID := vos.NewAccountID()
+func TestTransferUsecase_ListTransfers(t *testing.T) {
+	transfers := []entities.Transfer{entities.NewTransfer(vos.NewAccountID(), vos.NewAccountID(), 100)}
 
 	testCases := []struct {
-		name      string
-		repoSetup func() *mocks.TransferRepositoryMock
-		accountID vos.AccountID
-		wantErr   bool
+		name    string
+		repo    transfer.Repository
+		wantErr error
 	}{
 		{
-			name: "should return a list of transfers",
-			repoSetup: func() *mocks.TransferRepositoryMock {
-				transfer := entities.NewTransfer(
-					accountOriginID,
-					vos.NewAccountID(),
-					100,
-				)
-
-				return &mocks.TransferRepositoryMock{
-					Transfers: []entities.Transfer{transfer},
-				}
+			name: "should return a list of transfers successfully",
+			repo: &RepositoryMock{
+				GetTransfersFunc: func(context.Context, vos.AccountID) ([]entities.Transfer, error) {
+					return transfers, nil
+				},
 			},
-			accountID: accountOriginID,
-			wantErr:   false,
+			wantErr: nil,
 		},
 		{
-			name: "should return an error if something went wrong on repository",
-			repoSetup: func() *mocks.TransferRepositoryMock {
-				return &mocks.TransferRepositoryMock{
-					Err: testdata.ErrRepositoryFailsToFetch,
-				}
+			name: "should return an error if repo fails to get transfers",
+			repo: &RepositoryMock{
+				GetTransfersFunc: func(context.Context, vos.AccountID) ([]entities.Transfer, error) {
+					return nil, assert.AnError
+				},
 			},
-			accountID: accountOriginID,
-			wantErr:   true,
+			wantErr: assert.AnError,
 		},
 	}
 
 	for _, tt := range testCases {
 		t.Run(tt.name, func(t *testing.T) {
-			ctx := context.Background()
-			usecase := NewTransferUsecase(tt.repoSetup(), nil)
-			_, err := usecase.ListTransfers(ctx, tt.accountID)
+			usecase := NewTransferUsecase(tt.repo, nil)
 
-			// TODO: add result validation
-			assert.Equal(t, tt.wantErr, err != nil)
+			_, err := usecase.ListTransfers(context.Background(), vos.NewAccountID())
+			assert.ErrorIs(t, err, tt.wantErr)
 		})
 	}
 }

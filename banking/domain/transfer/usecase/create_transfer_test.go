@@ -6,123 +6,123 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/thalissonfelipe/banking/banking/domain/account"
 	"github.com/thalissonfelipe/banking/banking/domain/entities"
 	"github.com/thalissonfelipe/banking/banking/domain/transfer"
-	"github.com/thalissonfelipe/banking/banking/tests/mocks"
+	"github.com/thalissonfelipe/banking/banking/domain/vos"
 	"github.com/thalissonfelipe/banking/banking/tests/testdata"
 )
 
-func TestUsecase_CreateTransfer(t *testing.T) {
-	accOrigin := entities.NewAccount("Pedro", testdata.GetValidCPF(), testdata.GetValidSecret())
-	accDest := entities.NewAccount("Maria", testdata.GetValidCPF(), testdata.GetValidSecret())
+func TestTransferUsecase_CreateTransfer(t *testing.T) {
+	accOrigin := entities.NewAccount("origin", testdata.GetValidCPF(), testdata.GetValidSecret())
+	accOrigin.Balance = 100
+	accDest := entities.NewAccount("destination", testdata.GetValidCPF(), testdata.GetValidSecret())
 
 	testCases := []struct {
-		name        string
-		repoSetup   *mocks.TransferRepositoryMock
-		accUsecase  func() *mocks.AccountUsecaseMock
-		input       func() transfer.CreateTransferInput
-		expectedErr error
+		name       string
+		repo       transfer.Repository
+		accUsecase account.Usecase
+		input      transfer.CreateTransferInput
+		wantErr    error
 	}{
 		{
-			name:      "should perform a transfer successfully",
-			repoSetup: &mocks.TransferRepositoryMock{},
-			accUsecase: func() *mocks.AccountUsecaseMock {
-				accOriginWithBalance := accOrigin
-				accOriginWithBalance.Balance = 100
+			name: "should perform a transfer successfully",
+			repo: &RepositoryMock{
+				CreateTransferFunc: func(context.Context, *entities.Transfer) error {
+					return nil
+				},
+			},
+			accUsecase: &UsecaseMock{
+				GetAccountByIDFunc: func(_ context.Context, id vos.AccountID) (entities.Account, error) {
+					if id == accOrigin.ID {
+						return accOrigin, nil
+					}
 
-				return &mocks.AccountUsecaseMock{
-					Accounts: []entities.Account{accOriginWithBalance, accDest},
-				}
+					return accDest, nil
+				},
 			},
-			input: func() transfer.CreateTransferInput {
-				return transfer.NewTransferInput(accOrigin.ID, accDest.ID, 100)
-			},
-			expectedErr: nil,
+			input:   transfer.NewTransferInput(accOrigin.ID, accDest.ID, 100),
+			wantErr: nil,
 		},
 		{
-			name:      "should return an error if accOrigin does not have sufficient funds",
-			repoSetup: &mocks.TransferRepositoryMock{},
-			accUsecase: func() *mocks.AccountUsecaseMock {
-				return &mocks.AccountUsecaseMock{
-					Accounts: []entities.Account{accOrigin, accDest},
-				}
-			},
-			input: func() transfer.CreateTransferInput {
-				return transfer.NewTransferInput(accOrigin.ID, accDest.ID, 100)
-			},
-			expectedErr: entities.ErrInsufficientFunds,
-		},
-		{
-			name:      "should return an error if transfer repository fails",
-			repoSetup: &mocks.TransferRepositoryMock{Err: testdata.ErrRepositoryFailsToSave},
-			accUsecase: func() *mocks.AccountUsecaseMock {
-				accOriginWithBalance := accOrigin
-				accOriginWithBalance.Balance = 100
+			name: "should return an error if account origin does not have sufficient funds",
+			repo: &RepositoryMock{},
+			accUsecase: &UsecaseMock{
+				GetAccountByIDFunc: func(_ context.Context, id vos.AccountID) (entities.Account, error) {
+					if id == accOrigin.ID {
+						return accOrigin, nil
+					}
 
-				return &mocks.AccountUsecaseMock{
-					Accounts: []entities.Account{accOriginWithBalance, accDest},
-				}
+					return accDest, nil
+				},
 			},
-			input: func() transfer.CreateTransferInput {
-				return transfer.NewTransferInput(accOrigin.ID, accDest.ID, 100)
-			},
-			expectedErr: entities.ErrInternalError,
+			input:   transfer.NewTransferInput(accOrigin.ID, accDest.ID, accOrigin.Balance+1),
+			wantErr: entities.ErrInsufficientFunds,
 		},
 		{
-			name:      "should return an error if accUsecase fails",
-			repoSetup: &mocks.TransferRepositoryMock{},
-			accUsecase: func() *mocks.AccountUsecaseMock {
-				accOriginWithBalance := accOrigin
-				accOriginWithBalance.Balance = 100
+			name: "should return an error if account origin does not exist",
+			repo: &RepositoryMock{},
+			accUsecase: &UsecaseMock{
+				GetAccountByIDFunc: func(context.Context, vos.AccountID) (entities.Account, error) {
+					return entities.Account{}, entities.ErrAccountDoesNotExist
+				},
+			},
+			input:   transfer.NewTransferInput(accOrigin.ID, accDest.ID, accOrigin.Balance),
+			wantErr: entities.ErrAccountDoesNotExist,
+		},
+		{
+			name: "should return an error if account destination does not exist",
+			repo: &RepositoryMock{},
+			accUsecase: &UsecaseMock{
+				GetAccountByIDFunc: func(_ context.Context, id vos.AccountID) (entities.Account, error) {
+					if id == accOrigin.ID {
+						return accOrigin, nil
+					}
 
-				return &mocks.AccountUsecaseMock{
-					Accounts: []entities.Account{accOriginWithBalance, accDest},
-					Err:      testdata.ErrUsecaseFails,
-				}
+					return entities.Account{}, entities.ErrAccountDoesNotExist
+				},
 			},
-			input: func() transfer.CreateTransferInput {
-				return transfer.NewTransferInput(accOrigin.ID, accDest.ID, 100)
-			},
-			expectedErr: entities.ErrInternalError,
+			input:   transfer.NewTransferInput(accOrigin.ID, accDest.ID, accOrigin.Balance),
+			wantErr: entities.ErrAccountDestinationDoesNotExist,
 		},
 		{
-			name:      "should return an error if account origin does not exist",
-			repoSetup: &mocks.TransferRepositoryMock{},
-			accUsecase: func() *mocks.AccountUsecaseMock {
-				return &mocks.AccountUsecaseMock{
-					Accounts: []entities.Account{accDest},
-				}
+			name: "should return an error if account usecase fails",
+			repo: &RepositoryMock{},
+			accUsecase: &UsecaseMock{
+				GetAccountByIDFunc: func(context.Context, vos.AccountID) (entities.Account, error) {
+					return entities.Account{}, assert.AnError
+				},
 			},
-			input: func() transfer.CreateTransferInput {
-				return transfer.NewTransferInput(accOrigin.ID, accDest.ID, 100)
-			},
-			expectedErr: entities.ErrAccountDoesNotExist,
+			input:   transfer.NewTransferInput(accOrigin.ID, accDest.ID, accOrigin.Balance),
+			wantErr: assert.AnError,
 		},
 		{
-			name:      "should return an error if account destination does not exist",
-			repoSetup: &mocks.TransferRepositoryMock{},
-			accUsecase: func() *mocks.AccountUsecaseMock {
-				accOriginWithBalance := accOrigin
-				accOriginWithBalance.Balance = 100
+			name: "should return an error if repo fails to create a transfer",
+			repo: &RepositoryMock{
+				CreateTransferFunc: func(context.Context, *entities.Transfer) error {
+					return assert.AnError
+				},
+			},
+			accUsecase: &UsecaseMock{
+				GetAccountByIDFunc: func(_ context.Context, id vos.AccountID) (entities.Account, error) {
+					if id == accOrigin.ID {
+						return accOrigin, nil
+					}
 
-				return &mocks.AccountUsecaseMock{
-					Accounts: []entities.Account{accOriginWithBalance},
-				}
+					return accDest, nil
+				},
 			},
-			input: func() transfer.CreateTransferInput {
-				return transfer.NewTransferInput(accOrigin.ID, accDest.ID, 100)
-			},
-			expectedErr: entities.ErrAccountDestinationDoesNotExist,
+			input:   transfer.NewTransferInput(accOrigin.ID, accDest.ID, accOrigin.Balance),
+			wantErr: assert.AnError,
 		},
 	}
 
 	for _, tt := range testCases {
 		t.Run(tt.name, func(t *testing.T) {
-			ctx := context.Background()
-			usecase := NewTransferUsecase(tt.repoSetup, tt.accUsecase())
-			err := usecase.CreateTransfer(ctx, tt.input())
+			usecase := NewTransferUsecase(tt.repo, tt.accUsecase)
 
-			assert.ErrorIs(t, err, tt.expectedErr)
+			err := usecase.CreateTransfer(context.Background(), tt.input)
+			assert.ErrorIs(t, err, tt.wantErr)
 		})
 	}
 }

@@ -12,12 +12,7 @@ import (
 )
 
 func (s Server) Login(ctx context.Context, request *proto.LoginRequest) (*proto.LoginResponse, error) {
-	input := auth.AuthenticateInput{
-		CPF:    request.Cpf,
-		Secret: request.Secret,
-	}
-
-	token, err := s.auth.Autheticate(context.Background(), input)
+	token, err := s.auth.Autheticate(context.Background(), request.Cpf, request.Secret)
 	if err != nil {
 		if errors.Is(err, auth.ErrInvalidCredentials) {
 			return nil, status.Errorf(codes.InvalidArgument, "wrong credentials")

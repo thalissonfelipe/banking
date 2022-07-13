@@ -5,7 +5,6 @@ import (
 
 	"github.com/thalissonfelipe/banking/banking/gateway/http/auth/schemes"
 	"github.com/thalissonfelipe/banking/banking/gateway/http/rest"
-	"github.com/thalissonfelipe/banking/banking/services/auth"
 )
 
 // Login logs in :D
@@ -30,12 +29,7 @@ func (h Handler) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	input := auth.AuthenticateInput{
-		CPF:    body.CPF,
-		Secret: body.Secret,
-	}
-
-	token, err := h.authService.Autheticate(r.Context(), input)
+	token, err := h.authService.Autheticate(r.Context(), body.CPF, body.Secret)
 	if err != nil {
 		rest.HandleError(w, err)
 

@@ -13,47 +13,33 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/thalissonfelipe/banking/banking/domain/account"
 	"github.com/thalissonfelipe/banking/banking/domain/entities"
+	"github.com/thalissonfelipe/banking/banking/domain/vos"
 	"github.com/thalissonfelipe/banking/banking/gateway/http/account/schemes"
 	"github.com/thalissonfelipe/banking/banking/gateway/http/rest"
 	"github.com/thalissonfelipe/banking/banking/tests"
 	"github.com/thalissonfelipe/banking/banking/tests/fakes"
-	"github.com/thalissonfelipe/banking/banking/tests/mocks"
 	"github.com/thalissonfelipe/banking/banking/tests/testdata"
 )
 
-func TestHandler_GetAccountBalance(t *testing.T) {
+func TestAccountHandler_GetAccountBalance(t *testing.T) {
 	acc := entities.NewAccount("Pedro", testdata.GetValidCPF(), testdata.GetValidSecret())
 
 	testCases := []struct {
 		name         string
-		usecase      func() *mocks.AccountUsecaseMock
+		usecase      account.Usecase
 		requestURI   string
 		decoder      tests.Decoder
 		expectedBody interface{}
 		expectedCode int
 	}{
 		{
-			name: "should return status 200 and a balance equal to 0",
-			usecase: func() *mocks.AccountUsecaseMock {
-				return &mocks.AccountUsecaseMock{
-					Accounts: []entities.Account{acc},
-				}
-			},
-			requestURI:   fmt.Sprintf("/accounts/%s/balance", acc.ID),
-			decoder:      balanceResponseDecoder{},
-			expectedBody: schemes.BalanceResponse{Balance: 0},
-			expectedCode: http.StatusOK,
-		},
-		{
-			name: "should return status 200 and a balance equal to 100",
-			usecase: func() *mocks.AccountUsecaseMock {
-				accWithBalance := acc
-				accWithBalance.Balance = 100
-
-				return &mocks.AccountUsecaseMock{
-					Accounts: []entities.Account{accWithBalance},
-				}
+			name: "should return account balance successfully",
+			usecase: &UsecaseMock{
+				GetAccountBalanceByIDFunc: func(context.Context, vos.AccountID) (int, error) {
+					return 100, nil
+				},
 			},
 			requestURI:   fmt.Sprintf("/accounts/%s/balance", acc.ID),
 			decoder:      balanceResponseDecoder{},
@@ -62,8 +48,10 @@ func TestHandler_GetAccountBalance(t *testing.T) {
 		},
 		{
 			name: "should return status 404 if account does not exist",
-			usecase: func() *mocks.AccountUsecaseMock {
-				return &mocks.AccountUsecaseMock{}
+			usecase: &UsecaseMock{
+				GetAccountBalanceByIDFunc: func(context.Context, vos.AccountID) (int, error) {
+					return 0, entities.ErrAccountDoesNotExist
+				},
 			},
 			requestURI:   fmt.Sprintf("/accounts/%s/balance", acc.ID),
 			decoder:      tests.ErrorMessageDecoder{},
@@ -71,9 +59,11 @@ func TestHandler_GetAccountBalance(t *testing.T) {
 			expectedCode: http.StatusNotFound,
 		},
 		{
-			name: "should return status 500 if something went wrong on usecase",
-			usecase: func() *mocks.AccountUsecaseMock {
-				return &mocks.AccountUsecaseMock{Err: entities.ErrInternalError}
+			name: "should return status 500 if usecase fails",
+			usecase: &UsecaseMock{
+				GetAccountBalanceByIDFunc: func(context.Context, vos.AccountID) (int, error) {
+					return 0, assert.AnError
+				},
 			},
 			requestURI:   fmt.Sprintf("/accounts/%s/balance", acc.ID),
 			decoder:      tests.ErrorMessageDecoder{},
@@ -85,7 +75,7 @@ func TestHandler_GetAccountBalance(t *testing.T) {
 	for _, tt := range testCases {
 		t.Run(tt.name, func(t *testing.T) {
 			r := chi.NewRouter()
-			handler := NewHandler(r, tt.usecase())
+			handler := NewHandler(r, tt.usecase)
 
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("accountID", acc.ID.String())

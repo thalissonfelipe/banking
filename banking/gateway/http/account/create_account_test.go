@@ -2,6 +2,7 @@ package account
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -11,32 +12,43 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/thalissonfelipe/banking/banking/domain/account"
 	"github.com/thalissonfelipe/banking/banking/domain/entities"
 	"github.com/thalissonfelipe/banking/banking/gateway/http/account/schemes"
 	"github.com/thalissonfelipe/banking/banking/gateway/http/rest"
 	"github.com/thalissonfelipe/banking/banking/tests"
 	"github.com/thalissonfelipe/banking/banking/tests/fakes"
-	"github.com/thalissonfelipe/banking/banking/tests/mocks"
 	"github.com/thalissonfelipe/banking/banking/tests/testdata"
 )
 
-func TestHandler_CreateAccount(t *testing.T) {
+func TestAccountHandler_CreateAccount(t *testing.T) {
 	cpf := testdata.GetValidCPF()
 	secret := testdata.GetValidSecret()
 
 	testCases := []struct {
 		name         string
-		usecase      *mocks.AccountUsecaseMock
-		enc          *mocks.HashMock
+		usecase      account.Usecase
 		decoder      tests.Decoder
 		body         interface{}
 		expectedBody interface{}
 		expectedCode int
 	}{
 		{
+			name: "should return status code 201 if acc was created successfully",
+			usecase: &UsecaseMock{
+				CreateAccountFunc: func(context.Context, account.CreateAccountInput) (*entities.Account, error) {
+					acc := entities.NewAccount("name", cpf, secret)
+					return &acc, nil
+				},
+			},
+			decoder:      createdAccountDecoder{},
+			body:         schemes.CreateAccountInput{Name: "name", CPF: cpf.String(), Secret: secret.String()},
+			expectedBody: schemes.CreateAccountResponse{Name: "name", CPF: cpf.String(), Balance: 0},
+			expectedCode: http.StatusCreated,
+		},
+		{
 			name:         "should return status code 400 if name was not provided",
-			usecase:      &mocks.AccountUsecaseMock{},
-			enc:          &mocks.HashMock{},
+			usecase:      &UsecaseMock{},
 			decoder:      tests.ErrorMessageDecoder{},
 			body:         schemes.CreateAccountInput{CPF: cpf.String(), Secret: secret.String()},
 			expectedBody: rest.ErrorResponse{Message: "missing name parameter"},
@@ -44,26 +56,23 @@ func TestHandler_CreateAccount(t *testing.T) {
 		},
 		{
 			name:         "should return status code 400 if cpf was not provided",
-			usecase:      &mocks.AccountUsecaseMock{},
-			enc:          &mocks.HashMock{},
+			usecase:      &UsecaseMock{},
 			decoder:      tests.ErrorMessageDecoder{},
-			body:         schemes.CreateAccountInput{Name: "Pedro", Secret: secret.String()},
+			body:         schemes.CreateAccountInput{Name: "name", Secret: secret.String()},
 			expectedBody: rest.ErrorResponse{Message: "missing cpf parameter"},
 			expectedCode: http.StatusBadRequest,
 		},
 		{
 			name:         "should return status code 400 if secret was not provided",
-			usecase:      &mocks.AccountUsecaseMock{},
-			enc:          &mocks.HashMock{},
+			usecase:      &UsecaseMock{},
 			decoder:      tests.ErrorMessageDecoder{},
-			body:         schemes.CreateAccountInput{Name: "Pedro", CPF: cpf.String()},
+			body:         schemes.CreateAccountInput{Name: "name", CPF: cpf.String()},
 			expectedBody: rest.ErrorResponse{Message: "missing secret parameter"},
 			expectedCode: http.StatusBadRequest,
 		},
 		{
 			name:         "should return status code 400 if an invalid json was provided",
-			usecase:      &mocks.AccountUsecaseMock{},
-			enc:          &mocks.HashMock{},
+			usecase:      &UsecaseMock{},
 			decoder:      tests.ErrorMessageDecoder{},
 			body:         map[string]interface{}{"name": 123456},
 			expectedBody: rest.ErrorResponse{Message: "invalid json"},
@@ -71,52 +80,43 @@ func TestHandler_CreateAccount(t *testing.T) {
 		},
 		{
 			name:         "should return status code 400 if cpf provided is not valid",
-			usecase:      &mocks.AccountUsecaseMock{},
-			enc:          &mocks.HashMock{},
+			usecase:      &UsecaseMock{},
 			decoder:      tests.ErrorMessageDecoder{},
-			body:         schemes.CreateAccountInput{Name: "Pedro", CPF: "123.456.789-00", Secret: secret.String()},
+			body:         schemes.CreateAccountInput{Name: "name", CPF: "123.456.789-00", Secret: secret.String()},
 			expectedBody: rest.ErrorResponse{Message: "invalid cpf"},
 			expectedCode: http.StatusBadRequest,
 		},
 		{
 			name:         "should return status code 400 if secret provided is not valid",
-			usecase:      &mocks.AccountUsecaseMock{},
-			enc:          &mocks.HashMock{},
+			usecase:      &UsecaseMock{},
 			decoder:      tests.ErrorMessageDecoder{},
-			body:         schemes.CreateAccountInput{Name: "Pedro", CPF: cpf.String(), Secret: "12345678"},
+			body:         schemes.CreateAccountInput{Name: "name", CPF: cpf.String(), Secret: "12345678"},
 			expectedBody: rest.ErrorResponse{Message: "invalid secret"},
 			expectedCode: http.StatusBadRequest,
 		},
 		{
-			name: "should return status code 409 if cpf already exists",
-			usecase: &mocks.AccountUsecaseMock{
-				Accounts: []entities.Account{entities.NewAccount(
-					"Junior", cpf, secret,
-				)},
+			name: "should return status code 409 if account already exists",
+			usecase: &UsecaseMock{
+				CreateAccountFunc: func(context.Context, account.CreateAccountInput) (*entities.Account, error) {
+					return nil, entities.ErrAccountAlreadyExists
+				},
 			},
-			enc:          &mocks.HashMock{},
 			decoder:      tests.ErrorMessageDecoder{},
-			body:         schemes.CreateAccountInput{Name: "Pedro", CPF: cpf.String(), Secret: secret.String()},
+			body:         schemes.CreateAccountInput{Name: "name", CPF: cpf.String(), Secret: secret.String()},
 			expectedBody: rest.ErrorResponse{Message: "account already exists"},
 			expectedCode: http.StatusConflict,
 		},
 		{
-			name:         "should return status code 500 if usecase fails to create account",
-			usecase:      &mocks.AccountUsecaseMock{Err: testdata.ErrUsecaseFails},
-			enc:          &mocks.HashMock{},
+			name: "should return status code 500 if usecase fails to create an account",
+			usecase: &UsecaseMock{
+				CreateAccountFunc: func(context.Context, account.CreateAccountInput) (*entities.Account, error) {
+					return nil, assert.AnError
+				},
+			},
 			decoder:      tests.ErrorMessageDecoder{},
-			body:         schemes.CreateAccountInput{Name: "Pedro", CPF: cpf.String(), Secret: secret.String()},
+			body:         schemes.CreateAccountInput{Name: "name", CPF: cpf.String(), Secret: secret.String()},
 			expectedBody: rest.ErrorResponse{Message: "internal server error"},
 			expectedCode: http.StatusInternalServerError,
-		},
-		{
-			name:         "should return status code 201 and created account",
-			usecase:      &mocks.AccountUsecaseMock{},
-			enc:          &mocks.HashMock{},
-			decoder:      createdAccountDecoder{},
-			body:         schemes.CreateAccountInput{Name: "Pedro", CPF: cpf.String(), Secret: secret.String()},
-			expectedBody: schemes.CreateAccountResponse{Name: "Pedro", CPF: cpf.String(), Balance: 0},
-			expectedCode: http.StatusCreated,
 		},
 	}
 

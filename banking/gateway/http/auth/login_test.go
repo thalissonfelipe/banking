@@ -2,6 +2,7 @@ package auth
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -11,35 +12,42 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/thalissonfelipe/banking/banking/domain/account"
-	"github.com/thalissonfelipe/banking/banking/domain/encrypter"
-	"github.com/thalissonfelipe/banking/banking/domain/entities"
 	"github.com/thalissonfelipe/banking/banking/gateway/http/auth/schemes"
 	"github.com/thalissonfelipe/banking/banking/gateway/http/rest"
+	"github.com/thalissonfelipe/banking/banking/services"
 	"github.com/thalissonfelipe/banking/banking/services/auth"
 	"github.com/thalissonfelipe/banking/banking/tests"
 	"github.com/thalissonfelipe/banking/banking/tests/fakes"
-	"github.com/thalissonfelipe/banking/banking/tests/mocks"
 	"github.com/thalissonfelipe/banking/banking/tests/testdata"
 )
 
-func TestLogin(t *testing.T) {
+func TestAuthHandler_Login(t *testing.T) {
 	cpf := testdata.GetValidCPF()
 	secret := testdata.GetValidSecret()
 
 	testCases := []struct {
 		name         string
-		usecase      account.Usecase
-		enc          encrypter.Encrypter
+		auth         services.Auth
 		body         interface{}
 		decoder      tests.Decoder
 		expectedBody interface{}
 		expectedCode int
 	}{
 		{
+			name: "should authenticate successfully and return a token",
+			auth: &AuthMock{
+				AutheticateFunc: func(_ context.Context, _, _ string) (string, error) {
+					return "token", nil
+				},
+			},
+			body:         schemes.LoginInput{CPF: cpf.String(), Secret: secret.String()},
+			decoder:      responseBodyDecoder{},
+			expectedBody: schemes.LoginResponse{},
+			expectedCode: http.StatusOK,
+		},
+		{
 			name:         "should return status code 400 if cpf was not provided",
-			usecase:      mocks.AccountUsecaseMock{},
-			enc:          mocks.HashMock{},
+			auth:         &AuthMock{},
 			body:         schemes.LoginInput{Secret: secret.String()},
 			decoder:      tests.ErrorMessageDecoder{},
 			expectedBody: rest.ErrorResponse{Message: "missing cpf parameter"},
@@ -47,17 +55,15 @@ func TestLogin(t *testing.T) {
 		},
 		{
 			name:         "should return status code 400 if secret was not provided",
-			usecase:      mocks.AccountUsecaseMock{},
-			enc:          mocks.HashMock{},
+			auth:         &AuthMock{},
 			body:         schemes.LoginInput{CPF: cpf.String()},
 			decoder:      tests.ErrorMessageDecoder{},
 			expectedBody: rest.ErrorResponse{Message: "missing secret parameter"},
 			expectedCode: http.StatusBadRequest,
 		},
 		{
-			name:    "should return status code 400 if json provided was not valid",
-			usecase: mocks.AccountUsecaseMock{},
-			enc:     mocks.HashMock{},
+			name: "should return status code 400 if json provided was not valid",
+			auth: &AuthMock{},
 			body: map[string]interface{}{
 				"cpf": 123,
 			},
@@ -66,56 +72,35 @@ func TestLogin(t *testing.T) {
 			expectedCode: http.StatusBadRequest,
 		},
 		{
-			name:         "should return status code 500 if usecase fails",
-			usecase:      mocks.AccountUsecaseMock{Err: testdata.ErrUsecaseFails},
-			enc:          mocks.HashMock{},
+			name: "should return status code 500 if auth service fails",
+			auth: &AuthMock{
+				AutheticateFunc: func(_ context.Context, _, _ string) (string, error) {
+					return "", assert.AnError
+				},
+			},
 			body:         schemes.LoginInput{CPF: cpf.String(), Secret: secret.String()},
 			decoder:      tests.ErrorMessageDecoder{},
 			expectedBody: rest.ErrorResponse{Message: "internal server error"},
 			expectedCode: http.StatusInternalServerError,
 		},
 		{
-			name:         "should return status code 400 if account does not exist",
-			usecase:      mocks.AccountUsecaseMock{},
-			enc:          mocks.HashMock{},
+			name: "should return status code 400 if credentials are invalid",
+			auth: &AuthMock{
+				AutheticateFunc: func(_ context.Context, _, _ string) (string, error) {
+					return "", auth.ErrInvalidCredentials
+				},
+			},
 			body:         schemes.LoginInput{CPF: cpf.String(), Secret: secret.String()},
 			decoder:      tests.ErrorMessageDecoder{},
 			expectedBody: rest.ErrorResponse{Message: "cpf or secret are invalid"},
 			expectedCode: http.StatusBadRequest,
-		},
-		{
-			name: "should return status code 400 if secret was not correct",
-			usecase: mocks.AccountUsecaseMock{
-				Accounts: []entities.Account{
-					entities.NewAccount("Pedro", cpf, secret),
-				},
-			},
-			enc:          mocks.HashMock{Err: auth.ErrInvalidCredentials},
-			body:         schemes.LoginInput{CPF: cpf.String(), Secret: "12345678"},
-			decoder:      tests.ErrorMessageDecoder{},
-			expectedBody: rest.ErrorResponse{Message: "cpf or secret are invalid"},
-			expectedCode: http.StatusBadRequest,
-		},
-		{
-			name: "should authenticate successfully and return a token",
-			usecase: mocks.AccountUsecaseMock{
-				Accounts: []entities.Account{
-					entities.NewAccount("Pedro", cpf, secret),
-				},
-			},
-			enc:          mocks.HashMock{},
-			body:         schemes.LoginInput{CPF: cpf.String(), Secret: secret.String()},
-			decoder:      responseBodyDecoder{},
-			expectedBody: schemes.LoginResponse{},
-			expectedCode: http.StatusOK,
 		},
 	}
 
 	for _, tt := range testCases {
 		t.Run(tt.name, func(t *testing.T) {
 			r := chi.NewRouter()
-			authService := auth.NewAuth(tt.usecase, tt.enc)
-			handler := NewHandler(r, authService)
+			handler := NewHandler(r, tt.auth)
 
 			request := fakes.FakeRequest(http.MethodPost, "/accounts", tt.body)
 			response := httptest.NewRecorder()

@@ -2,6 +2,7 @@ package transfer
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -13,27 +14,25 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/thalissonfelipe/banking/banking/domain/entities"
-	"github.com/thalissonfelipe/banking/banking/domain/transfer/usecase"
+	"github.com/thalissonfelipe/banking/banking/domain/transfer"
 	"github.com/thalissonfelipe/banking/banking/domain/vos"
 	"github.com/thalissonfelipe/banking/banking/gateway/http/rest"
 	"github.com/thalissonfelipe/banking/banking/gateway/http/transfer/schemes"
 	"github.com/thalissonfelipe/banking/banking/services/auth"
 	"github.com/thalissonfelipe/banking/banking/tests"
 	"github.com/thalissonfelipe/banking/banking/tests/fakes"
-	"github.com/thalissonfelipe/banking/banking/tests/mocks"
 	"github.com/thalissonfelipe/banking/banking/tests/testdata"
 )
 
-func TestHandler_CreateTransfer(t *testing.T) {
-	accOrigin := entities.NewAccount("Pedro", testdata.GetValidCPF(), testdata.GetValidSecret())
-	accDest := entities.NewAccount("Maria", testdata.GetValidCPF(), testdata.GetValidSecret())
-	accOriginWithBalance := entities.NewAccount("João", testdata.GetValidCPF(), testdata.GetValidSecret())
+func TestTransferHandler_CreateTransfer(t *testing.T) {
+	accOrigin := entities.NewAccount("origin", testdata.GetValidCPF(), testdata.GetValidSecret())
+	accDest := entities.NewAccount("destination", testdata.GetValidCPF(), testdata.GetValidSecret())
+	accOriginWithBalance := entities.NewAccount("origin2", testdata.GetValidCPF(), testdata.GetValidSecret())
 	accOriginWithBalance.Balance = 200
 
 	testCases := []struct {
 		name         string
-		repo         *mocks.TransferRepositoryMock
-		accUsecase   *mocks.AccountUsecaseMock
+		usecase      transfer.Usecase
 		decoder      tests.Decoder
 		accOriginID  vos.AccountID
 		body         interface{}
@@ -41,115 +40,11 @@ func TestHandler_CreateTransfer(t *testing.T) {
 		expectedCode int
 	}{
 		{
-			name:        "should return status 400 if account dest id was not provided",
-			repo:        &mocks.TransferRepositoryMock{},
-			accUsecase:  &mocks.AccountUsecaseMock{},
-			decoder:     tests.ErrorMessageDecoder{},
-			accOriginID: accOrigin.ID,
-			body:        schemes.CreateTransferInput{Amount: 100},
-			expectedBody: rest.ErrorResponse{
-				Message: "missing account destination id parameter",
-			},
-			expectedCode: http.StatusBadRequest,
-		},
-		{
-			name:         "should return status 400 if amount was not provided",
-			repo:         &mocks.TransferRepositoryMock{},
-			accUsecase:   &mocks.AccountUsecaseMock{},
-			decoder:      tests.ErrorMessageDecoder{},
-			accOriginID:  accOrigin.ID,
-			body:         schemes.CreateTransferInput{AccountDestinationID: accDest.ID.String()},
-			expectedBody: rest.ErrorResponse{Message: "missing amount parameter"},
-			expectedCode: http.StatusBadRequest,
-		},
-		{
-			name:        "should return status 400 an invalid json was provided",
-			repo:        &mocks.TransferRepositoryMock{},
-			accUsecase:  &mocks.AccountUsecaseMock{},
-			decoder:     tests.ErrorMessageDecoder{},
-			accOriginID: accOrigin.ID,
-			body: map[string]interface{}{
-				"amount": "100",
-			},
-			expectedBody: rest.ErrorResponse{Message: "invalid json"},
-			expectedCode: http.StatusBadRequest,
-		},
-		{
-			name:        "should return status 404 if acc origin does not exist",
-			repo:        &mocks.TransferRepositoryMock{},
-			accUsecase:  &mocks.AccountUsecaseMock{},
-			decoder:     tests.ErrorMessageDecoder{},
-			accOriginID: accOrigin.ID,
-			body: schemes.CreateTransferInput{
-				AccountDestinationID: accDest.ID.String(),
-				Amount:               100,
-			},
-			expectedBody: rest.ErrorResponse{Message: "account origin does not exist"},
-			expectedCode: http.StatusNotFound,
-		},
-		{
-			name: "should return status 404 if acc dest does not exist",
-			repo: &mocks.TransferRepositoryMock{},
-			accUsecase: &mocks.AccountUsecaseMock{
-				Accounts: []entities.Account{accOrigin},
-			},
-			decoder:     tests.ErrorMessageDecoder{},
-			accOriginID: accOrigin.ID,
-			body: schemes.CreateTransferInput{
-				AccountDestinationID: accDest.ID.String(),
-				Amount:               100,
-			},
-			expectedBody: rest.ErrorResponse{Message: "account destination does not exist"},
-			expectedCode: http.StatusNotFound,
-		},
-		{
-			name: "should return status 400 if acc origin has insufficient funds",
-			repo: &mocks.TransferRepositoryMock{},
-			accUsecase: &mocks.AccountUsecaseMock{
-				Accounts: []entities.Account{accOrigin, accDest},
-			},
-			decoder:     tests.ErrorMessageDecoder{},
-			accOriginID: accOrigin.ID,
-			body: schemes.CreateTransferInput{
-				AccountDestinationID: accDest.ID.String(),
-				Amount:               100,
-			},
-			expectedBody: rest.ErrorResponse{Message: "insufficient funds"},
-			expectedCode: http.StatusBadRequest,
-		},
-		{
-			name:        "should return status 500 if usecase fails",
-			repo:        &mocks.TransferRepositoryMock{},
-			accUsecase:  &mocks.AccountUsecaseMock{Err: testdata.ErrUsecaseFails},
-			decoder:     tests.ErrorMessageDecoder{},
-			accOriginID: accOrigin.ID,
-			body: schemes.CreateTransferInput{
-				AccountDestinationID: accDest.ID.String(),
-				Amount:               100,
-			},
-			expectedBody: rest.ErrorResponse{Message: "internal server error"},
-			expectedCode: http.StatusInternalServerError,
-		},
-		{
-			name:        "should return status 400 if accDestID is the account origin id",
-			repo:        &mocks.TransferRepositoryMock{},
-			accUsecase:  &mocks.AccountUsecaseMock{},
-			decoder:     tests.ErrorMessageDecoder{},
-			accOriginID: accOrigin.ID,
-			body: schemes.CreateTransferInput{
-				AccountDestinationID: accOrigin.ID.String(),
-				Amount:               100,
-			},
-			expectedBody: rest.ErrorResponse{
-				Message: "account destination cannot be the account origin id",
-			},
-			expectedCode: http.StatusBadRequest,
-		},
-		{
-			name: "should transfer successfully",
-			repo: &mocks.TransferRepositoryMock{},
-			accUsecase: &mocks.AccountUsecaseMock{
-				Accounts: []entities.Account{accOriginWithBalance, accDest},
+			name: "should perform a transfer successfully",
+			usecase: &UsecaseMock{
+				CreateTransferFunc: func(context.Context, transfer.CreateTransferInput) error {
+					return nil
+				},
 			},
 			decoder:     createdTransferDecoder{},
 			accOriginID: accOriginWithBalance.ID,
@@ -164,13 +59,121 @@ func TestHandler_CreateTransfer(t *testing.T) {
 			},
 			expectedCode: http.StatusCreated,
 		},
+		{
+			name:        "should return status 400 if account dest id was not provided",
+			usecase:     &UsecaseMock{},
+			decoder:     tests.ErrorMessageDecoder{},
+			accOriginID: accOrigin.ID,
+			body:        schemes.CreateTransferInput{Amount: 100},
+			expectedBody: rest.ErrorResponse{
+				Message: "missing account destination id parameter",
+			},
+			expectedCode: http.StatusBadRequest,
+		},
+		{
+			name:         "should return status 400 if amount was not provided",
+			usecase:      &UsecaseMock{},
+			decoder:      tests.ErrorMessageDecoder{},
+			accOriginID:  accOrigin.ID,
+			body:         schemes.CreateTransferInput{AccountDestinationID: accDest.ID.String()},
+			expectedBody: rest.ErrorResponse{Message: "missing amount parameter"},
+			expectedCode: http.StatusBadRequest,
+		},
+		{
+			name:        "should return status 400 an invalid json was provided",
+			usecase:     &UsecaseMock{},
+			decoder:     tests.ErrorMessageDecoder{},
+			accOriginID: accOrigin.ID,
+			body: map[string]interface{}{
+				"amount": "100",
+			},
+			expectedBody: rest.ErrorResponse{Message: "invalid json"},
+			expectedCode: http.StatusBadRequest,
+		},
+		{
+			name: "should return status 404 if acc origin does not exist",
+			usecase: &UsecaseMock{
+				CreateTransferFunc: func(context.Context, transfer.CreateTransferInput) error {
+					return entities.ErrAccountDoesNotExist
+				},
+			},
+			decoder:     tests.ErrorMessageDecoder{},
+			accOriginID: accOrigin.ID,
+			body: schemes.CreateTransferInput{
+				AccountDestinationID: accDest.ID.String(),
+				Amount:               100,
+			},
+			expectedBody: rest.ErrorResponse{Message: "account origin does not exist"},
+			expectedCode: http.StatusNotFound,
+		},
+		{
+			name: "should return status 404 if acc dest does not exist",
+			usecase: &UsecaseMock{
+				CreateTransferFunc: func(context.Context, transfer.CreateTransferInput) error {
+					return entities.ErrAccountDestinationDoesNotExist
+				},
+			},
+			decoder:     tests.ErrorMessageDecoder{},
+			accOriginID: accOrigin.ID,
+			body: schemes.CreateTransferInput{
+				AccountDestinationID: accDest.ID.String(),
+				Amount:               100,
+			},
+			expectedBody: rest.ErrorResponse{Message: "account destination does not exist"},
+			expectedCode: http.StatusNotFound,
+		},
+		{
+			name: "should return status 400 if acc origin has insufficient funds",
+			usecase: &UsecaseMock{
+				CreateTransferFunc: func(context.Context, transfer.CreateTransferInput) error {
+					return entities.ErrInsufficientFunds
+				},
+			},
+			decoder:     tests.ErrorMessageDecoder{},
+			accOriginID: accOrigin.ID,
+			body: schemes.CreateTransferInput{
+				AccountDestinationID: accDest.ID.String(),
+				Amount:               100,
+			},
+			expectedBody: rest.ErrorResponse{Message: "insufficient funds"},
+			expectedCode: http.StatusBadRequest,
+		},
+		{
+			name:        "should return status 400 if accDestID is the same as account origin id",
+			usecase:     &UsecaseMock{},
+			decoder:     tests.ErrorMessageDecoder{},
+			accOriginID: accOrigin.ID,
+			body: schemes.CreateTransferInput{
+				AccountDestinationID: accOrigin.ID.String(),
+				Amount:               100,
+			},
+			expectedBody: rest.ErrorResponse{
+				Message: "account destination cannot be the account origin id",
+			},
+			expectedCode: http.StatusBadRequest,
+		},
+		{
+			name: "should return status 500 if usecase fails",
+			usecase: &UsecaseMock{
+				CreateTransferFunc: func(context.Context, transfer.CreateTransferInput) error {
+					return assert.AnError
+				},
+			},
+			decoder:     tests.ErrorMessageDecoder{},
+			accOriginID: accOrigin.ID,
+			body: schemes.CreateTransferInput{
+				AccountDestinationID: accDest.ID.String(),
+				Amount:               100,
+			},
+			expectedBody: rest.ErrorResponse{Message: "internal server error"},
+			expectedCode: http.StatusInternalServerError,
+		},
 	}
 
 	for _, tt := range testCases {
 		t.Run(tt.name, func(t *testing.T) {
 			r := chi.NewRouter()
-			usecase := usecase.NewTransferUsecase(tt.repo, tt.accUsecase)
-			handler := NewHandler(r, usecase)
+			handler := NewHandler(r, tt.usecase)
 
 			request := fakes.FakeRequest(http.MethodPost, "/transfers", tt.body)
 			token, _ := auth.NewToken(tt.accOriginID.String())

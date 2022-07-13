@@ -7,57 +7,66 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/thalissonfelipe/banking/banking/domain/account"
+	"github.com/thalissonfelipe/banking/banking/domain/encrypter"
 	"github.com/thalissonfelipe/banking/banking/domain/entities"
-	"github.com/thalissonfelipe/banking/banking/tests/mocks"
 	"github.com/thalissonfelipe/banking/banking/tests/testdata"
 )
 
-func TestUsecase_CreateAccount(t *testing.T) {
-	validInput := account.NewCreateAccountInput(
-		"Pedro",
-		testdata.GetValidCPF(),
-		testdata.GetValidSecret(),
-	)
-
+func TestAccountUsecase_CreateAccount(t *testing.T) {
 	testCases := []struct {
-		name        string
-		repoSetup   func() *mocks.AccountRepositoryMock
-		encSetup    *mocks.HashMock
-		input       account.CreateAccountInput
-		expectedErr error
+		name    string
+		repo    account.Repository
+		enc     encrypter.Encrypter
+		wantErr error
 	}{
 		{
 			name: "should create an account successfully",
-			repoSetup: func() *mocks.AccountRepositoryMock {
-				return &mocks.AccountRepositoryMock{}
+			repo: &RepositoryMock{
+				CreateAccountFunc: func(context.Context, *entities.Account) error {
+					return nil
+				},
 			},
-			encSetup:    &mocks.HashMock{},
-			input:       validInput,
-			expectedErr: nil,
+			enc: &EncrypterMock{
+				HashFunc: func(string) ([]byte, error) {
+					return nil, nil
+				},
+			},
+			wantErr: nil,
+		},
+		{
+			name: "should return an error if encrypter fails to hash secret",
+			repo: &RepositoryMock{},
+			enc: &EncrypterMock{
+				HashFunc: func(string) ([]byte, error) {
+					return nil, assert.AnError
+				},
+			},
+			wantErr: assert.AnError,
 		},
 		{
 			name: "should return an error if account already exists",
-			repoSetup: func() *mocks.AccountRepositoryMock {
-				acc := entities.NewAccount(validInput.Name, validInput.CPF, validInput.Secret)
-
-				return &mocks.AccountRepositoryMock{
-					Accounts: []entities.Account{acc},
-				}
+			repo: &RepositoryMock{
+				CreateAccountFunc: func(context.Context, *entities.Account) error {
+					return entities.ErrAccountAlreadyExists
+				},
 			},
-			input:       validInput,
-			encSetup:    &mocks.HashMock{},
-			expectedErr: entities.ErrAccountAlreadyExists,
+			enc: &EncrypterMock{
+				HashFunc: func(string) ([]byte, error) {
+					return nil, nil
+				},
+			},
+			wantErr: entities.ErrAccountAlreadyExists,
 		},
 	}
 
 	for _, tt := range testCases {
 		t.Run(tt.name, func(t *testing.T) {
-			ctx := context.Background()
-			usecase := NewAccountUsecase(tt.repoSetup(), tt.encSetup)
-			_, err := usecase.CreateAccount(ctx, tt.input)
+			usecase := NewAccountUsecase(tt.repo, tt.enc)
 
-			// TODO: add result validation
-			assert.ErrorIs(t, err, tt.expectedErr)
+			input := account.NewCreateAccountInput("name", testdata.GetValidCPF(), testdata.GetValidSecret())
+
+			_, err := usecase.CreateAccount(context.Background(), input)
+			assert.ErrorIs(t, err, tt.wantErr)
 		})
 	}
 }
