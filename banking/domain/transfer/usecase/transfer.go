@@ -8,6 +8,8 @@ import (
 //go:generate moq -pkg usecase -out repository_mock.gen.go .. Repository
 //go:generate moq -pkg usecase -out acc_usecase_mock.gen.go ../../account Usecase
 
+var _ transfer.Usecase = (*Transfer)(nil)
+
 type Transfer struct {
 	repository     transfer.Repository
 	accountUsecase account.Usecase

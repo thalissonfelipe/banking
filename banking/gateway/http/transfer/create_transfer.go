@@ -25,8 +25,8 @@ import (
 // @Failure 404 {object} responses.ErrorResponse
 // @Failure 500 {object} responses.ErrorResponse
 // @Router /transfers [POST].
-func (h Handler) CreateTransfer(w http.ResponseWriter, r *http.Request) {
-	var body schemes.CreateTransferInput
+func (h Handler) PerformTransfer(w http.ResponseWriter, r *http.Request) {
+	var body schemes.PerformTransferInput
 
 	if err := rest.DecodeRequestBody(r, &body); err != nil {
 		rest.HandleBadRequestError(w, err)
@@ -44,9 +44,9 @@ func (h Handler) CreateTransfer(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	input := transfer.NewTransferInput(accountID, accountDestinationID, body.Amount)
+	input := transfer.NewPerformTransferInput(accountID, accountDestinationID, body.Amount)
 
-	err := h.usecase.CreateTransfer(r.Context(), input)
+	err := h.usecase.PerformTransfer(r.Context(), input)
 	if err != nil {
 		if errors.Is(err, entities.ErrAccountNotFound) {
 			rest.SendError(w, http.StatusNotFound, rest.ErrAccountOriginNotFound)
@@ -59,7 +59,7 @@ func (h Handler) CreateTransfer(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response := schemes.CreateTransferResponse{
+	response := schemes.PerformTransferResponse{
 		AccountOriginID:      accountID.String(),
 		AccountDestinationID: body.AccountDestinationID,
 		Amount:               body.Amount,

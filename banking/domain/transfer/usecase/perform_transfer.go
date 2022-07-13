@@ -9,7 +9,7 @@ import (
 	"github.com/thalissonfelipe/banking/banking/domain/transfer"
 )
 
-func (t Transfer) CreateTransfer(ctx context.Context, input transfer.CreateTransferInput) error {
+func (t Transfer) PerformTransfer(ctx context.Context, input transfer.PerformTransferInput) error {
 	accOrigin, err := t.accountUsecase.GetAccountByID(ctx, input.AccountOriginID)
 	if err != nil {
 		return fmt.Errorf("getting origin account by id: %w", err)
@@ -34,7 +34,7 @@ func (t Transfer) CreateTransfer(ctx context.Context, input transfer.CreateTrans
 		return fmt.Errorf("creating transfer: %w", err)
 	}
 
-	err = t.repository.CreateTransfer(ctx, &transfer)
+	err = t.repository.PerformTransfer(ctx, &transfer)
 	if err != nil {
 		return fmt.Errorf("creating transfer: %w", err)
 	}

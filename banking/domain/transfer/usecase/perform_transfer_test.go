@@ -14,7 +14,7 @@ import (
 	"github.com/thalissonfelipe/banking/banking/tests/testdata"
 )
 
-func TestTransferUsecase_CreateTransfer(t *testing.T) {
+func TestTransferUsecase_PerformTransfer(t *testing.T) {
 	accOrigin, err := entities.NewAccount("origin", testdata.GetValidCPF().String(), testdata.GetValidSecret().String())
 	require.NoError(t, err)
 
@@ -25,13 +25,13 @@ func TestTransferUsecase_CreateTransfer(t *testing.T) {
 		name       string
 		repo       transfer.Repository
 		accUsecase account.Usecase
-		input      transfer.CreateTransferInput
+		input      transfer.PerformTransferInput
 		wantErr    error
 	}{
 		{
 			name: "should perform a transfer successfully",
 			repo: &RepositoryMock{
-				CreateTransferFunc: func(context.Context, *entities.Transfer) error {
+				PerformTransferFunc: func(context.Context, *entities.Transfer) error {
 					return nil
 				},
 			},
@@ -44,7 +44,7 @@ func TestTransferUsecase_CreateTransfer(t *testing.T) {
 					return accDest, nil
 				},
 			},
-			input:   transfer.NewTransferInput(accOrigin.ID, accDest.ID, 100),
+			input:   transfer.NewPerformTransferInput(accOrigin.ID, accDest.ID, 100),
 			wantErr: nil,
 		},
 		{
@@ -59,7 +59,7 @@ func TestTransferUsecase_CreateTransfer(t *testing.T) {
 					return accDest, nil
 				},
 			},
-			input:   transfer.NewTransferInput(accOrigin.ID, accDest.ID, accOrigin.Balance+1),
+			input:   transfer.NewPerformTransferInput(accOrigin.ID, accDest.ID, accOrigin.Balance+1),
 			wantErr: entities.ErrInsufficientFunds,
 		},
 		{
@@ -70,7 +70,7 @@ func TestTransferUsecase_CreateTransfer(t *testing.T) {
 					return entities.Account{}, entities.ErrAccountNotFound
 				},
 			},
-			input:   transfer.NewTransferInput(accOrigin.ID, accDest.ID, accOrigin.Balance),
+			input:   transfer.NewPerformTransferInput(accOrigin.ID, accDest.ID, accOrigin.Balance),
 			wantErr: entities.ErrAccountNotFound,
 		},
 		{
@@ -85,7 +85,7 @@ func TestTransferUsecase_CreateTransfer(t *testing.T) {
 					return entities.Account{}, entities.ErrAccountNotFound
 				},
 			},
-			input:   transfer.NewTransferInput(accOrigin.ID, accDest.ID, accOrigin.Balance),
+			input:   transfer.NewPerformTransferInput(accOrigin.ID, accDest.ID, accOrigin.Balance),
 			wantErr: entities.ErrAccountDestinationNotFound,
 		},
 		{
@@ -96,13 +96,13 @@ func TestTransferUsecase_CreateTransfer(t *testing.T) {
 					return entities.Account{}, assert.AnError
 				},
 			},
-			input:   transfer.NewTransferInput(accOrigin.ID, accDest.ID, accOrigin.Balance),
+			input:   transfer.NewPerformTransferInput(accOrigin.ID, accDest.ID, accOrigin.Balance),
 			wantErr: assert.AnError,
 		},
 		{
 			name: "should return an error if repo fails to create a transfer",
 			repo: &RepositoryMock{
-				CreateTransferFunc: func(context.Context, *entities.Transfer) error {
+				PerformTransferFunc: func(context.Context, *entities.Transfer) error {
 					return assert.AnError
 				},
 			},
@@ -115,7 +115,7 @@ func TestTransferUsecase_CreateTransfer(t *testing.T) {
 					return accDest, nil
 				},
 			},
-			input:   transfer.NewTransferInput(accOrigin.ID, accDest.ID, accOrigin.Balance),
+			input:   transfer.NewPerformTransferInput(accOrigin.ID, accDest.ID, accOrigin.Balance),
 			wantErr: assert.AnError,
 		},
 	}
@@ -124,7 +124,7 @@ func TestTransferUsecase_CreateTransfer(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			usecase := NewTransferUsecase(tt.repo, tt.accUsecase)
 
-			err := usecase.CreateTransfer(context.Background(), tt.input)
+			err := usecase.PerformTransfer(context.Background(), tt.input)
 			assert.ErrorIs(t, err, tt.wantErr)
 		})
 	}

@@ -24,7 +24,7 @@ import (
 	"github.com/thalissonfelipe/banking/banking/tests/testdata"
 )
 
-func TestTransferHandler_CreateTransfer(t *testing.T) {
+func TestTransferHandler_PerformTransfer(t *testing.T) {
 	cpf := testdata.GetValidCPF()
 	secret := testdata.GetValidSecret()
 
@@ -46,17 +46,17 @@ func TestTransferHandler_CreateTransfer(t *testing.T) {
 		{
 			name: "should perform a transfer successfully",
 			usecase: &UsecaseMock{
-				CreateTransferFunc: func(context.Context, transfer.CreateTransferInput) error {
+				PerformTransferFunc: func(context.Context, transfer.PerformTransferInput) error {
 					return nil
 				},
 			},
 			decoder:     createdTransferDecoder{},
 			accOriginID: accOrigin.ID,
-			body: schemes.CreateTransferInput{
+			body: schemes.PerformTransferInput{
 				AccountDestinationID: accDest.ID.String(),
 				Amount:               100,
 			},
-			expectedBody: schemes.CreateTransferResponse{
+			expectedBody: schemes.PerformTransferResponse{
 				AccountOriginID:      accOrigin.ID.String(),
 				AccountDestinationID: accDest.ID.String(),
 				Amount:               100,
@@ -68,7 +68,7 @@ func TestTransferHandler_CreateTransfer(t *testing.T) {
 			usecase:     &UsecaseMock{},
 			decoder:     tests.ErrorMessageDecoder{},
 			accOriginID: accOrigin.ID,
-			body:        schemes.CreateTransferInput{Amount: 100},
+			body:        schemes.PerformTransferInput{Amount: 100},
 			expectedBody: rest.ErrorResponse{
 				Message: "missing account destination id parameter",
 			},
@@ -79,7 +79,7 @@ func TestTransferHandler_CreateTransfer(t *testing.T) {
 			usecase:      &UsecaseMock{},
 			decoder:      tests.ErrorMessageDecoder{},
 			accOriginID:  accOrigin.ID,
-			body:         schemes.CreateTransferInput{AccountDestinationID: accDest.ID.String()},
+			body:         schemes.PerformTransferInput{AccountDestinationID: accDest.ID.String()},
 			expectedBody: rest.ErrorResponse{Message: "missing amount parameter"},
 			expectedCode: http.StatusBadRequest,
 		},
@@ -97,13 +97,13 @@ func TestTransferHandler_CreateTransfer(t *testing.T) {
 		{
 			name: "should return status 404 if acc origin does not exist",
 			usecase: &UsecaseMock{
-				CreateTransferFunc: func(context.Context, transfer.CreateTransferInput) error {
+				PerformTransferFunc: func(context.Context, transfer.PerformTransferInput) error {
 					return entities.ErrAccountNotFound
 				},
 			},
 			decoder:     tests.ErrorMessageDecoder{},
 			accOriginID: accOrigin.ID,
-			body: schemes.CreateTransferInput{
+			body: schemes.PerformTransferInput{
 				AccountDestinationID: accDest.ID.String(),
 				Amount:               100,
 			},
@@ -113,13 +113,13 @@ func TestTransferHandler_CreateTransfer(t *testing.T) {
 		{
 			name: "should return status 404 if acc dest does not exist",
 			usecase: &UsecaseMock{
-				CreateTransferFunc: func(context.Context, transfer.CreateTransferInput) error {
+				PerformTransferFunc: func(context.Context, transfer.PerformTransferInput) error {
 					return entities.ErrAccountDestinationNotFound
 				},
 			},
 			decoder:     tests.ErrorMessageDecoder{},
 			accOriginID: accOrigin.ID,
-			body: schemes.CreateTransferInput{
+			body: schemes.PerformTransferInput{
 				AccountDestinationID: accDest.ID.String(),
 				Amount:               100,
 			},
@@ -129,13 +129,13 @@ func TestTransferHandler_CreateTransfer(t *testing.T) {
 		{
 			name: "should return status 400 if acc origin has insufficient funds",
 			usecase: &UsecaseMock{
-				CreateTransferFunc: func(context.Context, transfer.CreateTransferInput) error {
+				PerformTransferFunc: func(context.Context, transfer.PerformTransferInput) error {
 					return entities.ErrInsufficientFunds
 				},
 			},
 			decoder:     tests.ErrorMessageDecoder{},
 			accOriginID: accOrigin.ID,
-			body: schemes.CreateTransferInput{
+			body: schemes.PerformTransferInput{
 				AccountDestinationID: accDest.ID.String(),
 				Amount:               100,
 			},
@@ -147,7 +147,7 @@ func TestTransferHandler_CreateTransfer(t *testing.T) {
 			usecase:     &UsecaseMock{},
 			decoder:     tests.ErrorMessageDecoder{},
 			accOriginID: accOrigin.ID,
-			body: schemes.CreateTransferInput{
+			body: schemes.PerformTransferInput{
 				AccountDestinationID: accOrigin.ID.String(),
 				Amount:               100,
 			},
@@ -159,13 +159,13 @@ func TestTransferHandler_CreateTransfer(t *testing.T) {
 		{
 			name: "should return status 500 if usecase fails",
 			usecase: &UsecaseMock{
-				CreateTransferFunc: func(context.Context, transfer.CreateTransferInput) error {
+				PerformTransferFunc: func(context.Context, transfer.PerformTransferInput) error {
 					return assert.AnError
 				},
 			},
 			decoder:     tests.ErrorMessageDecoder{},
 			accOriginID: accOrigin.ID,
-			body: schemes.CreateTransferInput{
+			body: schemes.PerformTransferInput{
 				AccountDestinationID: accDest.ID.String(),
 				Amount:               100,
 			},
@@ -185,7 +185,7 @@ func TestTransferHandler_CreateTransfer(t *testing.T) {
 			request.Header.Add("Authorization", bearerToken)
 			response := httptest.NewRecorder()
 
-			http.HandlerFunc(handler.CreateTransfer).ServeHTTP(response, request)
+			http.HandlerFunc(handler.PerformTransfer).ServeHTTP(response, request)
 
 			result := tt.decoder.Decode(t, response.Body)
 
@@ -199,7 +199,7 @@ func TestTransferHandler_CreateTransfer(t *testing.T) {
 type createdTransferDecoder struct{}
 
 func (createdTransferDecoder) Decode(t *testing.T, body *bytes.Buffer) interface{} {
-	var result schemes.CreateTransferResponse
+	var result schemes.PerformTransferResponse
 
 	err := json.NewDecoder(body).Decode(&result)
 	require.NoError(t, err)

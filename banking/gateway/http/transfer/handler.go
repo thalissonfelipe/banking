@@ -20,7 +20,7 @@ func NewHandler(r chi.Router, usecase transfer.Usecase) *Handler {
 		r.Use(middlewares.AuthorizeMiddleware)
 		r.Route("/transfers", func(r chi.Router) {
 			r.Get("/", handler.ListTransfers)
-			r.Post("/", handler.CreateTransfer)
+			r.Post("/", handler.PerformTransfer)
 		})
 	})
 

@@ -21,11 +21,11 @@ var _ transfer.Repository = &RepositoryMock{}
 //
 // 		// make and configure a mocked transfer.Repository
 // 		mockedRepository := &RepositoryMock{
-// 			CreateTransferFunc: func(ctx context.Context, transfer *entities.Transfer) error {
-// 				panic("mock out the CreateTransfer method")
+// 			ListTransfersFunc: func(contextMoqParam context.Context, accountID vos.AccountID) ([]entities.Transfer, error) {
+// 				panic("mock out the ListTransfers method")
 // 			},
-// 			GetTransfersFunc: func(ctx context.Context, id vos.AccountID) ([]entities.Transfer, error) {
-// 				panic("mock out the GetTransfers method")
+// 			PerformTransferFunc: func(contextMoqParam context.Context, transfer *entities.Transfer) error {
+// 				panic("mock out the PerformTransfer method")
 // 			},
 // 		}
 //
@@ -34,99 +34,99 @@ var _ transfer.Repository = &RepositoryMock{}
 //
 // 	}
 type RepositoryMock struct {
-	// CreateTransferFunc mocks the CreateTransfer method.
-	CreateTransferFunc func(ctx context.Context, transfer *entities.Transfer) error
+	// ListTransfersFunc mocks the ListTransfers method.
+	ListTransfersFunc func(contextMoqParam context.Context, accountID vos.AccountID) ([]entities.Transfer, error)
 
-	// GetTransfersFunc mocks the GetTransfers method.
-	GetTransfersFunc func(ctx context.Context, id vos.AccountID) ([]entities.Transfer, error)
+	// PerformTransferFunc mocks the PerformTransfer method.
+	PerformTransferFunc func(contextMoqParam context.Context, transfer *entities.Transfer) error
 
 	// calls tracks calls to the methods.
 	calls struct {
-		// CreateTransfer holds details about calls to the CreateTransfer method.
-		CreateTransfer []struct {
-			// Ctx is the ctx argument value.
-			Ctx context.Context
+		// ListTransfers holds details about calls to the ListTransfers method.
+		ListTransfers []struct {
+			// ContextMoqParam is the contextMoqParam argument value.
+			ContextMoqParam context.Context
+			// AccountID is the accountID argument value.
+			AccountID vos.AccountID
+		}
+		// PerformTransfer holds details about calls to the PerformTransfer method.
+		PerformTransfer []struct {
+			// ContextMoqParam is the contextMoqParam argument value.
+			ContextMoqParam context.Context
 			// Transfer is the transfer argument value.
 			Transfer *entities.Transfer
 		}
-		// GetTransfers holds details about calls to the GetTransfers method.
-		GetTransfers []struct {
-			// Ctx is the ctx argument value.
-			Ctx context.Context
-			// ID is the id argument value.
-			ID vos.AccountID
-		}
 	}
-	lockCreateTransfer sync.RWMutex
-	lockGetTransfers   sync.RWMutex
+	lockListTransfers   sync.RWMutex
+	lockPerformTransfer sync.RWMutex
 }
 
-// CreateTransfer calls CreateTransferFunc.
-func (mock *RepositoryMock) CreateTransfer(ctx context.Context, transfer *entities.Transfer) error {
-	if mock.CreateTransferFunc == nil {
-		panic("RepositoryMock.CreateTransferFunc: method is nil but Repository.CreateTransfer was just called")
+// ListTransfers calls ListTransfersFunc.
+func (mock *RepositoryMock) ListTransfers(contextMoqParam context.Context, accountID vos.AccountID) ([]entities.Transfer, error) {
+	if mock.ListTransfersFunc == nil {
+		panic("RepositoryMock.ListTransfersFunc: method is nil but Repository.ListTransfers was just called")
 	}
 	callInfo := struct {
-		Ctx      context.Context
-		Transfer *entities.Transfer
+		ContextMoqParam context.Context
+		AccountID       vos.AccountID
 	}{
-		Ctx:      ctx,
-		Transfer: transfer,
+		ContextMoqParam: contextMoqParam,
+		AccountID:       accountID,
 	}
-	mock.lockCreateTransfer.Lock()
-	mock.calls.CreateTransfer = append(mock.calls.CreateTransfer, callInfo)
-	mock.lockCreateTransfer.Unlock()
-	return mock.CreateTransferFunc(ctx, transfer)
+	mock.lockListTransfers.Lock()
+	mock.calls.ListTransfers = append(mock.calls.ListTransfers, callInfo)
+	mock.lockListTransfers.Unlock()
+	return mock.ListTransfersFunc(contextMoqParam, accountID)
 }
 
-// CreateTransferCalls gets all the calls that were made to CreateTransfer.
+// ListTransfersCalls gets all the calls that were made to ListTransfers.
 // Check the length with:
-//     len(mockedRepository.CreateTransferCalls())
-func (mock *RepositoryMock) CreateTransferCalls() []struct {
-	Ctx      context.Context
-	Transfer *entities.Transfer
+//     len(mockedRepository.ListTransfersCalls())
+func (mock *RepositoryMock) ListTransfersCalls() []struct {
+	ContextMoqParam context.Context
+	AccountID       vos.AccountID
 } {
 	var calls []struct {
-		Ctx      context.Context
-		Transfer *entities.Transfer
+		ContextMoqParam context.Context
+		AccountID       vos.AccountID
 	}
-	mock.lockCreateTransfer.RLock()
-	calls = mock.calls.CreateTransfer
-	mock.lockCreateTransfer.RUnlock()
+	mock.lockListTransfers.RLock()
+	calls = mock.calls.ListTransfers
+	mock.lockListTransfers.RUnlock()
 	return calls
 }
 
-// GetTransfers calls GetTransfersFunc.
-func (mock *RepositoryMock) GetTransfers(ctx context.Context, id vos.AccountID) ([]entities.Transfer, error) {
-	if mock.GetTransfersFunc == nil {
-		panic("RepositoryMock.GetTransfersFunc: method is nil but Repository.GetTransfers was just called")
+// PerformTransfer calls PerformTransferFunc.
+func (mock *RepositoryMock) PerformTransfer(contextMoqParam context.Context, transfer *entities.Transfer) error {
+	if mock.PerformTransferFunc == nil {
+		panic("RepositoryMock.PerformTransferFunc: method is nil but Repository.PerformTransfer was just called")
 	}
 	callInfo := struct {
-		Ctx context.Context
-		ID  vos.AccountID
+		ContextMoqParam context.Context
+		Transfer        *entities.Transfer
 	}{
-		Ctx: ctx,
-		ID:  id,
+		ContextMoqParam: contextMoqParam,
+		Transfer:        transfer,
 	}
-	mock.lockGetTransfers.Lock()
-	mock.calls.GetTransfers = append(mock.calls.GetTransfers, callInfo)
-	mock.lockGetTransfers.Unlock()
-	return mock.GetTransfersFunc(ctx, id)
+	mock.lockPerformTransfer.Lock()
+	mock.calls.PerformTransfer = append(mock.calls.PerformTransfer, callInfo)
+	mock.lockPerformTransfer.Unlock()
+	return mock.PerformTransferFunc(contextMoqParam, transfer)
 }
 
-// GetTransfersCalls gets all the calls that were made to GetTransfers.
+// PerformTransferCalls gets all the calls that were made to PerformTransfer.
 // Check the length with:
-//     len(mockedRepository.GetTransfersCalls())
-func (mock *RepositoryMock) GetTransfersCalls() []struct {
-	Ctx context.Context
-	ID  vos.AccountID
+//     len(mockedRepository.PerformTransferCalls())
+func (mock *RepositoryMock) PerformTransferCalls() []struct {
+	ContextMoqParam context.Context
+	Transfer        *entities.Transfer
 } {
 	var calls []struct {
-		Ctx context.Context
-		ID  vos.AccountID
+		ContextMoqParam context.Context
+		Transfer        *entities.Transfer
 	}
-	mock.lockGetTransfers.RLock()
-	calls = mock.calls.GetTransfers
-	mock.lockGetTransfers.RUnlock()
+	mock.lockPerformTransfer.RLock()
+	calls = mock.calls.PerformTransfer
+	mock.lockPerformTransfer.RUnlock()
 	return calls
 }

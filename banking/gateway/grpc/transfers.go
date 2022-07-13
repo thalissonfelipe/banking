@@ -82,13 +82,13 @@ func (s Server) CreateTransfer(
 			"account destination id must be different from account origin id")
 	}
 
-	input := transfer.NewTransferInput(
+	input := transfer.NewPerformTransferInput(
 		vos.AccountID(accounOriginID),
 		vos.AccountID(accounDestinationID),
 		int(request.Amount),
 	)
 
-	err = s.transferUsecase.CreateTransfer(ctx, input)
+	err = s.transferUsecase.PerformTransfer(ctx, input)
 	if err != nil {
 		if errors.Is(err, entities.ErrAccountNotFound) {
 			return nil, status.Errorf(codes.NotFound, "account origin does not exist")

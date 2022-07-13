@@ -8,18 +8,18 @@ import (
 )
 
 type Usecase interface {
-	ListTransfers(ctx context.Context, accountID vos.AccountID) ([]entities.Transfer, error)
-	CreateTransfer(ctx context.Context, input CreateTransferInput) error
+	ListTransfers(context.Context, vos.AccountID) ([]entities.Transfer, error)
+	PerformTransfer(context.Context, PerformTransferInput) error
 }
 
-type CreateTransferInput struct {
+type PerformTransferInput struct {
 	AccountOriginID      vos.AccountID
 	AccountDestinationID vos.AccountID
 	Amount               int
 }
 
-func NewTransferInput(accOriginID, accDestID vos.AccountID, amount int) CreateTransferInput {
-	return CreateTransferInput{
+func NewPerformTransferInput(accOriginID, accDestID vos.AccountID, amount int) PerformTransferInput {
+	return PerformTransferInput{
 		AccountOriginID:      accOriginID,
 		AccountDestinationID: accDestID,
 		Amount:               amount,

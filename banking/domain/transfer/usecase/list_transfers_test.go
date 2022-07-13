@@ -26,7 +26,7 @@ func TestTransferUsecase_ListTransfers(t *testing.T) {
 		{
 			name: "should return a list of transfers successfully",
 			repo: &RepositoryMock{
-				GetTransfersFunc: func(context.Context, vos.AccountID) ([]entities.Transfer, error) {
+				ListTransfersFunc: func(context.Context, vos.AccountID) ([]entities.Transfer, error) {
 					return transfers, nil
 				},
 			},
@@ -35,7 +35,7 @@ func TestTransferUsecase_ListTransfers(t *testing.T) {
 		{
 			name: "should return an error if repo fails to get transfers",
 			repo: &RepositoryMock{
-				GetTransfersFunc: func(context.Context, vos.AccountID) ([]entities.Transfer, error) {
+				ListTransfersFunc: func(context.Context, vos.AccountID) ([]entities.Transfer, error) {
 					return nil, assert.AnError
 				},
 			},

@@ -8,14 +8,14 @@ import (
 	"github.com/thalissonfelipe/banking/banking/domain/vos"
 )
 
-const getTransfersQuery = `
+const listTransfersQuery = `
 select id, account_origin_id, account_destination_id, amount, created_at
 from transfers
 where account_origin_id=$1
 `
 
-func (r Repository) GetTransfers(ctx context.Context, id vos.AccountID) ([]entities.Transfer, error) {
-	rows, err := r.db.Query(ctx, getTransfersQuery, id)
+func (r Repository) ListTransfers(ctx context.Context, id vos.AccountID) ([]entities.Transfer, error) {
+	rows, err := r.db.Query(ctx, listTransfersQuery, id)
 	if err != nil {
 		return nil, fmt.Errorf("db.Query: %w", err)
 	}

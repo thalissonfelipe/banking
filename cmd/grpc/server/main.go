@@ -84,11 +84,11 @@ type InMemoryTransferDatabase struct {
 	Transfers []entities.Transfer
 }
 
-func (i InMemoryTransferDatabase) GetTransfers(ctx context.Context, id vos.AccountID) ([]entities.Transfer, error) {
+func (i InMemoryTransferDatabase) ListTransfers(ctx context.Context, id vos.AccountID) ([]entities.Transfer, error) {
 	return i.Transfers, nil
 }
 
-func (i *InMemoryTransferDatabase) CreateTransfer(ctx context.Context, transfer *entities.Transfer) error {
+func (i *InMemoryTransferDatabase) PerformTransfer(ctx context.Context, transfer *entities.Transfer) error {
 	return nil
 }
 

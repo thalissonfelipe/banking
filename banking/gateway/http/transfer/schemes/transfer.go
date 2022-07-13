@@ -8,18 +8,18 @@ type TransferListResponse struct {
 	CreatedAt            string `json:"created_at"`
 }
 
-type CreateTransferInput struct {
+type PerformTransferInput struct {
 	AccountDestinationID string `json:"account_destination_id"`
 	Amount               int    `json:"amount"`
 }
 
-type CreateTransferResponse struct {
+type PerformTransferResponse struct {
 	AccountOriginID      string `json:"account_origin_id"`
 	AccountDestinationID string `json:"account_destination_id"`
 	Amount               int    `json:"amount"`
 }
 
-func (t CreateTransferInput) IsValid() error {
+func (t PerformTransferInput) IsValid() error {
 	if t.AccountDestinationID == "" {
 		return rest.ErrMissingAccDestinationIDParameter
 	}

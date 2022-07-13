@@ -17,11 +17,11 @@ import (
 //
 // 		// make and configure a mocked Usecase
 // 		mockedUsecase := &UsecaseMock{
-// 			CreateTransferFunc: func(ctx context.Context, input transfer.CreateTransferInput) error {
-// 				panic("mock out the CreateTransfer method")
-// 			},
-// 			ListTransfersFunc: func(ctx context.Context, accountID vos.AccountID) ([]entities.Transfer, error) {
+// 			ListTransfersFunc: func(contextMoqParam context.Context, accountID vos.AccountID) ([]entities.Transfer, error) {
 // 				panic("mock out the ListTransfers method")
+// 			},
+// 			PerformTransferFunc: func(contextMoqParam context.Context, performTransferInput transfer.PerformTransferInput) error {
+// 				panic("mock out the PerformTransfer method")
 // 			},
 // 		}
 //
@@ -30,99 +30,99 @@ import (
 //
 // 	}
 type UsecaseMock struct {
-	// CreateTransferFunc mocks the CreateTransfer method.
-	CreateTransferFunc func(ctx context.Context, input transfer.CreateTransferInput) error
-
 	// ListTransfersFunc mocks the ListTransfers method.
-	ListTransfersFunc func(ctx context.Context, accountID vos.AccountID) ([]entities.Transfer, error)
+	ListTransfersFunc func(contextMoqParam context.Context, accountID vos.AccountID) ([]entities.Transfer, error)
+
+	// PerformTransferFunc mocks the PerformTransfer method.
+	PerformTransferFunc func(contextMoqParam context.Context, performTransferInput transfer.PerformTransferInput) error
 
 	// calls tracks calls to the methods.
 	calls struct {
-		// CreateTransfer holds details about calls to the CreateTransfer method.
-		CreateTransfer []struct {
-			// Ctx is the ctx argument value.
-			Ctx context.Context
-			// Input is the input argument value.
-			Input transfer.CreateTransferInput
-		}
 		// ListTransfers holds details about calls to the ListTransfers method.
 		ListTransfers []struct {
-			// Ctx is the ctx argument value.
-			Ctx context.Context
+			// ContextMoqParam is the contextMoqParam argument value.
+			ContextMoqParam context.Context
 			// AccountID is the accountID argument value.
 			AccountID vos.AccountID
 		}
+		// PerformTransfer holds details about calls to the PerformTransfer method.
+		PerformTransfer []struct {
+			// ContextMoqParam is the contextMoqParam argument value.
+			ContextMoqParam context.Context
+			// PerformTransferInput is the performTransferInput argument value.
+			PerformTransferInput transfer.PerformTransferInput
+		}
 	}
-	lockCreateTransfer sync.RWMutex
-	lockListTransfers  sync.RWMutex
-}
-
-// CreateTransfer calls CreateTransferFunc.
-func (mock *UsecaseMock) CreateTransfer(ctx context.Context, input transfer.CreateTransferInput) error {
-	if mock.CreateTransferFunc == nil {
-		panic("UsecaseMock.CreateTransferFunc: method is nil but Usecase.CreateTransfer was just called")
-	}
-	callInfo := struct {
-		Ctx   context.Context
-		Input transfer.CreateTransferInput
-	}{
-		Ctx:   ctx,
-		Input: input,
-	}
-	mock.lockCreateTransfer.Lock()
-	mock.calls.CreateTransfer = append(mock.calls.CreateTransfer, callInfo)
-	mock.lockCreateTransfer.Unlock()
-	return mock.CreateTransferFunc(ctx, input)
-}
-
-// CreateTransferCalls gets all the calls that were made to CreateTransfer.
-// Check the length with:
-//     len(mockedUsecase.CreateTransferCalls())
-func (mock *UsecaseMock) CreateTransferCalls() []struct {
-	Ctx   context.Context
-	Input transfer.CreateTransferInput
-} {
-	var calls []struct {
-		Ctx   context.Context
-		Input transfer.CreateTransferInput
-	}
-	mock.lockCreateTransfer.RLock()
-	calls = mock.calls.CreateTransfer
-	mock.lockCreateTransfer.RUnlock()
-	return calls
+	lockListTransfers   sync.RWMutex
+	lockPerformTransfer sync.RWMutex
 }
 
 // ListTransfers calls ListTransfersFunc.
-func (mock *UsecaseMock) ListTransfers(ctx context.Context, accountID vos.AccountID) ([]entities.Transfer, error) {
+func (mock *UsecaseMock) ListTransfers(contextMoqParam context.Context, accountID vos.AccountID) ([]entities.Transfer, error) {
 	if mock.ListTransfersFunc == nil {
 		panic("UsecaseMock.ListTransfersFunc: method is nil but Usecase.ListTransfers was just called")
 	}
 	callInfo := struct {
-		Ctx       context.Context
-		AccountID vos.AccountID
+		ContextMoqParam context.Context
+		AccountID       vos.AccountID
 	}{
-		Ctx:       ctx,
-		AccountID: accountID,
+		ContextMoqParam: contextMoqParam,
+		AccountID:       accountID,
 	}
 	mock.lockListTransfers.Lock()
 	mock.calls.ListTransfers = append(mock.calls.ListTransfers, callInfo)
 	mock.lockListTransfers.Unlock()
-	return mock.ListTransfersFunc(ctx, accountID)
+	return mock.ListTransfersFunc(contextMoqParam, accountID)
 }
 
 // ListTransfersCalls gets all the calls that were made to ListTransfers.
 // Check the length with:
 //     len(mockedUsecase.ListTransfersCalls())
 func (mock *UsecaseMock) ListTransfersCalls() []struct {
-	Ctx       context.Context
-	AccountID vos.AccountID
+	ContextMoqParam context.Context
+	AccountID       vos.AccountID
 } {
 	var calls []struct {
-		Ctx       context.Context
-		AccountID vos.AccountID
+		ContextMoqParam context.Context
+		AccountID       vos.AccountID
 	}
 	mock.lockListTransfers.RLock()
 	calls = mock.calls.ListTransfers
 	mock.lockListTransfers.RUnlock()
+	return calls
+}
+
+// PerformTransfer calls PerformTransferFunc.
+func (mock *UsecaseMock) PerformTransfer(contextMoqParam context.Context, performTransferInput transfer.PerformTransferInput) error {
+	if mock.PerformTransferFunc == nil {
+		panic("UsecaseMock.PerformTransferFunc: method is nil but Usecase.PerformTransfer was just called")
+	}
+	callInfo := struct {
+		ContextMoqParam      context.Context
+		PerformTransferInput transfer.PerformTransferInput
+	}{
+		ContextMoqParam:      contextMoqParam,
+		PerformTransferInput: performTransferInput,
+	}
+	mock.lockPerformTransfer.Lock()
+	mock.calls.PerformTransfer = append(mock.calls.PerformTransfer, callInfo)
+	mock.lockPerformTransfer.Unlock()
+	return mock.PerformTransferFunc(contextMoqParam, performTransferInput)
+}
+
+// PerformTransferCalls gets all the calls that were made to PerformTransfer.
+// Check the length with:
+//     len(mockedUsecase.PerformTransferCalls())
+func (mock *UsecaseMock) PerformTransferCalls() []struct {
+	ContextMoqParam      context.Context
+	PerformTransferInput transfer.PerformTransferInput
+} {
+	var calls []struct {
+		ContextMoqParam      context.Context
+		PerformTransferInput transfer.PerformTransferInput
+	}
+	mock.lockPerformTransfer.RLock()
+	calls = mock.calls.PerformTransfer
+	mock.lockPerformTransfer.RUnlock()
 	return calls
 }

@@ -10,7 +10,7 @@ import (
 	"github.com/thalissonfelipe/banking/banking/domain/vos"
 )
 
-func (r Repository) CreateTransfer(ctx context.Context, transfer *entities.Transfer) error {
+func (r Repository) PerformTransfer(ctx context.Context, transfer *entities.Transfer) error {
 	// First experience with rollback.
 	// Tutorial: https://www.sohamkamani.com/golang/sql-transactions/
 	tx, err := r.db.Begin(ctx)
