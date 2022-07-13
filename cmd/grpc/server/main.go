@@ -18,6 +18,8 @@ import (
 	proto "github.com/thalissonfelipe/banking/proto/banking"
 )
 
+// TODO: remove in memory mocks
+
 type InMemoryAccountDatabase struct {
 	Accounts []entities.Account
 }
@@ -87,10 +89,6 @@ func (i InMemoryTransferDatabase) GetTransfers(ctx context.Context, id vos.Accou
 }
 
 func (i *InMemoryTransferDatabase) CreateTransfer(ctx context.Context, transfer *entities.Transfer) error {
-	tr := entities.NewTransfer(transfer.AccountOriginID, transfer.AccountDestinationID, transfer.Amount)
-
-	i.Transfers = append(i.Transfers, tr)
-
 	return nil
 }
 

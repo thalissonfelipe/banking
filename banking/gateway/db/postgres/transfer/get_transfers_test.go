@@ -45,7 +45,8 @@ func TestRepository_GetTransfers(t *testing.T) {
 	require.NoError(t, err)
 	assert.Len(t, transfers, 0)
 
-	transfer := entities.NewTransfer(accOrigin.ID, accDest.ID, 50)
+	transfer, err := entities.NewTransfer(accOrigin.ID, accDest.ID, 50, 100)
+	require.NoError(t, err)
 
 	err = r.CreateTransfer(ctx, &transfer)
 	require.NoError(t, err)

@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/thalissonfelipe/banking/banking/domain/entities"
 	"github.com/thalissonfelipe/banking/banking/domain/transfer"
@@ -12,7 +13,10 @@ import (
 )
 
 func TestTransferUsecase_ListTransfers(t *testing.T) {
-	transfers := []entities.Transfer{entities.NewTransfer(vos.NewAccountID(), vos.NewAccountID(), 100)}
+	tr, err := entities.NewTransfer(vos.NewAccountID(), vos.NewAccountID(), 100, 100)
+	require.NoError(t, err)
+
+	transfers := []entities.Transfer{tr}
 
 	testCases := []struct {
 		name    string

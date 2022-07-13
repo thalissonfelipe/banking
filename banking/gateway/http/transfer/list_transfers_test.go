@@ -24,7 +24,10 @@ import (
 )
 
 func TestTransferHandler_ListTransfers(t *testing.T) {
-	transfers := []entities.Transfer{entities.NewTransfer(vos.NewAccountID(), vos.NewAccountID(), 100)}
+	tr, err := entities.NewTransfer(vos.NewAccountID(), vos.NewAccountID(), 50, 100)
+	require.NoError(t, err)
+
+	transfers := []entities.Transfer{tr}
 
 	testCases := []struct {
 		name         string

@@ -24,11 +24,15 @@ var (
 	ErrAccountDestinationDoesNotExist = errors.New("account destination does not exist")
 )
 
-func NewTransfer(accOriginID, accDestID vos.AccountID, amount int) Transfer {
+func NewTransfer(accOriginID, accDestID vos.AccountID, amount, accOriginBalance int) (Transfer, error) {
+	if (accOriginBalance - amount) < 0 {
+		return Transfer{}, ErrInsufficientFunds
+	}
+
 	return Transfer{
 		ID:                   uuid.New(),
 		AccountOriginID:      accOriginID,
 		AccountDestinationID: accDestID,
 		Amount:               amount,
-	}
+	}, nil
 }
