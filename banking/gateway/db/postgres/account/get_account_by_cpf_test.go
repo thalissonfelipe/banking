@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/thalissonfelipe/banking/banking/domain/entities"
+	"github.com/thalissonfelipe/banking/banking/domain/entity"
 	"github.com/thalissonfelipe/banking/banking/tests/dockertest"
 	"github.com/thalissonfelipe/banking/banking/tests/testdata"
 )
@@ -20,7 +20,7 @@ func TestAccountRepository_GetAccountByCPF(t *testing.T) {
 
 		defer dockertest.TruncateTables(ctx, db)
 
-		want, err := entities.NewAccount("name", testdata.GetValidCPF().String(), testdata.GetValidSecret().String())
+		want, err := entity.NewAccount("name", testdata.GetValidCPF().String(), testdata.GetValidSecret().String())
 		require.NoError(t, err)
 
 		err = r.CreateAccount(ctx, &want)
@@ -42,7 +42,7 @@ func TestAccountRepository_GetAccountByCPF(t *testing.T) {
 		ctx := context.Background()
 
 		account, err := r.GetAccountByCPF(ctx, testdata.GetValidCPF())
-		assert.ErrorIs(t, err, entities.ErrAccountNotFound)
+		assert.ErrorIs(t, err, entity.ErrAccountNotFound)
 		assert.Zero(t, account)
 	})
 }

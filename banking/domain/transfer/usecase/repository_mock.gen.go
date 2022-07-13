@@ -5,7 +5,7 @@ package usecase
 
 import (
 	"context"
-	"github.com/thalissonfelipe/banking/banking/domain/entities"
+	"github.com/thalissonfelipe/banking/banking/domain/entity"
 	"github.com/thalissonfelipe/banking/banking/domain/transfer"
 	"github.com/thalissonfelipe/banking/banking/domain/vos"
 	"sync"
@@ -21,10 +21,10 @@ var _ transfer.Repository = &RepositoryMock{}
 //
 // 		// make and configure a mocked transfer.Repository
 // 		mockedRepository := &RepositoryMock{
-// 			ListTransfersFunc: func(contextMoqParam context.Context, accountID vos.AccountID) ([]entities.Transfer, error) {
+// 			ListTransfersFunc: func(contextMoqParam context.Context, accountID vos.AccountID) ([]entity.Transfer, error) {
 // 				panic("mock out the ListTransfers method")
 // 			},
-// 			PerformTransferFunc: func(contextMoqParam context.Context, transfer *entities.Transfer) error {
+// 			PerformTransferFunc: func(contextMoqParam context.Context, transfer *entity.Transfer) error {
 // 				panic("mock out the PerformTransfer method")
 // 			},
 // 		}
@@ -35,10 +35,10 @@ var _ transfer.Repository = &RepositoryMock{}
 // 	}
 type RepositoryMock struct {
 	// ListTransfersFunc mocks the ListTransfers method.
-	ListTransfersFunc func(contextMoqParam context.Context, accountID vos.AccountID) ([]entities.Transfer, error)
+	ListTransfersFunc func(contextMoqParam context.Context, accountID vos.AccountID) ([]entity.Transfer, error)
 
 	// PerformTransferFunc mocks the PerformTransfer method.
-	PerformTransferFunc func(contextMoqParam context.Context, transfer *entities.Transfer) error
+	PerformTransferFunc func(contextMoqParam context.Context, transfer *entity.Transfer) error
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -54,7 +54,7 @@ type RepositoryMock struct {
 			// ContextMoqParam is the contextMoqParam argument value.
 			ContextMoqParam context.Context
 			// Transfer is the transfer argument value.
-			Transfer *entities.Transfer
+			Transfer *entity.Transfer
 		}
 	}
 	lockListTransfers   sync.RWMutex
@@ -62,7 +62,7 @@ type RepositoryMock struct {
 }
 
 // ListTransfers calls ListTransfersFunc.
-func (mock *RepositoryMock) ListTransfers(contextMoqParam context.Context, accountID vos.AccountID) ([]entities.Transfer, error) {
+func (mock *RepositoryMock) ListTransfers(contextMoqParam context.Context, accountID vos.AccountID) ([]entity.Transfer, error) {
 	if mock.ListTransfersFunc == nil {
 		panic("RepositoryMock.ListTransfersFunc: method is nil but Repository.ListTransfers was just called")
 	}
@@ -97,13 +97,13 @@ func (mock *RepositoryMock) ListTransfersCalls() []struct {
 }
 
 // PerformTransfer calls PerformTransferFunc.
-func (mock *RepositoryMock) PerformTransfer(contextMoqParam context.Context, transfer *entities.Transfer) error {
+func (mock *RepositoryMock) PerformTransfer(contextMoqParam context.Context, transfer *entity.Transfer) error {
 	if mock.PerformTransferFunc == nil {
 		panic("RepositoryMock.PerformTransferFunc: method is nil but Repository.PerformTransfer was just called")
 	}
 	callInfo := struct {
 		ContextMoqParam context.Context
-		Transfer        *entities.Transfer
+		Transfer        *entity.Transfer
 	}{
 		ContextMoqParam: contextMoqParam,
 		Transfer:        transfer,
@@ -119,11 +119,11 @@ func (mock *RepositoryMock) PerformTransfer(contextMoqParam context.Context, tra
 //     len(mockedRepository.PerformTransferCalls())
 func (mock *RepositoryMock) PerformTransferCalls() []struct {
 	ContextMoqParam context.Context
-	Transfer        *entities.Transfer
+	Transfer        *entity.Transfer
 } {
 	var calls []struct {
 		ContextMoqParam context.Context
-		Transfer        *entities.Transfer
+		Transfer        *entity.Transfer
 	}
 	mock.lockPerformTransfer.RLock()
 	calls = mock.calls.PerformTransfer

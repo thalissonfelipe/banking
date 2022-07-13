@@ -7,7 +7,7 @@ import (
 
 	"github.com/jackc/pgx/v4"
 
-	"github.com/thalissonfelipe/banking/banking/domain/entities"
+	"github.com/thalissonfelipe/banking/banking/domain/entity"
 	"github.com/thalissonfelipe/banking/banking/domain/vos"
 )
 
@@ -17,8 +17,8 @@ from accounts
 where cpf=$1
 `
 
-func (r Repository) GetAccountByCPF(ctx context.Context, cpf vos.CPF) (entities.Account, error) {
-	var account entities.Account
+func (r Repository) GetAccountByCPF(ctx context.Context, cpf vos.CPF) (entity.Account, error) {
+	var account entity.Account
 
 	err := r.db.QueryRow(ctx, getAccountByCPFQuery, cpf).Scan(
 		&account.ID,
@@ -30,10 +30,10 @@ func (r Repository) GetAccountByCPF(ctx context.Context, cpf vos.CPF) (entities.
 	)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return entities.Account{}, entities.ErrAccountNotFound
+			return entity.Account{}, entity.ErrAccountNotFound
 		}
 
-		return entities.Account{}, fmt.Errorf("db.QueryRow.Scan: %w", err)
+		return entity.Account{}, fmt.Errorf("db.QueryRow.Scan: %w", err)
 	}
 
 	return account, nil

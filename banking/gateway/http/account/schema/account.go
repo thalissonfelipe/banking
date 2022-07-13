@@ -3,7 +3,7 @@ package schema
 import (
 	"time"
 
-	"github.com/thalissonfelipe/banking/banking/domain/entities"
+	"github.com/thalissonfelipe/banking/banking/domain/entity"
 	"github.com/thalissonfelipe/banking/banking/gateway/http/rest"
 )
 
@@ -19,7 +19,7 @@ type ListAccountsResponse struct {
 	Accounts []Account `json:"accounts"`
 }
 
-func MapToListAccountsResponse(accs []entities.Account) ListAccountsResponse {
+func MapToListAccountsResponse(accs []entity.Account) ListAccountsResponse {
 	response := ListAccountsResponse{
 		Accounts: make([]Account, 0, len(accs)),
 	}
@@ -74,7 +74,7 @@ type CreateAccountResponse struct {
 	CreatedAt string `json:"created_at"`
 }
 
-func MapToCreateAccountResponse(acc entities.Account) CreateAccountResponse {
+func MapToCreateAccountResponse(acc entity.Account) CreateAccountResponse {
 	return CreateAccountResponse{
 		Name:      acc.Name,
 		CPF:       acc.CPF.String(),

@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/thalissonfelipe/banking/banking/domain/account"
-	"github.com/thalissonfelipe/banking/banking/domain/entities"
+	"github.com/thalissonfelipe/banking/banking/domain/entity"
 	"github.com/thalissonfelipe/banking/banking/domain/vos"
 )
 
@@ -34,11 +34,11 @@ func TestAccountUsecase_GetAccountBalanceByID(t *testing.T) {
 			name: "should return an error if account does not exist",
 			repo: &RepositoryMock{
 				GetAccountBalanceByIDFunc: func(context.Context, vos.AccountID) (int, error) {
-					return 0, entities.ErrAccountNotFound
+					return 0, entity.ErrAccountNotFound
 				},
 			},
 			want:    0,
-			wantErr: entities.ErrAccountNotFound,
+			wantErr: entity.ErrAccountNotFound,
 		},
 	}
 

@@ -9,7 +9,7 @@ import (
 	"google.golang.org/grpc/credentials"
 
 	accUsecase "github.com/thalissonfelipe/banking/banking/domain/account/usecase"
-	"github.com/thalissonfelipe/banking/banking/domain/entities"
+	"github.com/thalissonfelipe/banking/banking/domain/entity"
 	trUsecase "github.com/thalissonfelipe/banking/banking/domain/transfer/usecase"
 	"github.com/thalissonfelipe/banking/banking/domain/vos"
 	grpcServer "github.com/thalissonfelipe/banking/banking/gateway/grpc"
@@ -21,10 +21,10 @@ import (
 // TODO: remove in memory mocks
 
 type InMemoryAccountDatabase struct {
-	Accounts []entities.Account
+	Accounts []entity.Account
 }
 
-func (i InMemoryAccountDatabase) ListAccounts(ctx context.Context) ([]entities.Account, error) {
+func (i InMemoryAccountDatabase) ListAccounts(ctx context.Context) ([]entity.Account, error) {
 	return i.Accounts, nil
 }
 
@@ -35,13 +35,13 @@ func (i InMemoryAccountDatabase) GetAccountBalanceByID(ctx context.Context, id v
 		}
 	}
 
-	return 0, entities.ErrAccountNotFound
+	return 0, entity.ErrAccountNotFound
 }
 
-func (i *InMemoryAccountDatabase) CreateAccount(ctx context.Context, account *entities.Account) error {
+func (i *InMemoryAccountDatabase) CreateAccount(ctx context.Context, account *entity.Account) error {
 	for _, acc := range i.Accounts {
 		if acc.CPF == account.CPF {
-			return entities.ErrAccountAlreadyExists
+			return entity.ErrAccountAlreadyExists
 		}
 	}
 
@@ -50,24 +50,24 @@ func (i *InMemoryAccountDatabase) CreateAccount(ctx context.Context, account *en
 	return nil
 }
 
-func (i InMemoryAccountDatabase) GetAccountByCPF(ctx context.Context, cpf vos.CPF) (entities.Account, error) {
+func (i InMemoryAccountDatabase) GetAccountByCPF(ctx context.Context, cpf vos.CPF) (entity.Account, error) {
 	for _, acc := range i.Accounts {
 		if acc.CPF == cpf {
 			return acc, nil
 		}
 	}
 
-	return entities.Account{}, entities.ErrAccountNotFound
+	return entity.Account{}, entity.ErrAccountNotFound
 }
 
-func (i InMemoryAccountDatabase) GetAccountByID(ctx context.Context, id vos.AccountID) (entities.Account, error) {
+func (i InMemoryAccountDatabase) GetAccountByID(ctx context.Context, id vos.AccountID) (entity.Account, error) {
 	for _, acc := range i.Accounts {
 		if acc.ID == id {
 			return acc, nil
 		}
 	}
 
-	return entities.Account{}, entities.ErrAccountNotFound
+	return entity.Account{}, entity.ErrAccountNotFound
 }
 
 type InMemoryEncrypter struct{}
@@ -81,14 +81,14 @@ func (i InMemoryEncrypter) CompareHashAndSecret(hashedSecret, secret []byte) err
 }
 
 type InMemoryTransferDatabase struct {
-	Transfers []entities.Transfer
+	Transfers []entity.Transfer
 }
 
-func (i InMemoryTransferDatabase) ListTransfers(ctx context.Context, id vos.AccountID) ([]entities.Transfer, error) {
+func (i InMemoryTransferDatabase) ListTransfers(ctx context.Context, id vos.AccountID) ([]entity.Transfer, error) {
 	return i.Transfers, nil
 }
 
-func (i *InMemoryTransferDatabase) PerformTransfer(ctx context.Context, transfer *entities.Transfer) error {
+func (i *InMemoryTransferDatabase) PerformTransfer(ctx context.Context, transfer *entity.Transfer) error {
 	return nil
 }
 
@@ -103,12 +103,12 @@ func main() {
 		log.Fatalf("failed to listen: %v", err)
 	}
 
-	acc, err := entities.NewAccount("name", testdata.GetValidCPF().String(), testdata.GetValidSecret().String())
+	acc, err := entity.NewAccount("name", testdata.GetValidCPF().String(), testdata.GetValidSecret().String())
 	if err != nil {
 		log.Fatalf("failed to create account: %v", err)
 	}
 
-	accRepo := &InMemoryAccountDatabase{Accounts: []entities.Account{acc}}
+	accRepo := &InMemoryAccountDatabase{Accounts: []entity.Account{acc}}
 	trRepo := &InMemoryTransferDatabase{}
 	enc := &InMemoryEncrypter{}
 	accountUsecase := accUsecase.NewAccountUsecase(accRepo, enc)

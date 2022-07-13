@@ -9,7 +9,7 @@ import (
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	"github.com/thalissonfelipe/banking/banking/domain/entities"
+	"github.com/thalissonfelipe/banking/banking/domain/entity"
 	"github.com/thalissonfelipe/banking/banking/domain/vos"
 	proto "github.com/thalissonfelipe/banking/proto/banking"
 )
@@ -38,7 +38,7 @@ func (s Server) GetAccountBalance(
 
 	balance, err := s.accountUsecase.GetAccountBalanceByID(ctx, vos.AccountID(accountID))
 	if err != nil {
-		if errors.Is(err, entities.ErrAccountNotFound) {
+		if errors.Is(err, entity.ErrAccountNotFound) {
 			return nil, status.Errorf(codes.NotFound, "account does not exist")
 		}
 
@@ -63,14 +63,14 @@ func (s Server) CreateAccount(
 		return nil, status.Errorf(codes.InvalidArgument, "missing secret parameter")
 	}
 
-	account, err := entities.NewAccount(request.Name, request.Cpf, request.Secret)
+	account, err := entity.NewAccount(request.Name, request.Cpf, request.Secret)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "invalid request parameters")
 	}
 
 	err = s.accountUsecase.CreateAccount(ctx, &account)
 	if err != nil {
-		if errors.Is(err, entities.ErrAccountAlreadyExists) {
+		if errors.Is(err, entity.ErrAccountAlreadyExists) {
 			return nil, status.Errorf(codes.AlreadyExists, "account already exists")
 		}
 
@@ -80,7 +80,7 @@ func (s Server) CreateAccount(
 	return &proto.CreateAccountResponse{Id: account.ID.String()}, nil
 }
 
-func domainAccountToGRPC(account entities.Account) *proto.Account {
+func domainAccountToGRPC(account entity.Account) *proto.Account {
 	return &proto.Account{
 		Id:        account.ID.String(),
 		Name:      account.Name,

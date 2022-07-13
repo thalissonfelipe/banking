@@ -13,7 +13,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/thalissonfelipe/banking/banking/domain/entities"
+	"github.com/thalissonfelipe/banking/banking/domain/entity"
 	"github.com/thalissonfelipe/banking/banking/domain/transfer"
 	"github.com/thalissonfelipe/banking/banking/domain/vos"
 	"github.com/thalissonfelipe/banking/banking/gateway/http/rest"
@@ -28,10 +28,10 @@ func TestTransferHandler_PerformTransfer(t *testing.T) {
 	cpf := testdata.GetValidCPF()
 	secret := testdata.GetValidSecret()
 
-	accOrigin, err := entities.NewAccount("origin", cpf.String(), secret.String())
+	accOrigin, err := entity.NewAccount("origin", cpf.String(), secret.String())
 	require.NoError(t, err)
 
-	accDest, err := entities.NewAccount("dest", cpf.String(), secret.String())
+	accDest, err := entity.NewAccount("dest", cpf.String(), secret.String())
 	require.NoError(t, err)
 
 	testCases := []struct {
@@ -98,7 +98,7 @@ func TestTransferHandler_PerformTransfer(t *testing.T) {
 			name: "should return status 404 if acc origin does not exist",
 			usecase: &UsecaseMock{
 				PerformTransferFunc: func(context.Context, transfer.PerformTransferInput) error {
-					return entities.ErrAccountNotFound
+					return entity.ErrAccountNotFound
 				},
 			},
 			decoder:     tests.ErrorMessageDecoder{},
@@ -114,7 +114,7 @@ func TestTransferHandler_PerformTransfer(t *testing.T) {
 			name: "should return status 404 if acc dest does not exist",
 			usecase: &UsecaseMock{
 				PerformTransferFunc: func(context.Context, transfer.PerformTransferInput) error {
-					return entities.ErrAccountDestinationNotFound
+					return entity.ErrAccountDestinationNotFound
 				},
 			},
 			decoder:     tests.ErrorMessageDecoder{},
@@ -130,7 +130,7 @@ func TestTransferHandler_PerformTransfer(t *testing.T) {
 			name: "should return status 400 if acc origin has insufficient funds",
 			usecase: &UsecaseMock{
 				PerformTransferFunc: func(context.Context, transfer.PerformTransferInput) error {
-					return entities.ErrInsufficientFunds
+					return entity.ErrInsufficientFunds
 				},
 			},
 			decoder:     tests.ErrorMessageDecoder{},

@@ -13,7 +13,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/thalissonfelipe/banking/banking/domain/account"
-	"github.com/thalissonfelipe/banking/banking/domain/entities"
+	"github.com/thalissonfelipe/banking/banking/domain/entity"
 	"github.com/thalissonfelipe/banking/banking/gateway/http/account/schema"
 	"github.com/thalissonfelipe/banking/banking/gateway/http/rest"
 	"github.com/thalissonfelipe/banking/banking/tests"
@@ -22,10 +22,10 @@ import (
 )
 
 func TestAccountHandler_ListAccounts(t *testing.T) {
-	acc, err := entities.NewAccount("name", testdata.GetValidCPF().String(), testdata.GetValidSecret().String())
+	acc, err := entity.NewAccount("name", testdata.GetValidCPF().String(), testdata.GetValidSecret().String())
 	require.NoError(t, err)
 
-	accounts := []entities.Account{acc}
+	accounts := []entity.Account{acc}
 
 	testCases := []struct {
 		name         string
@@ -37,7 +37,7 @@ func TestAccountHandler_ListAccounts(t *testing.T) {
 		{
 			name: "should return a list of accounts successfully",
 			usecase: &UsecaseMock{
-				ListAccountsFunc: func(context.Context) ([]entities.Account, error) {
+				ListAccountsFunc: func(context.Context) ([]entity.Account, error) {
 					return accounts, nil
 				},
 			},
@@ -48,7 +48,7 @@ func TestAccountHandler_ListAccounts(t *testing.T) {
 		{
 			name: "should return 500 if usecase fails",
 			usecase: &UsecaseMock{
-				ListAccountsFunc: func(context.Context) ([]entities.Account, error) {
+				ListAccountsFunc: func(context.Context) ([]entity.Account, error) {
 					return nil, assert.AnError
 				},
 			},

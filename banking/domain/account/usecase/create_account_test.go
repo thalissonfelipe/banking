@@ -9,7 +9,7 @@ import (
 
 	"github.com/thalissonfelipe/banking/banking/domain/account"
 	"github.com/thalissonfelipe/banking/banking/domain/encrypter"
-	"github.com/thalissonfelipe/banking/banking/domain/entities"
+	"github.com/thalissonfelipe/banking/banking/domain/entity"
 	"github.com/thalissonfelipe/banking/banking/tests/testdata"
 )
 
@@ -23,7 +23,7 @@ func TestAccountUsecase_CreateAccount(t *testing.T) {
 		{
 			name: "should create an account successfully",
 			repo: &RepositoryMock{
-				CreateAccountFunc: func(context.Context, *entities.Account) error {
+				CreateAccountFunc: func(context.Context, *entity.Account) error {
 					return nil
 				},
 			},
@@ -47,8 +47,8 @@ func TestAccountUsecase_CreateAccount(t *testing.T) {
 		{
 			name: "should return an error if account already exists",
 			repo: &RepositoryMock{
-				CreateAccountFunc: func(context.Context, *entities.Account) error {
-					return entities.ErrAccountAlreadyExists
+				CreateAccountFunc: func(context.Context, *entity.Account) error {
+					return entity.ErrAccountAlreadyExists
 				},
 			},
 			enc: &EncrypterMock{
@@ -56,7 +56,7 @@ func TestAccountUsecase_CreateAccount(t *testing.T) {
 					return nil, nil
 				},
 			},
-			wantErr: entities.ErrAccountAlreadyExists,
+			wantErr: entity.ErrAccountAlreadyExists,
 		},
 	}
 
@@ -64,7 +64,7 @@ func TestAccountUsecase_CreateAccount(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			usecase := NewAccountUsecase(tt.repo, tt.enc)
 
-			acc, err := entities.NewAccount("name", testdata.GetValidCPF().String(), testdata.GetValidSecret().String())
+			acc, err := entity.NewAccount("name", testdata.GetValidCPF().String(), testdata.GetValidSecret().String())
 			require.NoError(t, err)
 
 			err = usecase.CreateAccount(context.Background(), &acc)

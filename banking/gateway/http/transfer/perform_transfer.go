@@ -4,7 +4,7 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/thalissonfelipe/banking/banking/domain/entities"
+	"github.com/thalissonfelipe/banking/banking/domain/entity"
 	"github.com/thalissonfelipe/banking/banking/domain/transfer"
 	"github.com/thalissonfelipe/banking/banking/domain/vos"
 	"github.com/thalissonfelipe/banking/banking/gateway/http/rest"
@@ -48,7 +48,7 @@ func (h Handler) PerformTransfer(w http.ResponseWriter, r *http.Request) {
 
 	err := h.usecase.PerformTransfer(r.Context(), input)
 	if err != nil {
-		if errors.Is(err, entities.ErrAccountNotFound) {
+		if errors.Is(err, entity.ErrAccountNotFound) {
 			rest.SendError(w, http.StatusNotFound, rest.ErrAccountOriginNotFound)
 
 			return

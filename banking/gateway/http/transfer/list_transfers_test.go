@@ -13,7 +13,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/thalissonfelipe/banking/banking/domain/entities"
+	"github.com/thalissonfelipe/banking/banking/domain/entity"
 	"github.com/thalissonfelipe/banking/banking/domain/transfer"
 	"github.com/thalissonfelipe/banking/banking/domain/vos"
 	"github.com/thalissonfelipe/banking/banking/gateway/http/rest"
@@ -24,10 +24,10 @@ import (
 )
 
 func TestTransferHandler_ListTransfers(t *testing.T) {
-	tr, err := entities.NewTransfer(vos.NewAccountID(), vos.NewAccountID(), 50, 100)
+	tr, err := entity.NewTransfer(vos.NewAccountID(), vos.NewAccountID(), 50, 100)
 	require.NoError(t, err)
 
-	transfers := []entities.Transfer{tr}
+	transfers := []entity.Transfer{tr}
 
 	testCases := []struct {
 		name         string
@@ -39,7 +39,7 @@ func TestTransferHandler_ListTransfers(t *testing.T) {
 		{
 			name: "should return a list of transfers",
 			usecase: &UsecaseMock{
-				ListTransfersFunc: func(context.Context, vos.AccountID) ([]entities.Transfer, error) {
+				ListTransfersFunc: func(context.Context, vos.AccountID) ([]entity.Transfer, error) {
 					return transfers, nil
 				},
 			},
@@ -50,7 +50,7 @@ func TestTransferHandler_ListTransfers(t *testing.T) {
 		{
 			name: "should return an error if usecase fails",
 			usecase: &UsecaseMock{
-				ListTransfersFunc: func(context.Context, vos.AccountID) ([]entities.Transfer, error) {
+				ListTransfersFunc: func(context.Context, vos.AccountID) ([]entity.Transfer, error) {
 					return nil, assert.AnError
 				},
 			},

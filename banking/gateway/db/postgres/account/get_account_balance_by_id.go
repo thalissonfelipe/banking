@@ -7,7 +7,7 @@ import (
 
 	"github.com/jackc/pgx/v4"
 
-	"github.com/thalissonfelipe/banking/banking/domain/entities"
+	"github.com/thalissonfelipe/banking/banking/domain/entity"
 	"github.com/thalissonfelipe/banking/banking/domain/vos"
 )
 
@@ -21,7 +21,7 @@ func (r Repository) GetAccountBalanceByID(ctx context.Context, id vos.AccountID)
 	err := r.db.QueryRow(ctx, getBalanceQuery, id).Scan(&balance)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return 0, entities.ErrAccountNotFound
+			return 0, entity.ErrAccountNotFound
 		}
 
 		return 0, fmt.Errorf("db.QueryRow.Scan: %w", err)

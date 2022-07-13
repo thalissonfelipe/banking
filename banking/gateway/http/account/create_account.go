@@ -3,7 +3,7 @@ package account
 import (
 	"net/http"
 
-	"github.com/thalissonfelipe/banking/banking/domain/entities"
+	"github.com/thalissonfelipe/banking/banking/domain/entity"
 	"github.com/thalissonfelipe/banking/banking/gateway/http/account/schema"
 	"github.com/thalissonfelipe/banking/banking/gateway/http/rest"
 )
@@ -32,7 +32,7 @@ func (h Handler) CreateAccount(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	account, err := entities.NewAccount(body.Name, body.CPF, body.Secret)
+	account, err := entity.NewAccount(body.Name, body.CPF, body.Secret)
 	if err != nil {
 		rest.SendError(w, http.StatusBadRequest, err)
 

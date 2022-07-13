@@ -4,24 +4,24 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/thalissonfelipe/banking/banking/domain/entities"
+	"github.com/thalissonfelipe/banking/banking/domain/entity"
 )
 
 const listAccountsQuery = `
 select id, name, cpf, balance, created_at from accounts
 `
 
-func (r Repository) ListAccounts(ctx context.Context) ([]entities.Account, error) {
+func (r Repository) ListAccounts(ctx context.Context) ([]entity.Account, error) {
 	rows, err := r.db.Query(ctx, listAccountsQuery)
 	if err != nil {
 		return nil, fmt.Errorf("db.Query: %w", err)
 	}
 	defer rows.Close()
 
-	accounts := make([]entities.Account, 0)
+	accounts := make([]entity.Account, 0)
 
 	for rows.Next() {
-		var account entities.Account
+		var account entity.Account
 
 		err = rows.Scan(
 			&account.ID,

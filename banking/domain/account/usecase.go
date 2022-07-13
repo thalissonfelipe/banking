@@ -3,16 +3,16 @@ package account
 import (
 	"context"
 
-	"github.com/thalissonfelipe/banking/banking/domain/entities"
+	"github.com/thalissonfelipe/banking/banking/domain/entity"
 	"github.com/thalissonfelipe/banking/banking/domain/vos"
 )
 
 type Usecase interface {
-	ListAccounts(context.Context) ([]entities.Account, error)
+	ListAccounts(context.Context) ([]entity.Account, error)
 	GetAccountBalanceByID(context.Context, vos.AccountID) (int, error)
-	CreateAccount(context.Context, *entities.Account) error
-	GetAccountByID(context.Context, vos.AccountID) (entities.Account, error)
-	GetAccountByCPF(context.Context, vos.CPF) (entities.Account, error)
+	CreateAccount(context.Context, *entity.Account) error
+	GetAccountByID(context.Context, vos.AccountID) (entity.Account, error)
+	GetAccountByCPF(context.Context, vos.CPF) (entity.Account, error)
 }
 
 type CreateAccountInput struct {

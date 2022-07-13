@@ -5,7 +5,7 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/thalissonfelipe/banking/banking/domain/entities"
+	"github.com/thalissonfelipe/banking/banking/domain/entity"
 	"github.com/thalissonfelipe/banking/banking/services/auth"
 )
 
@@ -15,15 +15,15 @@ type ErrorResponse struct {
 
 func HandleError(w http.ResponseWriter, err error) {
 	switch {
-	case errors.Is(err, entities.ErrInsufficientFunds):
+	case errors.Is(err, entity.ErrInsufficientFunds):
 		SendError(w, http.StatusBadRequest, ErrInsufficientFunds)
 	case errors.Is(err, auth.ErrInvalidCredentials):
 		SendError(w, http.StatusBadRequest, ErrInvalidCredentials)
-	case errors.Is(err, entities.ErrAccountNotFound):
+	case errors.Is(err, entity.ErrAccountNotFound):
 		SendError(w, http.StatusNotFound, ErrAccountNotFound)
-	case errors.Is(err, entities.ErrAccountDestinationNotFound):
+	case errors.Is(err, entity.ErrAccountDestinationNotFound):
 		SendError(w, http.StatusNotFound, ErrAccountDestinationNotFound)
-	case errors.Is(err, entities.ErrAccountAlreadyExists):
+	case errors.Is(err, entity.ErrAccountAlreadyExists):
 		SendError(w, http.StatusConflict, ErrAccountAlreadyExists)
 	default:
 		SendError(w, http.StatusInternalServerError, ErrInternalError)

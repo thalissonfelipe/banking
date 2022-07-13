@@ -8,26 +8,26 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/thalissonfelipe/banking/banking/domain/account"
-	"github.com/thalissonfelipe/banking/banking/domain/entities"
+	"github.com/thalissonfelipe/banking/banking/domain/entity"
 	"github.com/thalissonfelipe/banking/banking/tests/testdata"
 )
 
 func TestAccountUsecase_ListAccounts(t *testing.T) {
-	acc, err := entities.NewAccount("name", testdata.GetValidCPF().String(), testdata.GetValidSecret().String())
+	acc, err := entity.NewAccount("name", testdata.GetValidCPF().String(), testdata.GetValidSecret().String())
 	require.NoError(t, err)
 
-	accounts := []entities.Account{acc}
+	accounts := []entity.Account{acc}
 
 	testCases := []struct {
 		name    string
 		repo    account.Repository
-		want    []entities.Account
+		want    []entity.Account
 		wantErr error
 	}{
 		{
 			name: "should return a list of accounts",
 			repo: &RepositoryMock{
-				ListAccountsFunc: func(context.Context) ([]entities.Account, error) {
+				ListAccountsFunc: func(context.Context) ([]entity.Account, error) {
 					return accounts, nil
 				},
 			},
@@ -37,7 +37,7 @@ func TestAccountUsecase_ListAccounts(t *testing.T) {
 		{
 			name: "should return an error if repo fails to get accounts",
 			repo: &RepositoryMock{
-				ListAccountsFunc: func(context.Context) ([]entities.Account, error) {
+				ListAccountsFunc: func(context.Context) ([]entity.Account, error) {
 					return nil, assert.AnError
 				},
 			},

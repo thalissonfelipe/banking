@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/thalissonfelipe/banking/banking/domain/entities"
+	"github.com/thalissonfelipe/banking/banking/domain/entity"
 	"github.com/thalissonfelipe/banking/banking/domain/transfer"
 )
 
@@ -17,14 +17,14 @@ func (t Transfer) PerformTransfer(ctx context.Context, input transfer.PerformTra
 
 	_, err = t.accountUsecase.GetAccountByID(ctx, input.AccountDestinationID)
 	if err != nil {
-		if errors.Is(err, entities.ErrAccountNotFound) {
-			return entities.ErrAccountDestinationNotFound
+		if errors.Is(err, entity.ErrAccountNotFound) {
+			return entity.ErrAccountDestinationNotFound
 		}
 
 		return fmt.Errorf("getting destination account by id: %w", err)
 	}
 
-	transfer, err := entities.NewTransfer(
+	transfer, err := entity.NewTransfer(
 		input.AccountOriginID,
 		input.AccountDestinationID,
 		input.Amount,

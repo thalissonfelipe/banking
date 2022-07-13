@@ -6,7 +6,7 @@ package auth
 import (
 	"context"
 	"github.com/thalissonfelipe/banking/banking/domain/account"
-	"github.com/thalissonfelipe/banking/banking/domain/entities"
+	"github.com/thalissonfelipe/banking/banking/domain/entity"
 	"github.com/thalissonfelipe/banking/banking/domain/vos"
 	"sync"
 )
@@ -21,19 +21,19 @@ var _ account.Repository = &RepositoryMock{}
 //
 // 		// make and configure a mocked account.Repository
 // 		mockedRepository := &RepositoryMock{
-// 			CreateAccountFunc: func(contextMoqParam context.Context, account *entities.Account) error {
+// 			CreateAccountFunc: func(contextMoqParam context.Context, account *entity.Account) error {
 // 				panic("mock out the CreateAccount method")
 // 			},
 // 			GetAccountBalanceByIDFunc: func(contextMoqParam context.Context, accountID vos.AccountID) (int, error) {
 // 				panic("mock out the GetAccountBalanceByID method")
 // 			},
-// 			GetAccountByCPFFunc: func(contextMoqParam context.Context, cPF vos.CPF) (entities.Account, error) {
+// 			GetAccountByCPFFunc: func(contextMoqParam context.Context, cPF vos.CPF) (entity.Account, error) {
 // 				panic("mock out the GetAccountByCPF method")
 // 			},
-// 			GetAccountByIDFunc: func(contextMoqParam context.Context, accountID vos.AccountID) (entities.Account, error) {
+// 			GetAccountByIDFunc: func(contextMoqParam context.Context, accountID vos.AccountID) (entity.Account, error) {
 // 				panic("mock out the GetAccountByID method")
 // 			},
-// 			ListAccountsFunc: func(contextMoqParam context.Context) ([]entities.Account, error) {
+// 			ListAccountsFunc: func(contextMoqParam context.Context) ([]entity.Account, error) {
 // 				panic("mock out the ListAccounts method")
 // 			},
 // 		}
@@ -44,19 +44,19 @@ var _ account.Repository = &RepositoryMock{}
 // 	}
 type RepositoryMock struct {
 	// CreateAccountFunc mocks the CreateAccount method.
-	CreateAccountFunc func(contextMoqParam context.Context, account *entities.Account) error
+	CreateAccountFunc func(contextMoqParam context.Context, account *entity.Account) error
 
 	// GetAccountBalanceByIDFunc mocks the GetAccountBalanceByID method.
 	GetAccountBalanceByIDFunc func(contextMoqParam context.Context, accountID vos.AccountID) (int, error)
 
 	// GetAccountByCPFFunc mocks the GetAccountByCPF method.
-	GetAccountByCPFFunc func(contextMoqParam context.Context, cPF vos.CPF) (entities.Account, error)
+	GetAccountByCPFFunc func(contextMoqParam context.Context, cPF vos.CPF) (entity.Account, error)
 
 	// GetAccountByIDFunc mocks the GetAccountByID method.
-	GetAccountByIDFunc func(contextMoqParam context.Context, accountID vos.AccountID) (entities.Account, error)
+	GetAccountByIDFunc func(contextMoqParam context.Context, accountID vos.AccountID) (entity.Account, error)
 
 	// ListAccountsFunc mocks the ListAccounts method.
-	ListAccountsFunc func(contextMoqParam context.Context) ([]entities.Account, error)
+	ListAccountsFunc func(contextMoqParam context.Context) ([]entity.Account, error)
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -65,7 +65,7 @@ type RepositoryMock struct {
 			// ContextMoqParam is the contextMoqParam argument value.
 			ContextMoqParam context.Context
 			// Account is the account argument value.
-			Account *entities.Account
+			Account *entity.Account
 		}
 		// GetAccountBalanceByID holds details about calls to the GetAccountBalanceByID method.
 		GetAccountBalanceByID []struct {
@@ -102,13 +102,13 @@ type RepositoryMock struct {
 }
 
 // CreateAccount calls CreateAccountFunc.
-func (mock *RepositoryMock) CreateAccount(contextMoqParam context.Context, account *entities.Account) error {
+func (mock *RepositoryMock) CreateAccount(contextMoqParam context.Context, account *entity.Account) error {
 	if mock.CreateAccountFunc == nil {
 		panic("RepositoryMock.CreateAccountFunc: method is nil but Repository.CreateAccount was just called")
 	}
 	callInfo := struct {
 		ContextMoqParam context.Context
-		Account         *entities.Account
+		Account         *entity.Account
 	}{
 		ContextMoqParam: contextMoqParam,
 		Account:         account,
@@ -124,11 +124,11 @@ func (mock *RepositoryMock) CreateAccount(contextMoqParam context.Context, accou
 //     len(mockedRepository.CreateAccountCalls())
 func (mock *RepositoryMock) CreateAccountCalls() []struct {
 	ContextMoqParam context.Context
-	Account         *entities.Account
+	Account         *entity.Account
 } {
 	var calls []struct {
 		ContextMoqParam context.Context
-		Account         *entities.Account
+		Account         *entity.Account
 	}
 	mock.lockCreateAccount.RLock()
 	calls = mock.calls.CreateAccount
@@ -172,7 +172,7 @@ func (mock *RepositoryMock) GetAccountBalanceByIDCalls() []struct {
 }
 
 // GetAccountByCPF calls GetAccountByCPFFunc.
-func (mock *RepositoryMock) GetAccountByCPF(contextMoqParam context.Context, cPF vos.CPF) (entities.Account, error) {
+func (mock *RepositoryMock) GetAccountByCPF(contextMoqParam context.Context, cPF vos.CPF) (entity.Account, error) {
 	if mock.GetAccountByCPFFunc == nil {
 		panic("RepositoryMock.GetAccountByCPFFunc: method is nil but Repository.GetAccountByCPF was just called")
 	}
@@ -207,7 +207,7 @@ func (mock *RepositoryMock) GetAccountByCPFCalls() []struct {
 }
 
 // GetAccountByID calls GetAccountByIDFunc.
-func (mock *RepositoryMock) GetAccountByID(contextMoqParam context.Context, accountID vos.AccountID) (entities.Account, error) {
+func (mock *RepositoryMock) GetAccountByID(contextMoqParam context.Context, accountID vos.AccountID) (entity.Account, error) {
 	if mock.GetAccountByIDFunc == nil {
 		panic("RepositoryMock.GetAccountByIDFunc: method is nil but Repository.GetAccountByID was just called")
 	}
@@ -242,7 +242,7 @@ func (mock *RepositoryMock) GetAccountByIDCalls() []struct {
 }
 
 // ListAccounts calls ListAccountsFunc.
-func (mock *RepositoryMock) ListAccounts(contextMoqParam context.Context) ([]entities.Account, error) {
+func (mock *RepositoryMock) ListAccounts(contextMoqParam context.Context) ([]entity.Account, error) {
 	if mock.ListAccountsFunc == nil {
 		panic("RepositoryMock.ListAccountsFunc: method is nil but Repository.ListAccounts was just called")
 	}

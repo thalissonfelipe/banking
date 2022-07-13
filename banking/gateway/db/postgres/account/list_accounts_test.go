@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/thalissonfelipe/banking/banking/domain/entities"
+	"github.com/thalissonfelipe/banking/banking/domain/entity"
 	"github.com/thalissonfelipe/banking/banking/tests/dockertest"
 	"github.com/thalissonfelipe/banking/banking/tests/testdata"
 )
@@ -23,7 +23,7 @@ func TestAccountRepository_ListAccounts(t *testing.T) {
 	require.NoError(t, err)
 	assert.Len(t, accounts, 0)
 
-	want, err := entities.NewAccount("name", testdata.GetValidCPF().String(), testdata.GetValidSecret().String())
+	want, err := entity.NewAccount("name", testdata.GetValidCPF().String(), testdata.GetValidSecret().String())
 	require.NoError(t, err)
 
 	err = r.CreateAccount(ctx, &want)

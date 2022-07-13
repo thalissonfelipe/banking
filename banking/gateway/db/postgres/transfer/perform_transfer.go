@@ -6,11 +6,11 @@ import (
 
 	"github.com/jackc/pgx/v4"
 
-	"github.com/thalissonfelipe/banking/banking/domain/entities"
+	"github.com/thalissonfelipe/banking/banking/domain/entity"
 	"github.com/thalissonfelipe/banking/banking/domain/vos"
 )
 
-func (r Repository) PerformTransfer(ctx context.Context, transfer *entities.Transfer) error {
+func (r Repository) PerformTransfer(ctx context.Context, transfer *entity.Transfer) error {
 	// First experience with rollback.
 	// Tutorial: https://www.sohamkamani.com/golang/sql-transactions/
 	tx, err := r.db.Begin(ctx)
@@ -61,7 +61,7 @@ values ($1, $2, $3, $4)
 returning created_at
 `
 
-func (r Repository) saveTransfer(ctx context.Context, tx pgx.Tx, transfer *entities.Transfer) error {
+func (r Repository) saveTransfer(ctx context.Context, tx pgx.Tx, transfer *entity.Transfer) error {
 	err := tx.QueryRow(ctx, insertTransferQuery,
 		transfer.ID,
 		transfer.AccountOriginID,

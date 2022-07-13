@@ -8,25 +8,25 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/thalissonfelipe/banking/banking/domain/account"
-	"github.com/thalissonfelipe/banking/banking/domain/entities"
+	"github.com/thalissonfelipe/banking/banking/domain/entity"
 	"github.com/thalissonfelipe/banking/banking/domain/vos"
 	"github.com/thalissonfelipe/banking/banking/tests/testdata"
 )
 
 func TestAccountUsecase_GetAccountByCPF(t *testing.T) {
-	acc, err := entities.NewAccount("name", testdata.GetValidCPF().String(), testdata.GetValidSecret().String())
+	acc, err := entity.NewAccount("name", testdata.GetValidCPF().String(), testdata.GetValidSecret().String())
 	require.NoError(t, err)
 
 	testCases := []struct {
 		name    string
 		repo    account.Repository
-		want    entities.Account
+		want    entity.Account
 		wantErr error
 	}{
 		{
 			name: "should return an account successfully",
 			repo: &RepositoryMock{
-				GetAccountByCPFFunc: func(context.Context, vos.CPF) (entities.Account, error) {
+				GetAccountByCPFFunc: func(context.Context, vos.CPF) (entity.Account, error) {
 					return acc, nil
 				},
 			},
@@ -36,12 +36,12 @@ func TestAccountUsecase_GetAccountByCPF(t *testing.T) {
 		{
 			name: "should return an error if account does not exist",
 			repo: &RepositoryMock{
-				GetAccountByCPFFunc: func(context.Context, vos.CPF) (entities.Account, error) {
-					return entities.Account{}, entities.ErrAccountNotFound
+				GetAccountByCPFFunc: func(context.Context, vos.CPF) (entity.Account, error) {
+					return entity.Account{}, entity.ErrAccountNotFound
 				},
 			},
-			want:    entities.Account{},
-			wantErr: entities.ErrAccountNotFound,
+			want:    entity.Account{},
+			wantErr: entity.ErrAccountNotFound,
 		},
 	}
 

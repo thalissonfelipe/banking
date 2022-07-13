@@ -5,7 +5,7 @@ package transfer
 
 import (
 	"context"
-	"github.com/thalissonfelipe/banking/banking/domain/entities"
+	"github.com/thalissonfelipe/banking/banking/domain/entity"
 	"github.com/thalissonfelipe/banking/banking/domain/transfer"
 	"github.com/thalissonfelipe/banking/banking/domain/vos"
 	"sync"
@@ -17,7 +17,7 @@ import (
 //
 // 		// make and configure a mocked Usecase
 // 		mockedUsecase := &UsecaseMock{
-// 			ListTransfersFunc: func(contextMoqParam context.Context, accountID vos.AccountID) ([]entities.Transfer, error) {
+// 			ListTransfersFunc: func(contextMoqParam context.Context, accountID vos.AccountID) ([]entity.Transfer, error) {
 // 				panic("mock out the ListTransfers method")
 // 			},
 // 			PerformTransferFunc: func(contextMoqParam context.Context, performTransferInput transfer.PerformTransferInput) error {
@@ -31,7 +31,7 @@ import (
 // 	}
 type UsecaseMock struct {
 	// ListTransfersFunc mocks the ListTransfers method.
-	ListTransfersFunc func(contextMoqParam context.Context, accountID vos.AccountID) ([]entities.Transfer, error)
+	ListTransfersFunc func(contextMoqParam context.Context, accountID vos.AccountID) ([]entity.Transfer, error)
 
 	// PerformTransferFunc mocks the PerformTransfer method.
 	PerformTransferFunc func(contextMoqParam context.Context, performTransferInput transfer.PerformTransferInput) error
@@ -58,7 +58,7 @@ type UsecaseMock struct {
 }
 
 // ListTransfers calls ListTransfersFunc.
-func (mock *UsecaseMock) ListTransfers(contextMoqParam context.Context, accountID vos.AccountID) ([]entities.Transfer, error) {
+func (mock *UsecaseMock) ListTransfers(contextMoqParam context.Context, accountID vos.AccountID) ([]entity.Transfer, error) {
 	if mock.ListTransfersFunc == nil {
 		panic("UsecaseMock.ListTransfersFunc: method is nil but Usecase.ListTransfers was just called")
 	}

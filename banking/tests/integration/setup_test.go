@@ -8,7 +8,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/thalissonfelipe/banking/banking/domain/entities"
+	"github.com/thalissonfelipe/banking/banking/domain/entity"
 	"github.com/thalissonfelipe/banking/banking/domain/vos"
 	"github.com/thalissonfelipe/banking/banking/gateway/hash"
 	h "github.com/thalissonfelipe/banking/banking/gateway/http"
@@ -32,8 +32,8 @@ func TestMain(m *testing.M) {
 	os.Exit(exitCode)
 }
 
-func createAccount(t *testing.T, cpf vos.CPF, secret vos.Secret, balance int) entities.Account {
-	acc, err := entities.NewAccount("name", cpf.String(), secret.String())
+func createAccount(t *testing.T, cpf vos.CPF, secret vos.Secret, balance int) entity.Account {
+	acc, err := entity.NewAccount("name", cpf.String(), secret.String())
 	require.NoError(t, err)
 	acc.Balance = balance
 

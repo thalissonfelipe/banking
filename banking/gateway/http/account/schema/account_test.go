@@ -7,20 +7,20 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/thalissonfelipe/banking/banking/domain/entities"
+	"github.com/thalissonfelipe/banking/banking/domain/entity"
 	"github.com/thalissonfelipe/banking/banking/gateway/http/rest"
 	"github.com/thalissonfelipe/banking/banking/tests/testdata"
 )
 
 func TestSchema_MapToListAccountsResponse(t *testing.T) {
-	acc, err := entities.NewAccount("name", testdata.GetValidCPF().String(), testdata.GetValidSecret().String())
+	acc, err := entity.NewAccount("name", testdata.GetValidCPF().String(), testdata.GetValidSecret().String())
 	require.NoError(t, err)
 
 	acc.CreatedAt = time.Now()
 
 	tests := []struct {
 		name     string
-		accounts []entities.Account
+		accounts []entity.Account
 		want     ListAccountsResponse
 	}{
 		{
@@ -30,7 +30,7 @@ func TestSchema_MapToListAccountsResponse(t *testing.T) {
 		},
 		{
 			name:     "map accounts successfully",
-			accounts: []entities.Account{acc, acc, acc, acc},
+			accounts: []entity.Account{acc, acc, acc, acc},
 			want: ListAccountsResponse{Accounts: []Account{
 				{
 					ID:        acc.ID.String(),

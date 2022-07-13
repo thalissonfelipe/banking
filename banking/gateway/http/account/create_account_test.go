@@ -14,7 +14,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/thalissonfelipe/banking/banking/domain/account"
-	"github.com/thalissonfelipe/banking/banking/domain/entities"
+	"github.com/thalissonfelipe/banking/banking/domain/entity"
 	"github.com/thalissonfelipe/banking/banking/gateway/http/account/schema"
 	"github.com/thalissonfelipe/banking/banking/gateway/http/rest"
 	"github.com/thalissonfelipe/banking/banking/tests"
@@ -26,7 +26,7 @@ func TestAccountHandler_CreateAccount(t *testing.T) {
 	cpf := testdata.GetValidCPF()
 	secret := testdata.GetValidSecret()
 
-	acc, err := entities.NewAccount("name", cpf.String(), secret.String())
+	acc, err := entity.NewAccount("name", cpf.String(), secret.String())
 	require.NoError(t, err)
 
 	acc.CreatedAt = time.Now()
@@ -42,7 +42,7 @@ func TestAccountHandler_CreateAccount(t *testing.T) {
 		{
 			name: "should return status code 201 if acc was created successfully",
 			usecase: &UsecaseMock{
-				CreateAccountFunc: func(_ context.Context, account *entities.Account) error {
+				CreateAccountFunc: func(_ context.Context, account *entity.Account) error {
 					*account = acc
 					return nil
 				},
@@ -108,8 +108,8 @@ func TestAccountHandler_CreateAccount(t *testing.T) {
 		{
 			name: "should return status code 409 if account already exists",
 			usecase: &UsecaseMock{
-				CreateAccountFunc: func(ctx context.Context, account *entities.Account) error {
-					return entities.ErrAccountAlreadyExists
+				CreateAccountFunc: func(ctx context.Context, account *entity.Account) error {
+					return entity.ErrAccountAlreadyExists
 				},
 			},
 			decoder:      tests.ErrorMessageDecoder{},
@@ -120,7 +120,7 @@ func TestAccountHandler_CreateAccount(t *testing.T) {
 		{
 			name: "should return status code 500 if usecase fails to create an account",
 			usecase: &UsecaseMock{
-				CreateAccountFunc: func(ctx context.Context, account *entities.Account) error {
+				CreateAccountFunc: func(ctx context.Context, account *entity.Account) error {
 					return assert.AnError
 				},
 			},

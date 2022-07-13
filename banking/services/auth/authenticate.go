@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/thalissonfelipe/banking/banking/domain/entities"
+	"github.com/thalissonfelipe/banking/banking/domain/entity"
 	"github.com/thalissonfelipe/banking/banking/domain/vos"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -18,7 +18,7 @@ func (a Auth) Autheticate(ctx context.Context, cpfStr, secretStr string) (string
 
 	acc, err := a.accountUsecase.GetAccountByCPF(ctx, cpf)
 	if err != nil {
-		if errors.Is(err, entities.ErrAccountNotFound) {
+		if errors.Is(err, entity.ErrAccountNotFound) {
 			return "", ErrInvalidCredentials
 		}
 

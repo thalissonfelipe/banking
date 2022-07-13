@@ -4,10 +4,10 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/thalissonfelipe/banking/banking/domain/entities"
+	"github.com/thalissonfelipe/banking/banking/domain/entity"
 )
 
-func (a Account) CreateAccount(ctx context.Context, acc *entities.Account) error {
+func (a Account) CreateAccount(ctx context.Context, acc *entity.Account) error {
 	err := acc.Secret.Hash(a.encrypter)
 	if err != nil {
 		return fmt.Errorf("hashing secret: %w", err)

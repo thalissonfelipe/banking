@@ -7,20 +7,20 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/thalissonfelipe/banking/banking/domain/entities"
+	"github.com/thalissonfelipe/banking/banking/domain/entity"
 	"github.com/thalissonfelipe/banking/banking/domain/vos"
 	"github.com/thalissonfelipe/banking/banking/gateway/http/rest"
 )
 
 func TestSchema_MapToListTransferResponse(t *testing.T) {
-	transfer, err := entities.NewTransfer(vos.NewAccountID(), vos.NewAccountID(), 100, 100)
+	transfer, err := entity.NewTransfer(vos.NewAccountID(), vos.NewAccountID(), 100, 100)
 	require.NoError(t, err)
 
 	transfer.CreatedAt = time.Now()
 
 	tests := []struct {
 		name      string
-		transfers []entities.Transfer
+		transfers []entity.Transfer
 		want      ListTransfersResponse
 	}{
 		{
@@ -30,7 +30,7 @@ func TestSchema_MapToListTransferResponse(t *testing.T) {
 		},
 		{
 			name:      "map transfers successfully",
-			transfers: []entities.Transfer{transfer, transfer, transfer, transfer},
+			transfers: []entity.Transfer{transfer, transfer, transfer, transfer},
 			want: ListTransfersResponse{Transfers: []Transfer{
 				{
 					AccountOriginID:      transfer.AccountOriginID.String(),

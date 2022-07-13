@@ -3,7 +3,7 @@ package schema
 import (
 	"time"
 
-	"github.com/thalissonfelipe/banking/banking/domain/entities"
+	"github.com/thalissonfelipe/banking/banking/domain/entity"
 	"github.com/thalissonfelipe/banking/banking/gateway/http/rest"
 )
 
@@ -18,7 +18,7 @@ type ListTransfersResponse struct {
 	Transfers []Transfer `json:"transfers"`
 }
 
-func MapToListTransfersResponse(transfers []entities.Transfer) ListTransfersResponse {
+func MapToListTransfersResponse(transfers []entity.Transfer) ListTransfersResponse {
 	response := ListTransfersResponse{
 		Transfers: make([]Transfer, 0, len(transfers)),
 	}

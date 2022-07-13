@@ -10,7 +10,7 @@ import (
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	"github.com/thalissonfelipe/banking/banking/domain/entities"
+	"github.com/thalissonfelipe/banking/banking/domain/entity"
 	"github.com/thalissonfelipe/banking/banking/domain/transfer"
 	"github.com/thalissonfelipe/banking/banking/domain/vos"
 	"github.com/thalissonfelipe/banking/banking/services/auth"
@@ -90,15 +90,15 @@ func (s Server) CreateTransfer(
 
 	err = s.transferUsecase.PerformTransfer(ctx, input)
 	if err != nil {
-		if errors.Is(err, entities.ErrAccountNotFound) {
+		if errors.Is(err, entity.ErrAccountNotFound) {
 			return nil, status.Errorf(codes.NotFound, "account origin does not exist")
 		}
 
-		if errors.Is(err, entities.ErrAccountDestinationNotFound) {
+		if errors.Is(err, entity.ErrAccountDestinationNotFound) {
 			return nil, status.Errorf(codes.NotFound, "account destination does not exist")
 		}
 
-		if errors.Is(err, entities.ErrInsufficientFunds) {
+		if errors.Is(err, entity.ErrInsufficientFunds) {
 			return nil, status.Errorf(codes.InvalidArgument, "insufficient funds")
 		}
 
@@ -108,7 +108,7 @@ func (s Server) CreateTransfer(
 	return &proto.CreateTransferResponse{}, nil
 }
 
-func domainTransferToGRPC(transfer entities.Transfer) *proto.Transfer {
+func domainTransferToGRPC(transfer entity.Transfer) *proto.Transfer {
 	return &proto.Transfer{
 		Id:                   transfer.ID.String(),
 		AccountDestinationId: transfer.AccountDestinationID.String(),

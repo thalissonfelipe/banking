@@ -3,12 +3,12 @@ package transfer
 import (
 	"context"
 
-	"github.com/thalissonfelipe/banking/banking/domain/entities"
+	"github.com/thalissonfelipe/banking/banking/domain/entity"
 	"github.com/thalissonfelipe/banking/banking/domain/vos"
 )
 
 type Usecase interface {
-	ListTransfers(context.Context, vos.AccountID) ([]entities.Transfer, error)
+	ListTransfers(context.Context, vos.AccountID) ([]entity.Transfer, error)
 	PerformTransfer(context.Context, PerformTransferInput) error
 }
 

@@ -14,7 +14,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/thalissonfelipe/banking/banking/domain/account"
-	"github.com/thalissonfelipe/banking/banking/domain/entities"
+	"github.com/thalissonfelipe/banking/banking/domain/entity"
 	"github.com/thalissonfelipe/banking/banking/domain/vos"
 	"github.com/thalissonfelipe/banking/banking/gateway/http/account/schema"
 	"github.com/thalissonfelipe/banking/banking/gateway/http/rest"
@@ -24,7 +24,7 @@ import (
 )
 
 func TestAccountHandler_GetAccountBalance(t *testing.T) {
-	acc, err := entities.NewAccount("name", testdata.GetValidCPF().String(), testdata.GetValidSecret().String())
+	acc, err := entity.NewAccount("name", testdata.GetValidCPF().String(), testdata.GetValidSecret().String())
 	require.NoError(t, err)
 
 	testCases := []struct {
@@ -51,7 +51,7 @@ func TestAccountHandler_GetAccountBalance(t *testing.T) {
 			name: "should return status 404 if account does not exist",
 			usecase: &UsecaseMock{
 				GetAccountBalanceByIDFunc: func(context.Context, vos.AccountID) (int, error) {
-					return 0, entities.ErrAccountNotFound
+					return 0, entity.ErrAccountNotFound
 				},
 			},
 			requestURI:   fmt.Sprintf("/accounts/%s/balance", acc.ID),

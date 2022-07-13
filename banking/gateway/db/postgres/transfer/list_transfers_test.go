@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/thalissonfelipe/banking/banking/domain/entities"
+	"github.com/thalissonfelipe/banking/banking/domain/entity"
 	"github.com/thalissonfelipe/banking/banking/domain/vos"
 	"github.com/thalissonfelipe/banking/banking/gateway/db/postgres/account"
 	"github.com/thalissonfelipe/banking/banking/tests/dockertest"
@@ -27,10 +27,10 @@ func TestRepository_ListTransfers(t *testing.T) {
 	require.NoError(t, err)
 	assert.Len(t, transfers, 0)
 
-	accOrigin, err := entities.NewAccount("origin", testdata.GetValidCPF().String(), testdata.GetValidSecret().String())
+	accOrigin, err := entity.NewAccount("origin", testdata.GetValidCPF().String(), testdata.GetValidSecret().String())
 	require.NoError(t, err)
 
-	accDest, err := entities.NewAccount("dest", testdata.GetValidCPF().String(), testdata.GetValidSecret().String())
+	accDest, err := entity.NewAccount("dest", testdata.GetValidCPF().String(), testdata.GetValidSecret().String())
 	require.NoError(t, err)
 
 	err = accRepository.CreateAccount(ctx, &accOrigin)
@@ -45,7 +45,7 @@ func TestRepository_ListTransfers(t *testing.T) {
 	require.NoError(t, err)
 	assert.Len(t, transfers, 0)
 
-	transfer, err := entities.NewTransfer(accOrigin.ID, accDest.ID, 50, 100)
+	transfer, err := entity.NewTransfer(accOrigin.ID, accDest.ID, 50, 100)
 	require.NoError(t, err)
 
 	err = r.PerformTransfer(ctx, &transfer)
