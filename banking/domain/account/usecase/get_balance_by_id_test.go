@@ -11,7 +11,7 @@ import (
 	"github.com/thalissonfelipe/banking/banking/domain/vos"
 )
 
-func TestAccountUsecase_GetBalanceByAccountID(t *testing.T) {
+func TestAccountUsecase_GetAccountBalanceByID(t *testing.T) {
 	wantBalance := 100
 
 	testCases := []struct {

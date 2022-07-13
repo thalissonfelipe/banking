@@ -15,7 +15,7 @@ import (
 	"github.com/thalissonfelipe/banking/banking/tests/testenv"
 )
 
-func TestIntegration_GetAccounts(t *testing.T) {
+func TestIntegration_ListAccounts(t *testing.T) {
 	defer dockertest.TruncateTables(context.Background(), testenv.DB)
 
 	request := fakes.FakeRequest(http.MethodGet, testenv.ServerURL+"/api/v1/accounts", nil)

@@ -16,7 +16,7 @@ import (
 	"github.com/thalissonfelipe/banking/banking/tests/testenv"
 )
 
-func TestIntegration_GetTransfers(t *testing.T) {
+func TestIntegration_ListTransfers(t *testing.T) {
 	uri := testenv.ServerURL + "/api/v1/transfers"
 
 	testCases := []struct {
