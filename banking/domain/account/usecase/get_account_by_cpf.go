@@ -2,7 +2,6 @@ package usecase
 
 import (
 	"context"
-	"errors"
 	"fmt"
 
 	"github.com/thalissonfelipe/banking/banking/domain/entities"
@@ -11,13 +10,9 @@ import (
 
 func (a Account) GetAccountByCPF(ctx context.Context, cpf vos.CPF) (entities.Account, error) {
 	acc, err := a.repository.GetAccountByCPF(ctx, cpf)
-	if err == nil {
-		return acc, nil
+	if err != nil {
+		return entities.Account{}, fmt.Errorf("getting account by cpf: %w", err)
 	}
 
-	if errors.Is(err, entities.ErrAccountDoesNotExist) {
-		return entities.Account{}, fmt.Errorf("account does not exist: %w", err)
-	}
-
-	return entities.Account{}, entities.ErrInternalError
+	return acc, nil
 }

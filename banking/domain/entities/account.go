@@ -23,8 +23,6 @@ var (
 	ErrAccountDoesNotExist = errors.New("account does not exist")
 	// ErrAccountAlreadyExists occurs when an account already exists.
 	ErrAccountAlreadyExists = errors.New("account already exists")
-	// ErrInternalError ocurrs when an unexpected error happens.
-	ErrInternalError = errors.New("internal server error")
 )
 
 func NewAccount(name, cpfStr, secretStr string) (Account, error) {
