@@ -21,20 +21,21 @@ func TestAccountRepository_CreateAccount(t *testing.T) {
 
 		defer dockertest.TruncateTables(ctx, db)
 
-		newAccount := entities.NewAccount("name", testdata.GetValidCPF(), testdata.GetValidSecret())
-
-		err := r.CreateAccount(ctx, &newAccount)
-		require.NoError(t, err)
-		assert.True(t, newAccount.CreatedAt.Before(time.Now()))
-
-		acc, err := r.GetAccountByID(ctx, newAccount.ID)
+		want, err := entities.NewAccount("name", testdata.GetValidCPF().String(), testdata.GetValidSecret().String())
 		require.NoError(t, err)
 
-		assert.Equal(t, newAccount.ID, acc.ID)
-		assert.Equal(t, newAccount.Name, acc.Name)
-		assert.Equal(t, newAccount.CPF, acc.CPF)
-		assert.Equal(t, newAccount.Balance, acc.Balance)
-		assert.Equal(t, newAccount.Secret, acc.Secret)
+		err = r.CreateAccount(ctx, &want)
+		require.NoError(t, err)
+		assert.True(t, want.CreatedAt.Before(time.Now()))
+
+		acc, err := r.GetAccountByID(ctx, want.ID)
+		require.NoError(t, err)
+
+		assert.Equal(t, want.ID, acc.ID)
+		assert.Equal(t, want.Name, acc.Name)
+		assert.Equal(t, want.CPF, acc.CPF)
+		assert.Equal(t, want.Balance, acc.Balance)
+		assert.Equal(t, want.Secret, acc.Secret)
 	})
 
 	t.Run("should return an error if account already exists", func(t *testing.T) {
@@ -42,9 +43,10 @@ func TestAccountRepository_CreateAccount(t *testing.T) {
 		r := NewRepository(db)
 		ctx := context.Background()
 
-		acc := entities.NewAccount("name", testdata.GetValidCPF(), testdata.GetValidSecret())
+		acc, err := entities.NewAccount("name", testdata.GetValidCPF().String(), testdata.GetValidSecret().String())
+		require.NoError(t, err)
 
-		err := r.CreateAccount(ctx, &acc)
+		err = r.CreateAccount(ctx, &acc)
 		require.NoError(t, err)
 
 		err = r.CreateAccount(ctx, &acc)

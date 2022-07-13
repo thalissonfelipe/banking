@@ -21,19 +21,20 @@ func TestAccountRepository_GetAccountByID(t *testing.T) {
 
 		defer dockertest.TruncateTables(ctx, db)
 
-		account := entities.NewAccount("name", testdata.GetValidCPF(), testdata.GetValidSecret())
-
-		err := r.CreateAccount(ctx, &account)
+		want, err := entities.NewAccount("name", testdata.GetValidCPF().String(), testdata.GetValidSecret().String())
 		require.NoError(t, err)
 
-		got, err := r.GetAccountByID(ctx, account.ID)
+		err = r.CreateAccount(ctx, &want)
 		require.NoError(t, err)
 
-		assert.Equal(t, account.ID, got.ID)
-		assert.Equal(t, account.Name, got.Name)
-		assert.Equal(t, account.CPF, got.CPF)
-		assert.Equal(t, account.Balance, got.Balance)
-		assert.Equal(t, account.CreatedAt, got.CreatedAt)
+		got, err := r.GetAccountByID(ctx, want.ID)
+		require.NoError(t, err)
+
+		assert.Equal(t, want.ID, got.ID)
+		assert.Equal(t, want.Name, got.Name)
+		assert.Equal(t, want.CPF, got.CPF)
+		assert.Equal(t, want.Balance, got.Balance)
+		assert.Equal(t, want.CreatedAt, got.CreatedAt)
 	})
 
 	t.Run("should return an error if account does not exist", func(t *testing.T) {

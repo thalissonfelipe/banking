@@ -22,17 +22,20 @@ func TestTransferRepository_CreateTransfer(t *testing.T) {
 
 	defer dockertest.TruncateTables(ctx, db)
 
-	accOrigin := entities.NewAccount("origin", testdata.GetValidCPF(), testdata.GetValidSecret())
+	accOrigin, err := entities.NewAccount("origin", testdata.GetValidCPF().String(), testdata.GetValidSecret().String())
+	require.NoError(t, err)
 	accOrigin.Balance = 100
-	accDestination := entities.NewAccount("destination", testdata.GetValidCPF(), testdata.GetValidSecret())
 
-	err := accRepository.CreateAccount(ctx, &accOrigin)
+	accDest, err := entities.NewAccount("dest", testdata.GetValidCPF().String(), testdata.GetValidSecret().String())
 	require.NoError(t, err)
 
-	err = accRepository.CreateAccount(ctx, &accDestination)
+	err = accRepository.CreateAccount(ctx, &accOrigin)
 	require.NoError(t, err)
 
-	transfer := entities.NewTransfer(accOrigin.ID, accDestination.ID, 50)
+	err = accRepository.CreateAccount(ctx, &accDest)
+	require.NoError(t, err)
+
+	transfer := entities.NewTransfer(accOrigin.ID, accDest.ID, 50)
 
 	err = r.CreateTransfer(ctx, &transfer)
 	require.NoError(t, err)
@@ -51,7 +54,7 @@ func TestTransferRepository_CreateTransfer(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, 50, originBalance)
 
-	destinationBalance, err := accRepository.GetBalanceByID(ctx, accDestination.ID)
+	destinationBalance, err := accRepository.GetBalanceByID(ctx, accDest.ID)
 	require.NoError(t, err)
 	assert.Equal(t, 50, destinationBalance)
 }

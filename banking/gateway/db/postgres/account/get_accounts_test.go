@@ -23,17 +23,18 @@ func TestAccountRepository_GetAccounts(t *testing.T) {
 	require.NoError(t, err)
 	assert.Len(t, accounts, 0)
 
-	acc := entities.NewAccount("name", testdata.GetValidCPF(), testdata.GetValidSecret())
+	want, err := entities.NewAccount("name", testdata.GetValidCPF().String(), testdata.GetValidSecret().String())
+	require.NoError(t, err)
 
-	err = r.CreateAccount(ctx, &acc)
+	err = r.CreateAccount(ctx, &want)
 	require.NoError(t, err)
 
 	accounts, err = r.GetAccounts(ctx)
 	require.NoError(t, err)
 
 	assert.Len(t, accounts, 1)
-	assert.Equal(t, acc.ID, accounts[0].ID)
-	assert.Equal(t, acc.Name, accounts[0].Name)
-	assert.Equal(t, acc.CPF.String(), accounts[0].CPF.String())
-	assert.Equal(t, acc.Balance, accounts[0].Balance)
+	assert.Equal(t, want.ID, accounts[0].ID)
+	assert.Equal(t, want.Name, accounts[0].Name)
+	assert.Equal(t, want.CPF.String(), accounts[0].CPF.String())
+	assert.Equal(t, want.Balance, accounts[0].Balance)
 }

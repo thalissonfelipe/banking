@@ -27,14 +27,17 @@ func TestRepository_GetTransfers(t *testing.T) {
 	require.NoError(t, err)
 	assert.Len(t, transfers, 0)
 
-	accOrigin := entities.NewAccount("origin", testdata.GetValidCPF(), testdata.GetValidSecret())
+	accOrigin, err := entities.NewAccount("origin", testdata.GetValidCPF().String(), testdata.GetValidSecret().String())
+	require.NoError(t, err)
 	accOrigin.Balance = 100
-	accDestination := entities.NewAccount("destination", testdata.GetValidCPF(), testdata.GetValidSecret())
+
+	accDest, err := entities.NewAccount("dest", testdata.GetValidCPF().String(), testdata.GetValidSecret().String())
+	require.NoError(t, err)
 
 	err = accRepository.CreateAccount(ctx, &accOrigin)
 	require.NoError(t, err)
 
-	err = accRepository.CreateAccount(ctx, &accDestination)
+	err = accRepository.CreateAccount(ctx, &accDest)
 	require.NoError(t, err)
 
 	// It must return empty because the accounts have not yet carried out
@@ -43,7 +46,7 @@ func TestRepository_GetTransfers(t *testing.T) {
 	require.NoError(t, err)
 	assert.Len(t, transfers, 0)
 
-	transfer := entities.NewTransfer(accOrigin.ID, accDestination.ID, 50)
+	transfer := entities.NewTransfer(accOrigin.ID, accDest.ID, 50)
 
 	err = r.CreateTransfer(ctx, &transfer)
 	require.NoError(t, err)

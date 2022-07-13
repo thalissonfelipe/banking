@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/thalissonfelipe/banking/banking/domain/account"
 	"github.com/thalissonfelipe/banking/banking/domain/entities"
@@ -12,7 +13,10 @@ import (
 )
 
 func TestAccountUsecase_ListAccounts(t *testing.T) {
-	accounts := []entities.Account{entities.NewAccount("Piter", testdata.GetValidCPF(), testdata.GetValidSecret())}
+	acc, err := entities.NewAccount("name", testdata.GetValidCPF().String(), testdata.GetValidSecret().String())
+	require.NoError(t, err)
+
+	accounts := []entities.Account{acc}
 
 	testCases := []struct {
 		name    string

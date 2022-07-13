@@ -23,13 +23,14 @@ func TestAccountRepository_GetBalanceByID(t *testing.T) {
 
 		wantBalance := 100
 
-		acc := entities.NewAccount("name", testdata.GetValidCPF(), testdata.GetValidSecret())
-		acc.Balance = wantBalance
+		want, err := entities.NewAccount("name", testdata.GetValidCPF().String(), testdata.GetValidSecret().String())
+		require.NoError(t, err)
+		want.Balance = wantBalance
 
-		err := r.CreateAccount(ctx, &acc)
+		err = r.CreateAccount(ctx, &want)
 		require.NoError(t, err)
 
-		balance, err := r.GetBalanceByID(ctx, acc.ID)
+		balance, err := r.GetBalanceByID(ctx, want.ID)
 		require.NoError(t, err)
 		assert.Equal(t, wantBalance, balance)
 	})

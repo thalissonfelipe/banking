@@ -9,7 +9,6 @@ import (
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	"github.com/thalissonfelipe/banking/banking/domain/account"
 	"github.com/thalissonfelipe/banking/banking/domain/entities"
 	"github.com/thalissonfelipe/banking/banking/domain/vos"
 	proto "github.com/thalissonfelipe/banking/proto/banking"
@@ -64,19 +63,12 @@ func (s Server) CreateAccount(
 		return nil, status.Errorf(codes.InvalidArgument, "missing secret parameter")
 	}
 
-	cpf, err := vos.NewCPF(request.Cpf)
+	account, err := entities.NewAccount(request.Name, request.Cpf, request.Secret)
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, err.Error())
+		return nil, status.Errorf(codes.InvalidArgument, "invalid request parameters")
 	}
 
-	secret, err := vos.NewSecret(request.Secret)
-	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, err.Error())
-	}
-
-	input := account.NewCreateAccountInput(request.Name, cpf, secret)
-
-	account, err := s.accountUsecase.CreateAccount(ctx, input)
+	err = s.accountUsecase.CreateAccount(ctx, &account)
 	if err != nil {
 		if errors.Is(err, entities.ErrAccountAlreadyExists) {
 			return nil, status.Errorf(codes.AlreadyExists, "account already exists")

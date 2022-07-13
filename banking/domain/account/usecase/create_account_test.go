@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/thalissonfelipe/banking/banking/domain/account"
 	"github.com/thalissonfelipe/banking/banking/domain/encrypter"
@@ -63,9 +64,10 @@ func TestAccountUsecase_CreateAccount(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			usecase := NewAccountUsecase(tt.repo, tt.enc)
 
-			input := account.NewCreateAccountInput("name", testdata.GetValidCPF(), testdata.GetValidSecret())
+			acc, err := entities.NewAccount("name", testdata.GetValidCPF().String(), testdata.GetValidSecret().String())
+			require.NoError(t, err)
 
-			_, err := usecase.CreateAccount(context.Background(), input)
+			err = usecase.CreateAccount(context.Background(), &acc)
 			assert.ErrorIs(t, err, tt.wantErr)
 		})
 	}

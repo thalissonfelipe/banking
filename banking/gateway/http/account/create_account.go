@@ -3,8 +3,7 @@ package account
 import (
 	"net/http"
 
-	"github.com/thalissonfelipe/banking/banking/domain/account"
-	"github.com/thalissonfelipe/banking/banking/domain/vos"
+	"github.com/thalissonfelipe/banking/banking/domain/entities"
 	"github.com/thalissonfelipe/banking/banking/gateway/http/account/schemes"
 	"github.com/thalissonfelipe/banking/banking/gateway/http/rest"
 )
@@ -33,29 +32,20 @@ func (h Handler) CreateAccount(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cpf, err := vos.NewCPF(body.CPF)
+	account, err := entities.NewAccount(body.Name, body.CPF, body.Secret)
 	if err != nil {
 		rest.SendError(w, http.StatusBadRequest, err)
 
 		return
 	}
 
-	secret, err := vos.NewSecret(body.Secret)
-	if err != nil {
-		rest.SendError(w, http.StatusBadRequest, err)
-
-		return
-	}
-
-	input := account.NewCreateAccountInput(body.Name, cpf, secret)
-
-	acc, err := h.usecase.CreateAccount(r.Context(), input)
+	err = h.usecase.CreateAccount(r.Context(), &account)
 	if err != nil {
 		rest.HandleError(w, err)
 
 		return
 	}
 
-	accResponse := convertAccountToCreateAccountResponse(acc)
+	accResponse := convertAccountToCreateAccountResponse(&account)
 	rest.SendJSON(w, http.StatusCreated, accResponse)
 }

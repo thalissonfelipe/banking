@@ -25,6 +25,9 @@ func TestAccountHandler_CreateAccount(t *testing.T) {
 	cpf := testdata.GetValidCPF()
 	secret := testdata.GetValidSecret()
 
+	acc, err := entities.NewAccount("name", cpf.String(), secret.String())
+	require.NoError(t, err)
+
 	testCases := []struct {
 		name         string
 		usecase      account.Usecase
@@ -36,9 +39,9 @@ func TestAccountHandler_CreateAccount(t *testing.T) {
 		{
 			name: "should return status code 201 if acc was created successfully",
 			usecase: &UsecaseMock{
-				CreateAccountFunc: func(context.Context, account.CreateAccountInput) (*entities.Account, error) {
-					acc := entities.NewAccount("name", cpf, secret)
-					return &acc, nil
+				CreateAccountFunc: func(_ context.Context, account *entities.Account) error {
+					*account = acc
+					return nil
 				},
 			},
 			decoder:      createdAccountDecoder{},
@@ -97,8 +100,8 @@ func TestAccountHandler_CreateAccount(t *testing.T) {
 		{
 			name: "should return status code 409 if account already exists",
 			usecase: &UsecaseMock{
-				CreateAccountFunc: func(context.Context, account.CreateAccountInput) (*entities.Account, error) {
-					return nil, entities.ErrAccountAlreadyExists
+				CreateAccountFunc: func(ctx context.Context, account *entities.Account) error {
+					return entities.ErrAccountAlreadyExists
 				},
 			},
 			decoder:      tests.ErrorMessageDecoder{},
@@ -109,8 +112,8 @@ func TestAccountHandler_CreateAccount(t *testing.T) {
 		{
 			name: "should return status code 500 if usecase fails to create an account",
 			usecase: &UsecaseMock{
-				CreateAccountFunc: func(context.Context, account.CreateAccountInput) (*entities.Account, error) {
-					return nil, assert.AnError
+				CreateAccountFunc: func(ctx context.Context, account *entities.Account) error {
+					return assert.AnError
 				},
 			},
 			decoder:      tests.ErrorMessageDecoder{},

@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/thalissonfelipe/banking/banking/domain/account"
 	"github.com/thalissonfelipe/banking/banking/domain/entities"
@@ -14,9 +15,12 @@ import (
 )
 
 func TestTransferUsecase_CreateTransfer(t *testing.T) {
-	accOrigin := entities.NewAccount("origin", testdata.GetValidCPF(), testdata.GetValidSecret())
+	accOrigin, err := entities.NewAccount("origin", testdata.GetValidCPF().String(), testdata.GetValidSecret().String())
+	require.NoError(t, err)
 	accOrigin.Balance = 100
-	accDest := entities.NewAccount("destination", testdata.GetValidCPF(), testdata.GetValidSecret())
+
+	accDest, err := entities.NewAccount("dest", testdata.GetValidCPF().String(), testdata.GetValidSecret().String())
+	require.NoError(t, err)
 
 	testCases := []struct {
 		name       string

@@ -105,7 +105,11 @@ func main() {
 		log.Fatalf("failed to listen: %v", err)
 	}
 
-	acc := entities.NewAccount("Felipe", testdata.GetValidCPF(), testdata.GetValidSecret())
+	acc, err := entities.NewAccount("name", testdata.GetValidCPF().String(), testdata.GetValidSecret().String())
+	if err != nil {
+		log.Fatalf("failed to create account: %v", err)
+	}
+
 	amount := 100
 	acc.Balance = amount
 	accRepo := &InMemoryAccountDatabase{Accounts: []entities.Account{acc}}

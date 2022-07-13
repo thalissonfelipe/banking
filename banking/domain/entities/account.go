@@ -27,12 +27,22 @@ var (
 	ErrInternalError = errors.New("internal server error")
 )
 
-func NewAccount(name string, cpf vos.CPF, secret vos.Secret) Account {
+func NewAccount(name, cpfStr, secretStr string) (Account, error) {
+	cpf, err := vos.NewCPF(cpfStr)
+	if err != nil {
+		return Account{}, err
+	}
+
+	secret, err := vos.NewSecret(secretStr)
+	if err != nil {
+		return Account{}, err
+	}
+
 	return Account{
 		ID:      vos.NewAccountID(),
 		Name:    name,
 		CPF:     cpf,
 		Secret:  secret,
 		Balance: DefaultBalance,
-	}
+	}, nil
 }

@@ -33,12 +33,13 @@ func TestMain(m *testing.M) {
 }
 
 func createAccount(t *testing.T, cpf vos.CPF, secret vos.Secret, balance int) entities.Account {
-	acc := entities.NewAccount("Felipe", cpf, secret)
+	acc, err := entities.NewAccount("name", cpf.String(), secret.String())
+	require.NoError(t, err)
 	acc.Balance = balance
 
 	encrypter := hash.Hash{}
 
-	err := acc.Secret.Hash(encrypter)
+	err = acc.Secret.Hash(encrypter)
 	require.NoError(t, err)
 
 	_, err = testenv.DB.Exec(context.Background(),

@@ -25,9 +25,17 @@ import (
 )
 
 func TestTransferHandler_CreateTransfer(t *testing.T) {
-	accOrigin := entities.NewAccount("origin", testdata.GetValidCPF(), testdata.GetValidSecret())
-	accDest := entities.NewAccount("destination", testdata.GetValidCPF(), testdata.GetValidSecret())
-	accOriginWithBalance := entities.NewAccount("origin2", testdata.GetValidCPF(), testdata.GetValidSecret())
+	cpf := testdata.GetValidCPF()
+	secret := testdata.GetValidSecret()
+
+	accOrigin, err := entities.NewAccount("origin", cpf.String(), secret.String())
+	require.NoError(t, err)
+
+	accDest, err := entities.NewAccount("dest", cpf.String(), secret.String())
+	require.NoError(t, err)
+
+	accOriginWithBalance, err := entities.NewAccount("origin2", cpf.String(), secret.String())
+	require.NoError(t, err)
 	accOriginWithBalance.Balance = 200
 
 	testCases := []struct {

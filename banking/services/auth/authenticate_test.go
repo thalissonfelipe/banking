@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"golang.org/x/crypto/bcrypt"
 
 	"github.com/thalissonfelipe/banking/banking/domain/account"
@@ -19,6 +20,9 @@ func TestAuth_Authenticate(t *testing.T) {
 	cpf := testdata.GetValidCPF()
 	secret := testdata.GetValidSecret()
 
+	acc, err := entities.NewAccount("name", cpf.String(), secret.String())
+	require.NoError(t, err)
+
 	testCases := []struct {
 		name    string
 		repo    account.Repository
@@ -31,7 +35,7 @@ func TestAuth_Authenticate(t *testing.T) {
 			name: "should return a token if authentication succeeds",
 			repo: &RepositoryMock{
 				GetAccountByCPFFunc: func(context.Context, vos.CPF) (entities.Account, error) {
-					return entities.NewAccount("name", cpf, secret), nil
+					return acc, nil
 				},
 			},
 			enc: &EncrypterMock{
@@ -67,7 +71,7 @@ func TestAuth_Authenticate(t *testing.T) {
 			name: "should return an error if secret does not match",
 			repo: &RepositoryMock{
 				GetAccountByCPFFunc: func(context.Context, vos.CPF) (entities.Account, error) {
-					return entities.NewAccount("name", cpf, secret), nil
+					return acc, nil
 				},
 			},
 			enc: &EncrypterMock{
