@@ -67,11 +67,11 @@ func TestTransferUsecase_CreateTransfer(t *testing.T) {
 			repo: &RepositoryMock{},
 			accUsecase: &UsecaseMock{
 				GetAccountByIDFunc: func(context.Context, vos.AccountID) (entities.Account, error) {
-					return entities.Account{}, entities.ErrAccountDoesNotExist
+					return entities.Account{}, entities.ErrAccountNotFound
 				},
 			},
 			input:   transfer.NewTransferInput(accOrigin.ID, accDest.ID, accOrigin.Balance),
-			wantErr: entities.ErrAccountDoesNotExist,
+			wantErr: entities.ErrAccountNotFound,
 		},
 		{
 			name: "should return an error if account destination does not exist",
@@ -82,11 +82,11 @@ func TestTransferUsecase_CreateTransfer(t *testing.T) {
 						return accOrigin, nil
 					}
 
-					return entities.Account{}, entities.ErrAccountDoesNotExist
+					return entities.Account{}, entities.ErrAccountNotFound
 				},
 			},
 			input:   transfer.NewTransferInput(accOrigin.ID, accDest.ID, accOrigin.Balance),
-			wantErr: entities.ErrAccountDestinationDoesNotExist,
+			wantErr: entities.ErrAccountDestinationNotFound,
 		},
 		{
 			name: "should return an error if account usecase fails",

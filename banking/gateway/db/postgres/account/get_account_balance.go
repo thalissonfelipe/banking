@@ -21,7 +21,7 @@ func (r Repository) GetBalanceByID(ctx context.Context, id vos.AccountID) (int, 
 	err := r.db.QueryRow(ctx, getBalanceQuery, id).Scan(&balance)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return 0, entities.ErrAccountDoesNotExist
+			return 0, entities.ErrAccountNotFound
 		}
 
 		return 0, fmt.Errorf("db.QueryRow.Scan: %w", err)

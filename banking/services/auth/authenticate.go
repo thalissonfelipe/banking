@@ -18,7 +18,7 @@ func (a Auth) Autheticate(ctx context.Context, cpfStr, secretStr string) (string
 
 	acc, err := a.accountUsecase.GetAccountByCPF(ctx, cpf)
 	if err != nil {
-		if errors.Is(err, entities.ErrAccountDoesNotExist) {
+		if errors.Is(err, entities.ErrAccountNotFound) {
 			return "", ErrInvalidCredentials
 		}
 

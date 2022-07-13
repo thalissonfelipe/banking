@@ -42,7 +42,7 @@ func TestAccountRepository_GetAccountByCPF(t *testing.T) {
 		ctx := context.Background()
 
 		account, err := r.GetAccountByCPF(ctx, testdata.GetValidCPF())
-		assert.ErrorIs(t, err, entities.ErrAccountDoesNotExist)
+		assert.ErrorIs(t, err, entities.ErrAccountNotFound)
 		assert.Zero(t, account)
 	})
 }

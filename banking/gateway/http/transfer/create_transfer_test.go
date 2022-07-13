@@ -98,7 +98,7 @@ func TestTransferHandler_CreateTransfer(t *testing.T) {
 			name: "should return status 404 if acc origin does not exist",
 			usecase: &UsecaseMock{
 				CreateTransferFunc: func(context.Context, transfer.CreateTransferInput) error {
-					return entities.ErrAccountDoesNotExist
+					return entities.ErrAccountNotFound
 				},
 			},
 			decoder:     tests.ErrorMessageDecoder{},
@@ -114,7 +114,7 @@ func TestTransferHandler_CreateTransfer(t *testing.T) {
 			name: "should return status 404 if acc dest does not exist",
 			usecase: &UsecaseMock{
 				CreateTransferFunc: func(context.Context, transfer.CreateTransferInput) error {
-					return entities.ErrAccountDestinationDoesNotExist
+					return entities.ErrAccountDestinationNotFound
 				},
 			},
 			decoder:     tests.ErrorMessageDecoder{},

@@ -51,7 +51,7 @@ func TestAccountHandler_GetAccountBalance(t *testing.T) {
 			name: "should return status 404 if account does not exist",
 			usecase: &UsecaseMock{
 				GetAccountBalanceByIDFunc: func(context.Context, vos.AccountID) (int, error) {
-					return 0, entities.ErrAccountDoesNotExist
+					return 0, entities.ErrAccountNotFound
 				},
 			},
 			requestURI:   fmt.Sprintf("/accounts/%s/balance", acc.ID),

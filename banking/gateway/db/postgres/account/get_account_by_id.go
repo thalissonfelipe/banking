@@ -30,7 +30,7 @@ func (r Repository) GetAccountByID(ctx context.Context, id vos.AccountID) (entit
 	)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return entities.Account{}, entities.ErrAccountDoesNotExist
+			return entities.Account{}, entities.ErrAccountNotFound
 		}
 
 		return entities.Account{}, fmt.Errorf("db.QueryRow.Scan: %w", err)

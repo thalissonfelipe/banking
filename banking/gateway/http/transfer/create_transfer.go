@@ -48,7 +48,7 @@ func (h Handler) CreateTransfer(w http.ResponseWriter, r *http.Request) {
 
 	err := h.usecase.CreateTransfer(r.Context(), input)
 	if err != nil {
-		if errors.Is(err, entities.ErrAccountDoesNotExist) {
+		if errors.Is(err, entities.ErrAccountNotFound) {
 			rest.SendError(w, http.StatusNotFound, rest.ErrAccountOriginNotFound)
 
 			return

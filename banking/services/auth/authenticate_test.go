@@ -51,7 +51,7 @@ func TestAuth_Authenticate(t *testing.T) {
 			name: "should return an error if account does not exist",
 			repo: &RepositoryMock{
 				GetAccountByCPFFunc: func(context.Context, vos.CPF) (entities.Account, error) {
-					return entities.Account{}, entities.ErrAccountDoesNotExist
+					return entities.Account{}, entities.ErrAccountNotFound
 				},
 			},
 			enc:     &EncrypterMock{},

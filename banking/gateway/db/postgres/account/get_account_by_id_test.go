@@ -43,7 +43,7 @@ func TestAccountRepository_GetAccountByID(t *testing.T) {
 		ctx := context.Background()
 
 		account, err := r.GetAccountByID(ctx, vos.NewAccountID())
-		assert.ErrorIs(t, err, entities.ErrAccountDoesNotExist)
+		assert.ErrorIs(t, err, entities.ErrAccountNotFound)
 		assert.Zero(t, account)
 	})
 }

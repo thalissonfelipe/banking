@@ -19,8 +19,10 @@ type Account struct {
 const defaultBalance = 100
 
 var (
-	// ErrAccountDoesNotExist occurs when an account does not exist.
-	ErrAccountDoesNotExist = errors.New("account does not exist")
+	// ErrAccountNotFound occurs when an account does not exist.
+	ErrAccountNotFound = errors.New("account does not exist")
+	// ErrAccountDestinationNotFound ocurrs when the account destination does not exist.
+	ErrAccountDestinationNotFound = errors.New("account destination does not exist")
 	// ErrAccountAlreadyExists occurs when an account already exists.
 	ErrAccountAlreadyExists = errors.New("account already exists")
 )

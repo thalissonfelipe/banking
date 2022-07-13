@@ -38,7 +38,7 @@ func (s Server) GetAccountBalance(
 
 	balance, err := s.accountUsecase.GetAccountBalanceByID(ctx, vos.AccountID(accountID))
 	if err != nil {
-		if errors.Is(err, entities.ErrAccountDoesNotExist) {
+		if errors.Is(err, entities.ErrAccountNotFound) {
 			return nil, status.Errorf(codes.NotFound, "account does not exist")
 		}
 

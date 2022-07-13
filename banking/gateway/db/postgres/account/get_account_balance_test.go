@@ -41,7 +41,7 @@ func TestAccountRepository_GetBalanceByID(t *testing.T) {
 		ctx := context.Background()
 
 		balance, err := r.GetBalanceByID(ctx, vos.NewAccountID())
-		assert.ErrorIs(t, err, entities.ErrAccountDoesNotExist)
+		assert.ErrorIs(t, err, entities.ErrAccountNotFound)
 		assert.Zero(t, balance)
 	})
 }

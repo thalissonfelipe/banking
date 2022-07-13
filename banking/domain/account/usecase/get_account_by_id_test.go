@@ -37,11 +37,11 @@ func TestAccountUsecase_GetAccountByID(t *testing.T) {
 			name: "should return an error if account does not exist",
 			repo: &RepositoryMock{
 				GetAccountByIDFunc: func(context.Context, vos.AccountID) (entities.Account, error) {
-					return entities.Account{}, entities.ErrAccountDoesNotExist
+					return entities.Account{}, entities.ErrAccountNotFound
 				},
 			},
 			want:    entities.Account{},
-			wantErr: entities.ErrAccountDoesNotExist,
+			wantErr: entities.ErrAccountNotFound,
 		},
 	}
 

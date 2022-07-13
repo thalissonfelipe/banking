@@ -19,9 +19,9 @@ func HandleError(w http.ResponseWriter, err error) {
 		SendError(w, http.StatusBadRequest, ErrInsufficientFunds)
 	case errors.Is(err, auth.ErrInvalidCredentials):
 		SendError(w, http.StatusBadRequest, ErrInvalidCredentials)
-	case errors.Is(err, entities.ErrAccountDoesNotExist):
+	case errors.Is(err, entities.ErrAccountNotFound):
 		SendError(w, http.StatusNotFound, ErrAccountNotFound)
-	case errors.Is(err, entities.ErrAccountDestinationDoesNotExist):
+	case errors.Is(err, entities.ErrAccountDestinationNotFound):
 		SendError(w, http.StatusNotFound, ErrAccountDestinationNotFound)
 	case errors.Is(err, entities.ErrAccountAlreadyExists):
 		SendError(w, http.StatusConflict, ErrAccountAlreadyExists)

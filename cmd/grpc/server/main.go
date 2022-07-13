@@ -35,7 +35,7 @@ func (i InMemoryAccountDatabase) GetBalanceByID(ctx context.Context, id vos.Acco
 		}
 	}
 
-	return 0, entities.ErrAccountDoesNotExist
+	return 0, entities.ErrAccountNotFound
 }
 
 func (i *InMemoryAccountDatabase) CreateAccount(ctx context.Context, account *entities.Account) error {
@@ -57,7 +57,7 @@ func (i InMemoryAccountDatabase) GetAccountByCPF(ctx context.Context, cpf vos.CP
 		}
 	}
 
-	return entities.Account{}, entities.ErrAccountDoesNotExist
+	return entities.Account{}, entities.ErrAccountNotFound
 }
 
 func (i InMemoryAccountDatabase) GetAccountByID(ctx context.Context, id vos.AccountID) (entities.Account, error) {
@@ -67,7 +67,7 @@ func (i InMemoryAccountDatabase) GetAccountByID(ctx context.Context, id vos.Acco
 		}
 	}
 
-	return entities.Account{}, entities.ErrAccountDoesNotExist
+	return entities.Account{}, entities.ErrAccountNotFound
 }
 
 type InMemoryEncrypter struct{}

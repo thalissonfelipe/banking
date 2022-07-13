@@ -90,11 +90,11 @@ func (s Server) CreateTransfer(
 
 	err = s.transferUsecase.CreateTransfer(ctx, input)
 	if err != nil {
-		if errors.Is(err, entities.ErrAccountDoesNotExist) {
+		if errors.Is(err, entities.ErrAccountNotFound) {
 			return nil, status.Errorf(codes.NotFound, "account origin does not exist")
 		}
 
-		if errors.Is(err, entities.ErrAccountDestinationDoesNotExist) {
+		if errors.Is(err, entities.ErrAccountDestinationNotFound) {
 			return nil, status.Errorf(codes.NotFound, "account destination does not exist")
 		}
 

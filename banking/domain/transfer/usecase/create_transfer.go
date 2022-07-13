@@ -17,8 +17,8 @@ func (t Transfer) CreateTransfer(ctx context.Context, input transfer.CreateTrans
 
 	_, err = t.accountUsecase.GetAccountByID(ctx, input.AccountDestinationID)
 	if err != nil {
-		if errors.Is(err, entities.ErrAccountDoesNotExist) {
-			return entities.ErrAccountDestinationDoesNotExist
+		if errors.Is(err, entities.ErrAccountNotFound) {
+			return entities.ErrAccountDestinationNotFound
 		}
 
 		return fmt.Errorf("getting destination account by id: %w", err)
