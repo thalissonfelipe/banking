@@ -56,14 +56,14 @@ func badRequest(err error, msg string) Error {
 
 	if errors.Is(err, vos.ErrInvalidCPF) {
 		berr.Details = append(berr.Details, ErrorDetail{
-			Message:  err.Error(),
+			Message:  vos.ErrInvalidCPF.Error(),
 			Location: bodyPrefix + "cpf",
 		})
 	}
 
 	if errors.Is(err, vos.ErrInvalidSecret) {
 		berr.Details = append(berr.Details, ErrorDetail{
-			Message:  err.Error(),
+			Message:  vos.ErrInvalidSecret.Error(),
 			Location: bodyPrefix + "secret",
 		})
 	}
