@@ -14,10 +14,10 @@ import (
 	"github.com/thalissonfelipe/banking/banking/domain/usecases"
 	"github.com/thalissonfelipe/banking/banking/domain/vos"
 	"github.com/thalissonfelipe/banking/banking/gateway/jwt"
-	proto "github.com/thalissonfelipe/banking/proto/banking"
+	proto "github.com/thalissonfelipe/banking/gen/banking/v1"
 )
 
-func (s Server) GetTransfers(
+func (s Server) ListTransfers(
 	ctx context.Context, _ *proto.ListTransfersRequest) (*proto.ListTransfersResponse, error) {
 	meta, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
@@ -45,8 +45,8 @@ func (s Server) GetTransfers(
 	return &proto.ListTransfersResponse{Transfers: response}, nil
 }
 
-func (s Server) CreateTransfer(
-	ctx context.Context, request *proto.CreateTransferRequest) (*proto.CreateTransferResponse, error) {
+func (s Server) PerformTransfer(
+	ctx context.Context, request *proto.PerformTransferRequest) (*proto.PerformTransferResponse, error) {
 	if request.AccountDestinationId == "" {
 		return nil, status.Errorf(codes.InvalidArgument, "missing account destination id parameter")
 	}
@@ -105,7 +105,7 @@ func (s Server) CreateTransfer(
 		return nil, status.Errorf(codes.Internal, "internal server error")
 	}
 
-	return &proto.CreateTransferResponse{}, nil
+	return &proto.PerformTransferResponse{}, nil
 }
 
 func domainTransferToGRPC(transfer entity.Transfer) *proto.Transfer {

@@ -8,7 +8,7 @@ import (
 	"google.golang.org/grpc/status"
 
 	"github.com/thalissonfelipe/banking/banking/domain/usecases"
-	proto "github.com/thalissonfelipe/banking/proto/banking"
+	proto "github.com/thalissonfelipe/banking/gen/banking/v1"
 )
 
 func (s Server) Login(ctx context.Context, request *proto.LoginRequest) (*proto.LoginResponse, error) {

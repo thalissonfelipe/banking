@@ -11,7 +11,7 @@ import (
 	"google.golang.org/grpc/metadata"
 
 	"github.com/thalissonfelipe/banking/banking/tests/testdata"
-	proto "github.com/thalissonfelipe/banking/proto/banking"
+	proto "github.com/thalissonfelipe/banking/gen/banking/v1"
 )
 
 func main() {
@@ -30,9 +30,9 @@ func main() {
 
 	client := proto.NewBankingServiceClient(conn)
 
-	accounts, err := client.GetAccounts(context.Background(), &proto.ListAccountsRequest{})
+	accounts, err := client.ListAccounts(context.Background(), &proto.ListAccountsRequest{})
 	if err != nil {
-		log.Panicf("Error when calling GetAccounts: %v", err)
+		log.Panicf("Error when calling ListAccounts: %v", err)
 	}
 
 	log.Printf("response from server: %s", accounts.Accounts)
@@ -57,9 +57,9 @@ func main() {
 
 	log.Printf("response from server: %s", id.Id)
 
-	accounts, err = client.GetAccounts(context.Background(), &proto.ListAccountsRequest{})
+	accounts, err = client.ListAccounts(context.Background(), &proto.ListAccountsRequest{})
 	if err != nil {
-		log.Panicf("Error when calling GetAccounts: %v", err)
+		log.Panicf("Error when calling ListAccounts: %v", err)
 	}
 
 	log.Printf("response from server: %s", accounts.Accounts)
@@ -77,26 +77,26 @@ func main() {
 	md := metadata.Pairs("authorization", token.Token)
 	ctx := metadata.NewOutgoingContext(context.Background(), md)
 
-	transfers, err := client.GetTransfers(ctx, &proto.ListTransfersRequest{})
+	transfers, err := client.ListTransfers(ctx, &proto.ListTransfersRequest{})
 	if err != nil {
-		log.Panicf("Error when calling GetTransfers: %v", err)
+		log.Panicf("Error when calling ListTransfers: %v", err)
 	}
 
 	log.Printf("response from server: %s", transfers.Transfers)
 
 	amount := 100
 
-	_, err = client.CreateTransfer(ctx, &proto.CreateTransferRequest{
+	_, err = client.PerformTransfer(ctx, &proto.PerformTransferRequest{
 		AccountDestinationId: id.Id,
 		Amount:               int64(amount),
 	})
 	if err != nil {
-		log.Panicf("Error when calling CreateTransfer: %v", err)
+		log.Panicf("Error when calling PerformTransfer: %v", err)
 	}
 
-	transfers, err = client.GetTransfers(ctx, &proto.ListTransfersRequest{})
+	transfers, err = client.ListTransfers(ctx, &proto.ListTransfersRequest{})
 	if err != nil {
-		log.Panicf("Error when calling GetTransfers: %v", err)
+		log.Panicf("Error when calling ListTransfers: %v", err)
 	}
 
 	log.Printf("response from server: %s", transfers.Transfers)

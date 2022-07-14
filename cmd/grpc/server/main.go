@@ -15,7 +15,7 @@ import (
 	"github.com/thalissonfelipe/banking/banking/domain/vos"
 	grpcServer "github.com/thalissonfelipe/banking/banking/gateway/grpc"
 	"github.com/thalissonfelipe/banking/banking/tests/testdata"
-	proto "github.com/thalissonfelipe/banking/proto/banking"
+	proto "github.com/thalissonfelipe/banking/gen/banking/v1"
 )
 
 // TODO: remove in memory mocks

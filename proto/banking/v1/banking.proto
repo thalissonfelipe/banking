@@ -21,14 +21,14 @@ package banking;
 import "google/protobuf/timestamp.proto";
 
 service BankingService {
-  rpc GetAccounts(ListAccountsRequest) returns (ListAccountsResponse) {};
+  rpc ListAccounts(ListAccountsRequest) returns (ListAccountsResponse) {};
   rpc GetAccountBalance(GetAccountBalanceRequest) returns (GetAccountBalanceResponse) {};
   rpc CreateAccount(CreateAccountRequest) returns (CreateAccountResponse) {};
 
   rpc Login(LoginRequest) returns (LoginResponse) {};
 
-  rpc GetTransfers(ListTransfersRequest) returns (ListTransfersResponse) {};
-  rpc CreateTransfer(CreateTransferRequest) returns (CreateTransferResponse) {};
+  rpc ListTransfers(ListTransfersRequest) returns (ListTransfersResponse) {};
+  rpc PerformTransfer(PerformTransferRequest) returns (PerformTransferResponse) {};
 }
 
 message ListAccountsRequest {}
@@ -85,9 +85,9 @@ message Transfer {
     google.protobuf.Timestamp created_at = 4;
 }
 
-message CreateTransferRequest {
+message PerformTransferRequest {
     string account_destination_id = 1;
     int64 amount = 2;
 }
 
-message CreateTransferResponse {}
+message PerformTransferResponse {}

@@ -11,10 +11,10 @@ import (
 
 	"github.com/thalissonfelipe/banking/banking/domain/entity"
 	"github.com/thalissonfelipe/banking/banking/domain/vos"
-	proto "github.com/thalissonfelipe/banking/proto/banking"
+	proto "github.com/thalissonfelipe/banking/gen/banking/v1"
 )
 
-func (s Server) GetAccounts(ctx context.Context, _ *proto.ListAccountsRequest) (*proto.ListAccountsResponse, error) {
+func (s Server) ListAccounts(ctx context.Context, _ *proto.ListAccountsRequest) (*proto.ListAccountsResponse, error) {
 	accounts, err := s.accountUsecase.ListAccounts(ctx)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "internal server error")
