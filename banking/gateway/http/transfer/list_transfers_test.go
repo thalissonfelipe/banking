@@ -17,7 +17,7 @@ import (
 	"github.com/thalissonfelipe/banking/banking/domain/vos"
 	"github.com/thalissonfelipe/banking/banking/gateway/http/rest"
 	"github.com/thalissonfelipe/banking/banking/gateway/http/transfer/schema"
-	"github.com/thalissonfelipe/banking/banking/services/auth"
+	"github.com/thalissonfelipe/banking/banking/gateway/jwt"
 	"github.com/thalissonfelipe/banking/banking/tests/fakes"
 )
 
@@ -60,7 +60,7 @@ func TestTransferHandler_ListTransfers(t *testing.T) {
 			r := chi.NewRouter()
 			handler := NewHandler(r, tt.usecase)
 
-			token, err := auth.NewToken(transfers[0].AccountOriginID.String())
+			token, err := jwt.NewToken(transfers[0].AccountOriginID.String())
 			require.NoError(t, err)
 
 			request := fakes.FakeRequest(http.MethodGet, "/transfers", nil)

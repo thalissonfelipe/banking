@@ -13,7 +13,7 @@ import (
 	"github.com/thalissonfelipe/banking/banking/domain/entity"
 	"github.com/thalissonfelipe/banking/banking/domain/usecases"
 	"github.com/thalissonfelipe/banking/banking/domain/vos"
-	"github.com/thalissonfelipe/banking/banking/services/auth"
+	"github.com/thalissonfelipe/banking/banking/gateway/jwt"
 	proto "github.com/thalissonfelipe/banking/proto/banking"
 )
 
@@ -26,7 +26,7 @@ func (s Server) GetTransfers(
 
 	token := meta["authorization"][0]
 
-	accountID, err := uuid.Parse(auth.GetIDFromToken(token))
+	accountID, err := uuid.Parse(jwt.GetIDFromToken(token))
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "invalid account id")
 	}
@@ -66,7 +66,7 @@ func (s Server) CreateTransfer(
 
 	token := meta["authorization"][0]
 
-	accounOriginID, err := uuid.Parse(auth.GetIDFromToken(token))
+	accounOriginID, err := uuid.Parse(jwt.GetIDFromToken(token))
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "invalid account origin id")
 	}

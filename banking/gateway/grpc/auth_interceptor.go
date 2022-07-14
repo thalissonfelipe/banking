@@ -8,7 +8,7 @@ import (
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 
-	"github.com/thalissonfelipe/banking/banking/services/auth"
+	"github.com/thalissonfelipe/banking/banking/gateway/jwt"
 )
 
 // jwtMethods is an array of methods that need authentication validation.
@@ -35,7 +35,7 @@ func AuthInterceptor(
 
 	token := meta["authorization"][0]
 
-	err := auth.IsValidToken(token)
+	err := jwt.IsValidToken(token)
 	if err != nil {
 		return nil, status.Errorf(codes.Unauthenticated, "incorrect access token")
 	}

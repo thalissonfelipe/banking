@@ -3,19 +3,19 @@ package auth
 import (
 	"github.com/go-chi/chi/v5"
 
+	"github.com/thalissonfelipe/banking/banking/domain/usecases"
 	"github.com/thalissonfelipe/banking/banking/gateway/http/rest"
-	"github.com/thalissonfelipe/banking/banking/services"
 )
 
-//go:generate moq -pkg auth -out auth_mock.gen.go ../../../services Auth
+//go:generate moq -pkg auth -out usecase_mock.gen.go ../../../domain/usecases Auth:UsecaseMock
 
 type Handler struct {
-	authService services.Auth
+	usecase usecases.Auth
 }
 
-func NewHandler(r chi.Router, authService services.Auth) *Handler {
+func NewHandler(r chi.Router, usecase usecases.Auth) *Handler {
 	handler := &Handler{
-		authService: authService,
+		usecase: usecase,
 	}
 
 	r.Post("/login", rest.Wrap(handler.Login))

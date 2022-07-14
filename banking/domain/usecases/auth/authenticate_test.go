@@ -10,6 +10,7 @@ import (
 
 	"github.com/thalissonfelipe/banking/banking/domain/encrypter"
 	"github.com/thalissonfelipe/banking/banking/domain/entity"
+	"github.com/thalissonfelipe/banking/banking/domain/usecases"
 	"github.com/thalissonfelipe/banking/banking/domain/usecases/account"
 	"github.com/thalissonfelipe/banking/banking/domain/vos"
 	"github.com/thalissonfelipe/banking/banking/tests/testdata"
@@ -56,7 +57,7 @@ func TestAuth_Authenticate(t *testing.T) {
 			enc:     &EncrypterMock{},
 			cpf:     cpf.String(),
 			secret:  secret.String(),
-			wantErr: ErrInvalidCredentials,
+			wantErr: usecases.ErrInvalidCredentials,
 		},
 		{
 			name:    "should return an error if cpf provided is invalid",
@@ -80,7 +81,7 @@ func TestAuth_Authenticate(t *testing.T) {
 			},
 			cpf:     cpf.String(),
 			secret:  secret.String(),
-			wantErr: ErrInvalidCredentials,
+			wantErr: usecases.ErrInvalidCredentials,
 		},
 	}
 

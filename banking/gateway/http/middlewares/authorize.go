@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/thalissonfelipe/banking/banking/gateway/http/rest"
-	"github.com/thalissonfelipe/banking/banking/services/auth"
+	"github.com/thalissonfelipe/banking/banking/gateway/jwt"
 )
 
 func AuthorizeMiddleware(next http.Handler) http.Handler {
@@ -21,7 +21,7 @@ func AuthorizeMiddleware(next http.Handler) http.Handler {
 		}
 
 		token := parts[1]
-		if err := auth.IsValidToken(token); err != nil {
+		if err := jwt.IsValidToken(token); err != nil {
 			rest.SendJSON(w, http.StatusUnauthorized, rest.ErrUnauthorized)
 
 			return

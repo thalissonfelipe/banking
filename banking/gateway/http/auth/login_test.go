@@ -11,10 +11,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/thalissonfelipe/banking/banking/domain/usecases"
 	"github.com/thalissonfelipe/banking/banking/gateway/http/auth/schema"
 	"github.com/thalissonfelipe/banking/banking/gateway/http/rest"
-	"github.com/thalissonfelipe/banking/banking/services"
-	"github.com/thalissonfelipe/banking/banking/services/auth"
 	"github.com/thalissonfelipe/banking/banking/tests/fakes"
 	"github.com/thalissonfelipe/banking/banking/tests/testdata"
 )
@@ -25,14 +24,14 @@ func TestAuthHandler_Login(t *testing.T) {
 
 	testCases := []struct {
 		name     string
-		auth     services.Auth
+		auth     usecases.Auth
 		body     interface{}
 		wantBody interface{}
 		wantCode int
 	}{
 		{
 			name: "should authenticate successfully and return a token",
-			auth: &AuthMock{
+			auth: &UsecaseMock{
 				AutheticateFunc: func(_ context.Context, _, _ string) (string, error) {
 					return "token", nil
 				},
@@ -43,7 +42,7 @@ func TestAuthHandler_Login(t *testing.T) {
 		},
 		{
 			name: "should return status code 400 if cpf was not provided",
-			auth: &AuthMock{},
+			auth: &UsecaseMock{},
 			body: schema.LoginInput{Secret: secret.String()},
 			wantBody: rest.Error{
 				Error: "invalid request body",
@@ -58,7 +57,7 @@ func TestAuthHandler_Login(t *testing.T) {
 		},
 		{
 			name: "should return status code 400 if json provided was not valid",
-			auth: &AuthMock{},
+			auth: &UsecaseMock{},
 			body: map[string]interface{}{
 				"cpf": 123,
 			},
@@ -67,9 +66,9 @@ func TestAuthHandler_Login(t *testing.T) {
 		},
 		{
 			name: "should return status code 400 if credentials are invalid",
-			auth: &AuthMock{
+			auth: &UsecaseMock{
 				AutheticateFunc: func(_ context.Context, _, _ string) (string, error) {
-					return "", auth.ErrInvalidCredentials
+					return "", usecases.ErrInvalidCredentials
 				},
 			},
 			body:     schema.LoginInput{CPF: cpf.String(), Secret: secret.String()},
@@ -78,7 +77,7 @@ func TestAuthHandler_Login(t *testing.T) {
 		},
 		{
 			name: "should return status code 500 if auth service fails",
-			auth: &AuthMock{
+			auth: &UsecaseMock{
 				AutheticateFunc: func(_ context.Context, _, _ string) (string, error) {
 					return "", assert.AnError
 				},

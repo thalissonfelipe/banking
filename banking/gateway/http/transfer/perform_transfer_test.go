@@ -17,7 +17,7 @@ import (
 	"github.com/thalissonfelipe/banking/banking/domain/vos"
 	"github.com/thalissonfelipe/banking/banking/gateway/http/rest"
 	"github.com/thalissonfelipe/banking/banking/gateway/http/transfer/schema"
-	"github.com/thalissonfelipe/banking/banking/services/auth"
+	"github.com/thalissonfelipe/banking/banking/gateway/jwt"
 	"github.com/thalissonfelipe/banking/banking/tests/fakes"
 	"github.com/thalissonfelipe/banking/banking/tests/testdata"
 )
@@ -183,7 +183,7 @@ func TestTransferHandler_PerformTransfer(t *testing.T) {
 			handler := NewHandler(r, tt.usecase)
 
 			request := fakes.FakeRequest(http.MethodPost, "/transfers", tt.body)
-			token, _ := auth.NewToken(tt.accOriginID.String())
+			token, _ := jwt.NewToken(tt.accOriginID.String())
 			bearerToken := fmt.Sprintf("Bearer %s", token)
 			request.Header.Add("Authorization", bearerToken)
 			response := httptest.NewRecorder()

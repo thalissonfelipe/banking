@@ -4,9 +4,9 @@ import (
 	"errors"
 	"net/http"
 
+	"github.com/thalissonfelipe/banking/banking/domain/usecases"
 	"github.com/thalissonfelipe/banking/banking/gateway/http/auth/schema"
 	"github.com/thalissonfelipe/banking/banking/gateway/http/rest"
-	"github.com/thalissonfelipe/banking/banking/services/auth"
 )
 
 // Login logs in :D
@@ -27,9 +27,9 @@ func (h Handler) Login(r *http.Request) rest.Response {
 		return rest.BadRequest(err, "invalid request body")
 	}
 
-	token, err := h.authService.Autheticate(r.Context(), body.CPF, body.Secret)
+	token, err := h.usecase.Autheticate(r.Context(), body.CPF, body.Secret)
 	if err != nil {
-		if errors.Is(err, auth.ErrInvalidCredentials) {
+		if errors.Is(err, usecases.ErrInvalidCredentials) {
 			return rest.InvalidCredentials(err)
 		}
 

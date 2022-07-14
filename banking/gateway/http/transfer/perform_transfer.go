@@ -10,7 +10,7 @@ import (
 	"github.com/thalissonfelipe/banking/banking/domain/vos"
 	"github.com/thalissonfelipe/banking/banking/gateway/http/rest"
 	"github.com/thalissonfelipe/banking/banking/gateway/http/transfer/schema"
-	"github.com/thalissonfelipe/banking/banking/services/auth"
+	"github.com/thalissonfelipe/banking/banking/gateway/jwt"
 )
 
 // CreateTransfer creates a new transfer between two accounts
@@ -34,7 +34,7 @@ func (h Handler) PerformTransfer(r *http.Request) rest.Response {
 
 	token := strings.Split(r.Header.Get("Authorization"), "Bearer ")[1]
 
-	accountID, err := rest.ParseUUID(auth.GetIDFromToken(token), "token")
+	accountID, err := rest.ParseUUID(jwt.GetIDFromToken(token), "token")
 	if err != nil {
 		return rest.BadRequest(err, "invalid token")
 	}

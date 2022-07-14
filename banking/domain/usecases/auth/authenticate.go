@@ -5,9 +5,12 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/thalissonfelipe/banking/banking/domain/entity"
-	"github.com/thalissonfelipe/banking/banking/domain/vos"
 	"golang.org/x/crypto/bcrypt"
+
+	"github.com/thalissonfelipe/banking/banking/domain/entity"
+	"github.com/thalissonfelipe/banking/banking/domain/usecases"
+	"github.com/thalissonfelipe/banking/banking/domain/vos"
+	"github.com/thalissonfelipe/banking/banking/gateway/jwt"
 )
 
 func (a Auth) Autheticate(ctx context.Context, cpfStr, secretStr string) (string, error) {
@@ -16,10 +19,10 @@ func (a Auth) Autheticate(ctx context.Context, cpfStr, secretStr string) (string
 		return "", fmt.Errorf("new cpf: %w", err)
 	}
 
-	acc, err := a.accountUsecase.GetAccountByCPF(ctx, cpf)
+	acc, err := a.usecase.GetAccountByCPF(ctx, cpf)
 	if err != nil {
 		if errors.Is(err, entity.ErrAccountNotFound) {
-			return "", ErrInvalidCredentials
+			return "", usecases.ErrInvalidCredentials
 		}
 
 		return "", fmt.Errorf("getting account by cpf: %w", err)
@@ -31,13 +34,13 @@ func (a Auth) Autheticate(ctx context.Context, cpfStr, secretStr string) (string
 	err = a.encrypter.CompareHashAndSecret(hashedSecret, secret)
 	if err != nil {
 		if errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
-			return "", ErrInvalidCredentials
+			return "", usecases.ErrInvalidCredentials
 		}
 
 		return "", fmt.Errorf("hashing secret: %w", err)
 	}
 
-	token, err := NewToken(acc.ID.String())
+	token, err := jwt.NewToken(acc.ID.String())
 	if err != nil {
 		return "", fmt.Errorf("creating token: %w", err)
 	}

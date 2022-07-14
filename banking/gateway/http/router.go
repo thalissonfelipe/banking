@@ -10,6 +10,7 @@ import (
 	httpSwagger "github.com/swaggo/http-swagger"
 
 	"github.com/thalissonfelipe/banking/banking/domain/usecases/account"
+	"github.com/thalissonfelipe/banking/banking/domain/usecases/auth"
 	"github.com/thalissonfelipe/banking/banking/domain/usecases/transfer"
 	accountRepo "github.com/thalissonfelipe/banking/banking/gateway/db/postgres/account"
 	transferRepo "github.com/thalissonfelipe/banking/banking/gateway/db/postgres/transfer"
@@ -17,7 +18,6 @@ import (
 	accHandler "github.com/thalissonfelipe/banking/banking/gateway/http/account"
 	authHandler "github.com/thalissonfelipe/banking/banking/gateway/http/auth"
 	trHandler "github.com/thalissonfelipe/banking/banking/gateway/http/transfer"
-	"github.com/thalissonfelipe/banking/banking/services/auth"
 )
 
 func NewRouter(db *pgx.Conn) http.Handler {

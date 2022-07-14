@@ -1,10 +1,11 @@
-package auth
+package jwt
 
 import (
 	"fmt"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
+	"github.com/thalissonfelipe/banking/banking/domain/usecases"
 )
 
 var (
@@ -40,7 +41,7 @@ func IsValidToken(tokenString string) error {
 		return jwtKey, nil
 	})
 	if err != nil || !token.Valid {
-		return ErrUnauthorized
+		return usecases.ErrUnauthorized
 	}
 
 	return nil
