@@ -59,7 +59,7 @@ func loadAPIConfig() (*apiConfig, error) {
 
 	err := envconfig.Process("API", &apiCfg)
 	if err != nil {
-		return nil, fmt.Errorf("could not get api config: %w", err)
+		return nil, fmt.Errorf("loading api config: %w", err)
 	}
 
 	return &apiCfg, nil
@@ -70,7 +70,7 @@ func loadPostgresConfig() (*postgresConfig, error) {
 
 	err := envconfig.Process("DB", &postgresCfg)
 	if err != nil {
-		return nil, fmt.Errorf("could not get postgres config: %w", err)
+		return nil, fmt.Errorf("loading postgres config: %w", err)
 	}
 
 	return &postgresCfg, nil

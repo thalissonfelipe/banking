@@ -49,12 +49,12 @@ func SetupTest(migrationsPath string) *PostgresDocker {
 
 		conn, err = pgx.Connect(ctx, connString)
 		if err != nil {
-			return fmt.Errorf("could not connect with postgres: %w", err)
+			return fmt.Errorf("connecting with postgres: %w", err)
 		}
 
 		err = conn.Ping(ctx)
 		if err != nil {
-			return fmt.Errorf("could not ping: %w", err)
+			return fmt.Errorf("ping connection: %w", err)
 		}
 
 		return nil
@@ -89,12 +89,12 @@ func runMigrations(migrationsPath, connString string) error {
 	if migrationsPath != "" {
 		mig, err := migrate.New("file://"+migrationsPath, connString)
 		if err != nil {
-			return fmt.Errorf("failed to start migrate struct: %w", err)
+			return fmt.Errorf("creating migrations: %w", err)
 		}
 		defer mig.Close()
 
 		if err = mig.Up(); err != nil {
-			return fmt.Errorf("failed to run migration: %w", err)
+			return fmt.Errorf("running migration: %w", err)
 		}
 	}
 

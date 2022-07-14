@@ -25,17 +25,17 @@ func main() {
 						Action: func(c *cli.Context) error {
 							cfg, err := config.LoadConfig()
 							if err != nil {
-								return fmt.Errorf("could not load config: %w", err)
+								return fmt.Errorf("loading config: %w", err)
 							}
 
 							m, err := postgres.GetMigrationHandler(cfg.Postgres.DSN())
 							if err != nil {
-								return fmt.Errorf("could not get migration handler: %w", err)
+								return fmt.Errorf("getting migration handler: %w", err)
 							}
 
 							err = m.Up()
 							if err != nil {
-								return fmt.Errorf("could not apply up migrations: %w", err)
+								return fmt.Errorf("applying up migrations: %w", err)
 							}
 
 							return nil
@@ -47,17 +47,17 @@ func main() {
 						Action: func(c *cli.Context) error {
 							cfg, err := config.LoadConfig()
 							if err != nil {
-								return fmt.Errorf("could not load config: %w", err)
+								return fmt.Errorf("loading config: %w", err)
 							}
 
 							m, err := postgres.GetMigrationHandler(cfg.Postgres.DSN())
 							if err != nil {
-								return fmt.Errorf("could not get migration handler: %w", err)
+								return fmt.Errorf("getting migration handler: %w", err)
 							}
 
 							err = m.Down()
 							if err != nil {
-								return fmt.Errorf("could not apply up migrations: %w", err)
+								return fmt.Errorf("applying up migrations: %w", err)
 							}
 
 							return nil
