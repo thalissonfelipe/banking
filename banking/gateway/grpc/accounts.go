@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"github.com/google/uuid"
+	"google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -17,75 +18,75 @@ import (
 func (h Handler) ListAccounts(ctx context.Context, _ *proto.ListAccountsRequest) (*proto.ListAccountsResponse, error) {
 	accounts, err := h.accountUsecase.ListAccounts(ctx)
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "internal server error")
+		return nil, status.Error(codes.Internal, "internal server error")
 	}
 
 	response := make([]*proto.Account, 0)
 
 	for _, acc := range accounts {
-		response = append(response, domainAccountToGRPC(acc))
+		response = append(response, &proto.Account{
+			Id:        acc.ID.String(),
+			Name:      acc.Name,
+			Cpf:       acc.CPF.String(),
+			Balance:   int64(acc.Balance),
+			CreatedAt: timestamppb.New(acc.CreatedAt),
+		})
 	}
 
 	return &proto.ListAccountsResponse{Accounts: response}, nil
 }
 
 func (h Handler) GetAccountBalance(
-	ctx context.Context, request *proto.GetAccountBalanceRequest) (*proto.GetAccountBalanceResponse, error) {
-	accountID, err := uuid.Parse(request.AccountId)
+	ctx context.Context, req *proto.GetAccountBalanceRequest) (*proto.GetAccountBalanceResponse, error) {
+	accountID, err := uuid.Parse(req.GetAccountId())
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid account id")
+		return nil, status.Error(codes.InvalidArgument, "invalid account id")
 	}
 
 	balance, err := h.accountUsecase.GetAccountBalanceByID(ctx, vos.AccountID(accountID))
 	if err != nil {
 		if errors.Is(err, entity.ErrAccountNotFound) {
-			return nil, status.Errorf(codes.NotFound, "account does not exist")
+			return nil, status.Error(codes.NotFound, "account not found")
 		}
 
-		return nil, status.Errorf(codes.Internal, "internal server error")
+		return nil, status.Error(codes.Internal, "internal server error")
 	}
 
 	return &proto.GetAccountBalanceResponse{Balance: int64(balance)}, nil
 }
 
 func (h Handler) CreateAccount(
-	ctx context.Context, request *proto.CreateAccountRequest) (*proto.CreateAccountResponse, error) {
-	// TODO: refact
-	if request.Name == "" {
-		return nil, status.Errorf(codes.InvalidArgument, "missing name parameter")
+	ctx context.Context, req *proto.CreateAccountRequest,
+) (*proto.CreateAccountResponse, error) {
+	var errs []*errdetails.BadRequest_FieldViolation
+
+	if req.GetName() == "" {
+		errs = append(errs, newFieldViolation("name", "must not be empty"))
 	}
 
-	if request.Cpf == "" {
-		return nil, status.Errorf(codes.InvalidArgument, "missing cpf parameter")
-	}
-
-	if request.Secret == "" {
-		return nil, status.Errorf(codes.InvalidArgument, "missing secret parameter")
-	}
-
-	account, err := entity.NewAccount(request.Name, request.Cpf, request.Secret)
+	account, err := entity.NewAccount(req.Name, req.Cpf, req.Secret)
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid request parameters")
+		if errors.Is(err, vos.ErrInvalidCPF) {
+			errs = append(errs, newFieldViolation("cpf", "invalid value"))
+		}
+
+		if errors.Is(err, vos.ErrInvalidSecret) {
+			errs = append(errs, newFieldViolation("secret", "invalid value"))
+		}
+	}
+
+	if len(errs) != 0 {
+		return nil, newBadRequestError(errs)
 	}
 
 	err = h.accountUsecase.CreateAccount(ctx, &account)
 	if err != nil {
 		if errors.Is(err, entity.ErrAccountAlreadyExists) {
-			return nil, status.Errorf(codes.AlreadyExists, "account already exists")
+			return nil, status.Error(codes.AlreadyExists, "account already exists")
 		}
 
-		return nil, status.Errorf(codes.Internal, "internal server error")
+		return nil, status.Error(codes.Internal, "internal server error")
 	}
 
 	return &proto.CreateAccountResponse{Id: account.ID.String()}, nil
-}
-
-func domainAccountToGRPC(account entity.Account) *proto.Account {
-	return &proto.Account{
-		Id:        account.ID.String(),
-		Name:      account.Name,
-		Cpf:       account.CPF.String(),
-		Balance:   int64(account.Balance),
-		CreatedAt: timestamppb.New(account.CreatedAt),
-	}
 }

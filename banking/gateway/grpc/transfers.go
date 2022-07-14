@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"github.com/google/uuid"
+	"google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
@@ -21,65 +22,73 @@ func (h Handler) ListTransfers(
 	ctx context.Context, _ *proto.ListTransfersRequest) (*proto.ListTransfersResponse, error) {
 	meta, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
-		return nil, status.Errorf(codes.Unauthenticated, "missing context metadata")
+		return nil, status.Error(codes.Unauthenticated, "missing context metadata")
 	}
 
 	token := meta["authorization"][0]
 
 	accountID, err := uuid.Parse(jwt.GetAccountIDFromToken(token))
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid account id")
+		return nil, status.Error(codes.InvalidArgument, "invalid account id")
 	}
 
 	transfers, err := h.transferUsecase.ListTransfers(ctx, vos.AccountID(accountID))
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "internal server error")
+		return nil, status.Error(codes.Internal, "internal server error")
 	}
 
 	response := make([]*proto.Transfer, 0)
 
-	for _, tr := range transfers {
-		response = append(response, domainTransferToGRPC(tr))
+	for _, transfer := range transfers {
+		response = append(response, &proto.Transfer{
+			Id:                   transfer.ID.String(),
+			AccountDestinationId: transfer.AccountDestinationID.String(),
+			Amount:               int64(transfer.Amount),
+			CreatedAt:            timestamppb.New(transfer.CreatedAt),
+		})
 	}
 
 	return &proto.ListTransfersResponse{Transfers: response}, nil
 }
 
 func (h Handler) PerformTransfer(
-	ctx context.Context, request *proto.PerformTransferRequest) (*proto.PerformTransferResponse, error) {
-	if request.AccountDestinationId == "" {
-		return nil, status.Errorf(codes.InvalidArgument, "missing account destination id parameter")
+	ctx context.Context, request *proto.PerformTransferRequest,
+) (*proto.PerformTransferResponse, error) {
+	var errs []*errdetails.BadRequest_FieldViolation
+
+	if request.GetAccountDestinationId() == "" {
+		errs = append(errs, newFieldViolation("account_origin_id", "must not be empty"))
 	}
 
-	if request.Amount == 0 {
-		return nil, status.Errorf(codes.InvalidArgument, "missing amount parameter")
+	if request.Amount <= 0 {
+		errs = append(errs, newFieldViolation("amount", "must be a value bigger than 0"))
 	}
 
-	if request.Amount < 0 {
-		return nil, status.Errorf(codes.InvalidArgument, "amount must be bigger than 0")
+	if len(errs) != 0 {
+		return nil, newBadRequestError(errs)
 	}
 
 	meta, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
-		return nil, status.Errorf(codes.Unauthenticated, "missing context metadata")
+		return nil, status.Error(codes.Unauthenticated, "missing context metadata")
 	}
 
 	token := meta["authorization"][0]
 
 	accounOriginID, err := uuid.Parse(jwt.GetAccountIDFromToken(token))
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid account origin id")
+		return nil, status.Error(codes.InvalidArgument, "invalid account origin id")
 	}
 
 	accounDestinationID, err := uuid.Parse(request.AccountDestinationId)
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid account destination id")
+		return nil, status.Error(codes.InvalidArgument, "invalid account destination id")
 	}
 
 	if accounOriginID == accounDestinationID {
-		return nil, status.Errorf(
+		return nil, status.Error(
 			codes.InvalidArgument,
-			"account destination id must be different from account origin id")
+			"account origin id cannot be equal to destination id")
 	}
 
 	input := usecases.NewPerformTransferInput(
@@ -91,28 +100,19 @@ func (h Handler) PerformTransfer(
 	err = h.transferUsecase.PerformTransfer(ctx, input)
 	if err != nil {
 		if errors.Is(err, entity.ErrAccountNotFound) {
-			return nil, status.Errorf(codes.NotFound, "account origin does not exist")
+			return nil, status.Error(codes.NotFound, "account origin does not exist")
 		}
 
 		if errors.Is(err, entity.ErrAccountDestinationNotFound) {
-			return nil, status.Errorf(codes.NotFound, "account destination does not exist")
+			return nil, status.Error(codes.NotFound, "account destination does not exist")
 		}
 
 		if errors.Is(err, entity.ErrInsufficientFunds) {
-			return nil, status.Errorf(codes.InvalidArgument, "insufficient funds")
+			return nil, status.Error(codes.InvalidArgument, "insufficient funds")
 		}
 
-		return nil, status.Errorf(codes.Internal, "internal server error")
+		return nil, status.Error(codes.Internal, "internal server error")
 	}
 
 	return &proto.PerformTransferResponse{}, nil
-}
-
-func domainTransferToGRPC(transfer entity.Transfer) *proto.Transfer {
-	return &proto.Transfer{
-		Id:                   transfer.ID.String(),
-		AccountDestinationId: transfer.AccountDestinationID.String(),
-		Amount:               int64(transfer.Amount),
-		CreatedAt:            timestamppb.New(transfer.CreatedAt),
-	}
 }

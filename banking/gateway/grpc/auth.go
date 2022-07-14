@@ -12,13 +12,13 @@ import (
 )
 
 func (h Handler) Login(ctx context.Context, request *proto.LoginRequest) (*proto.LoginResponse, error) {
-	token, err := h.authUsecase.Autheticate(ctx, request.Cpf, request.Secret)
+	token, err := h.authUsecase.Autheticate(ctx, request.GetCpf(), request.GetSecret())
 	if err != nil {
 		if errors.Is(err, usecases.ErrInvalidCredentials) {
-			return nil, status.Errorf(codes.InvalidArgument, "wrong credentials")
+			return nil, status.Error(codes.InvalidArgument, "invalid credentials")
 		}
 
-		return nil, status.Errorf(codes.Internal, "internal server error")
+		return nil, status.Error(codes.Internal, "internal server error")
 	}
 
 	return &proto.LoginResponse{Token: token}, nil
