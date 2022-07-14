@@ -1,8 +1,6 @@
 package vos
 
 import (
-	"log"
-
 	"github.com/google/uuid"
 )
 
@@ -14,13 +12,4 @@ func (i AccountID) String() string {
 
 func NewAccountID() AccountID {
 	return AccountID(uuid.New())
-}
-
-func ConvertStringToAccountID(id string) AccountID {
-	uuID, err := uuid.Parse(id)
-	if err != nil {
-		log.Printf("unable to parse uuid: %s", err.Error())
-	}
-
-	return AccountID(uuID)
 }

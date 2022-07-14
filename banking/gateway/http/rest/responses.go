@@ -1,64 +1,143 @@
 package rest
 
 import (
-	"encoding/json"
 	"errors"
 	"net/http"
 
-	"github.com/thalissonfelipe/banking/banking/domain/entity"
-	"github.com/thalissonfelipe/banking/banking/services/auth"
+	"github.com/thalissonfelipe/banking/banking/domain/vos"
 )
 
-type ErrorResponse struct {
-	Message string `json:"message"`
+type Response struct {
+	Status  int
+	Payload interface{}
+	Error   error
 }
 
-func HandleError(w http.ResponseWriter, err error) {
-	switch {
-	case errors.Is(err, entity.ErrInsufficientFunds):
-		SendError(w, http.StatusBadRequest, ErrInsufficientFunds)
-	case errors.Is(err, auth.ErrInvalidCredentials):
-		SendError(w, http.StatusBadRequest, ErrInvalidCredentials)
-	case errors.Is(err, entity.ErrAccountNotFound):
-		SendError(w, http.StatusNotFound, ErrAccountNotFound)
-	case errors.Is(err, entity.ErrAccountDestinationNotFound):
-		SendError(w, http.StatusNotFound, ErrAccountDestinationNotFound)
-	case errors.Is(err, entity.ErrAccountAlreadyExists):
-		SendError(w, http.StatusConflict, ErrAccountAlreadyExists)
-	default:
-		SendError(w, http.StatusInternalServerError, ErrInternalError)
+type Error struct {
+	Error   string        `json:"error"`
+	Details []ErrorDetail `json:"details,omitempty"`
+}
+
+type ErrorDetail struct {
+	Location string `json:"location"`
+	Message  string `json:"message"`
+}
+
+func OK(payload interface{}) Response {
+	return Response{
+		Status:  http.StatusOK,
+		Payload: payload,
 	}
 }
 
-func HandleBadRequestError(w http.ResponseWriter, err error) {
-	const status = http.StatusBadRequest
-
-	switch {
-	case errors.Is(err, ErrInvalidJSON):
-		SendError(w, status, ErrInvalidJSON)
-	case errors.Is(err, ErrMissingNameParameter):
-		SendError(w, status, ErrMissingNameParameter)
-	case errors.Is(err, ErrMissingCPFParameter):
-		SendError(w, status, ErrMissingCPFParameter)
-	case errors.Is(err, ErrMissingSecretParameter):
-		SendError(w, status, ErrMissingSecretParameter)
-	case errors.Is(err, ErrMissingAccDestinationIDParameter):
-		SendError(w, status, ErrMissingAccDestinationIDParameter)
-	case errors.Is(err, ErrMissingAmountParameter):
-		SendError(w, status, ErrMissingAmountParameter)
+func Created(payload interface{}) Response {
+	return Response{
+		Status:  http.StatusCreated,
+		Payload: payload,
 	}
 }
 
-func SendError(w http.ResponseWriter, statusCode int, err error) {
-	w.Header().Add("Content-Type", "application/json")
-	w.WriteHeader(statusCode)
-
-	_ = json.NewEncoder(w).Encode(ErrorResponse{Message: err.Error()})
+func BadRequest(err error, msg string) Response {
+	return Response{
+		Status:  http.StatusBadRequest,
+		Payload: badRequest(err, msg),
+		Error:   err,
+	}
 }
 
-func SendJSON(w http.ResponseWriter, statusCode int, payload interface{}) {
-	w.Header().Add("Content-Type", "application/json")
-	w.WriteHeader(statusCode)
+// TODO: add tests.
+func badRequest(err error, msg string) Error {
+	const bodyPrefix = "body."
 
-	_ = json.NewEncoder(w).Encode(payload)
+	berr := Error{
+		Error:   msg,
+		Details: []ErrorDetail{},
+	}
+
+	if errors.Is(err, vos.ErrInvalidCPF) {
+		berr.Details = append(berr.Details, ErrorDetail{
+			Message:  err.Error(),
+			Location: bodyPrefix + "cpf",
+		})
+	}
+
+	if errors.Is(err, vos.ErrInvalidSecret) {
+		berr.Details = append(berr.Details, ErrorDetail{
+			Message:  err.Error(),
+			Location: bodyPrefix + "secret",
+		})
+	}
+
+	var verr ValidationError
+	if errors.As(err, &verr) {
+		berr.Details = append(berr.Details, ErrorDetail{
+			Message:  verr.Err.Error(),
+			Location: verr.Location,
+		})
+	}
+
+	var verrs ValidationErrors
+	if errors.As(err, &verrs) {
+		for _, err := range verrs {
+			var verr ValidationError
+			if errors.As(err, &verr) {
+				berr.Details = append(berr.Details, ErrorDetail{
+					Message:  verr.Err.Error(),
+					Location: verr.Location,
+				})
+			}
+		}
+	}
+
+	return berr
+}
+
+func InvalidCredentials(err error) Response {
+	return Response{
+		Status: http.StatusBadRequest,
+		Payload: Error{
+			Error: "invalid credentials",
+		},
+		Error: err,
+	}
+}
+
+func Unauthorized(err error) Response {
+	return Response{
+		Status: http.StatusUnauthorized,
+		Payload: Error{
+			Error: "unauthorized",
+		},
+		Error: err,
+	}
+}
+
+func NotFound(err error, msg string) Response {
+	return Response{
+		Status: http.StatusNotFound,
+		Payload: Error{
+			Error: msg,
+		},
+		Error: err,
+	}
+}
+
+func Conflict(err error, msg string) Response {
+	return Response{
+		Status: http.StatusConflict,
+		Payload: Error{
+			Error: msg,
+		},
+		Error: err,
+	}
+}
+
+func InternalServer(err error) Response {
+	return Response{
+		Status: http.StatusInternalServerError,
+		Payload: Error{
+			Error: "internal server error",
+		},
+		Error: err,
+	}
 }

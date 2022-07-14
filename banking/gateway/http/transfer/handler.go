@@ -1,12 +1,11 @@
 package transfer
 
 import (
-	"strings"
-
 	"github.com/go-chi/chi/v5"
 
 	"github.com/thalissonfelipe/banking/banking/domain/usecases"
 	"github.com/thalissonfelipe/banking/banking/gateway/http/middlewares"
+	"github.com/thalissonfelipe/banking/banking/gateway/http/rest"
 )
 
 //go:generate moq -pkg transfer -skip-ensure -out usecase_mock.gen.go ../../../domain/usecases Transfer:UsecaseMock
@@ -21,14 +20,10 @@ func NewHandler(r chi.Router, usecase usecases.Transfer) *Handler {
 	r.Group(func(r chi.Router) {
 		r.Use(middlewares.AuthorizeMiddleware)
 		r.Route("/transfers", func(r chi.Router) {
-			r.Get("/", handler.ListTransfers)
-			r.Post("/", handler.PerformTransfer)
+			r.Get("/", rest.Wrap(handler.ListTransfers))
+			r.Post("/", rest.Wrap(handler.PerformTransfer))
 		})
 	})
 
 	return &handler
-}
-
-func getTokenFromHeader(authHeader string) string {
-	return strings.Split(authHeader, "Bearer ")[1]
 }

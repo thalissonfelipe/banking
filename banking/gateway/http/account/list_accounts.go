@@ -13,16 +13,14 @@ import (
 // @Description List all accounts.
 // @Accept json
 // @Produce json
-// @Success 200 {array} schema.ListAccountsResponse
+// @Success 200 schema.ListAccountsResponse
 // @Failure 500 {object} responses.ErrorResponse
 // @Router /accounts [GET].
-func (h Handler) ListAccounts(w http.ResponseWriter, r *http.Request) {
+func (h Handler) ListAccounts(r *http.Request) rest.Response {
 	accounts, err := h.usecase.ListAccounts(r.Context())
 	if err != nil {
-		rest.SendError(w, http.StatusInternalServerError, rest.ErrInternalError)
-
-		return
+		return rest.InternalServer(err)
 	}
 
-	rest.SendJSON(w, http.StatusOK, schema.MapToListAccountsResponse(accounts))
+	return rest.OK(schema.MapToListAccountsResponse(accounts))
 }

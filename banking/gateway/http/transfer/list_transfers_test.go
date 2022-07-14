@@ -1,7 +1,6 @@
 package transfer
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -19,7 +18,6 @@ import (
 	"github.com/thalissonfelipe/banking/banking/gateway/http/rest"
 	"github.com/thalissonfelipe/banking/banking/gateway/http/transfer/schema"
 	"github.com/thalissonfelipe/banking/banking/services/auth"
-	"github.com/thalissonfelipe/banking/banking/tests"
 	"github.com/thalissonfelipe/banking/banking/tests/fakes"
 )
 
@@ -30,11 +28,10 @@ func TestTransferHandler_ListTransfers(t *testing.T) {
 	transfers := []entity.Transfer{tr}
 
 	testCases := []struct {
-		name         string
-		usecase      usecases.Transfer
-		decoder      tests.Decoder
-		expectedBody interface{}
-		expectedCode int
+		name     string
+		usecase  usecases.Transfer
+		wantBody interface{}
+		wantCode int
 	}{
 		{
 			name: "should return a list of transfers",
@@ -43,9 +40,8 @@ func TestTransferHandler_ListTransfers(t *testing.T) {
 					return transfers, nil
 				},
 			},
-			decoder:      listTransfersDecoder{},
-			expectedBody: schema.MapToListTransfersResponse(transfers),
-			expectedCode: http.StatusOK,
+			wantBody: schema.MapToListTransfersResponse(transfers),
+			wantCode: http.StatusOK,
 		},
 		{
 			name: "should return an error if usecase fails",
@@ -54,9 +50,8 @@ func TestTransferHandler_ListTransfers(t *testing.T) {
 					return nil, assert.AnError
 				},
 			},
-			decoder:      tests.ErrorMessageDecoder{},
-			expectedBody: rest.ErrorResponse{Message: "internal server error"},
-			expectedCode: http.StatusInternalServerError,
+			wantBody: rest.Error{Error: "internal server error"},
+			wantCode: http.StatusInternalServerError,
 		},
 	}
 
@@ -74,24 +69,14 @@ func TestTransferHandler_ListTransfers(t *testing.T) {
 
 			response := httptest.NewRecorder()
 
-			http.HandlerFunc(handler.ListTransfers).ServeHTTP(response, request)
+			rest.Wrap(handler.ListTransfers).ServeHTTP(response, request)
 
-			result := tt.decoder.Decode(t, response.Body)
+			want, err := json.Marshal(tt.wantBody)
+			require.NoError(t, err)
 
-			assert.Equal(t, tt.expectedBody, result)
-			assert.Equal(t, tt.expectedCode, response.Code)
+			assert.Equal(t, tt.wantCode, response.Code)
+			assert.JSONEq(t, string(want), response.Body.String())
 			assert.Equal(t, "application/json", response.Header().Get("Content-Type"))
 		})
 	}
-}
-
-type listTransfersDecoder struct{}
-
-func (listTransfersDecoder) Decode(t *testing.T, body *bytes.Buffer) interface{} {
-	var result schema.ListTransfersResponse
-
-	err := json.NewDecoder(body).Decode(&result)
-	require.NoError(t, err)
-
-	return result
 }

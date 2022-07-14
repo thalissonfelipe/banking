@@ -7,6 +7,23 @@ import (
 	"github.com/thalissonfelipe/banking/banking/gateway/http/rest"
 )
 
+var (
+	ErrMissingNameParameter = rest.ValidationError{
+		Location: "body.name",
+		Err:      rest.ErrMissingParameter,
+	}
+
+	ErrMissingCPFParameter = rest.ValidationError{
+		Location: "body.cpf",
+		Err:      rest.ErrMissingParameter,
+	}
+
+	ErrMissingSecretParameter = rest.ValidationError{
+		Location: "body.secret",
+		Err:      rest.ErrMissingParameter,
+	}
+)
+
 type Account struct {
 	ID        string `json:"id"`
 	Name      string `json:"name"`
@@ -52,16 +69,22 @@ type CreateAccountInput struct {
 }
 
 func (r CreateAccountInput) IsValid() error {
+	var errs rest.ValidationErrors
+
 	if r.Name == "" {
-		return rest.ErrMissingNameParameter
+		errs = append(errs, ErrMissingNameParameter)
 	}
 
 	if r.CPF == "" {
-		return rest.ErrMissingCPFParameter
+		errs = append(errs, ErrMissingCPFParameter)
 	}
 
 	if r.Secret == "" {
-		return rest.ErrMissingSecretParameter
+		errs = append(errs, ErrMissingSecretParameter)
+	}
+
+	if len(errs) != 0 {
+		return errs
 	}
 
 	return nil

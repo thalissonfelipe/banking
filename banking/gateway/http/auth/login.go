@@ -1,10 +1,12 @@
 package auth
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/thalissonfelipe/banking/banking/gateway/http/auth/schema"
 	"github.com/thalissonfelipe/banking/banking/gateway/http/rest"
+	"github.com/thalissonfelipe/banking/banking/services/auth"
 )
 
 // Login logs in :D
@@ -19,22 +21,20 @@ import (
 // @Failure 404 {object} responses.ErrorResponse
 // @Failure 500 {object} responses.ErrorResponse
 // @Router /login [POST].
-func (h Handler) Login(w http.ResponseWriter, r *http.Request) {
+func (h Handler) Login(r *http.Request) rest.Response {
 	var body schema.LoginInput
-
-	err := rest.DecodeRequestBody(r, &body)
-	if err != nil {
-		rest.HandleBadRequestError(w, err)
-
-		return
+	if err := rest.DecodeRequestBody(r, &body); err != nil {
+		return rest.BadRequest(err, "invalid request body")
 	}
 
 	token, err := h.authService.Autheticate(r.Context(), body.CPF, body.Secret)
 	if err != nil {
-		rest.HandleError(w, err)
+		if errors.Is(err, auth.ErrInvalidCredentials) {
+			return rest.InvalidCredentials(err)
+		}
 
-		return
+		return rest.InternalServer(err)
 	}
 
-	rest.SendJSON(w, http.StatusOK, schema.MapToLoginResponse(token))
+	return rest.OK(schema.MapToLoginResponse(token))
 }

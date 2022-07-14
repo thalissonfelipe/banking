@@ -1,6 +1,7 @@
 package account
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/thalissonfelipe/banking/banking/domain/entity"
@@ -18,33 +19,30 @@ import (
 // @Accept json
 // @Produce json
 // @Param Body body requestBody true "Body"
-// @Success 201 {object} createdAccountResponse
+// @Success 201 {object} schema.CreateAccountResponse
 // @Failure 400 {object} responses.ErrorResponse
 // @Failure 409 {object} responses.ErrorResponse
 // @Failure 500 {object} responses.ErrorResponse
 // @Router /accounts [POST].
-func (h Handler) CreateAccount(w http.ResponseWriter, r *http.Request) {
+func (h Handler) CreateAccount(r *http.Request) rest.Response {
 	var body schema.CreateAccountInput
-
 	if err := rest.DecodeRequestBody(r, &body); err != nil {
-		rest.HandleBadRequestError(w, err)
-
-		return
+		return rest.BadRequest(err, "invalid request body")
 	}
 
 	account, err := entity.NewAccount(body.Name, body.CPF, body.Secret)
 	if err != nil {
-		rest.SendError(w, http.StatusBadRequest, err)
-
-		return
+		return rest.BadRequest(err, "invalid request body")
 	}
 
 	err = h.usecase.CreateAccount(r.Context(), &account)
 	if err != nil {
-		rest.HandleError(w, err)
+		if errors.Is(err, entity.ErrAccountAlreadyExists) {
+			return rest.Conflict(err, "account already exists")
+		}
 
-		return
+		return rest.InternalServer(err)
 	}
 
-	rest.SendJSON(w, http.StatusCreated, schema.MapToCreateAccountResponse(account))
+	return rest.Created(schema.MapToCreateAccountResponse(account))
 }

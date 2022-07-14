@@ -1,7 +1,6 @@
 package account
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"net/http"
@@ -16,7 +15,6 @@ import (
 	"github.com/thalissonfelipe/banking/banking/domain/usecases"
 	"github.com/thalissonfelipe/banking/banking/gateway/http/account/schema"
 	"github.com/thalissonfelipe/banking/banking/gateway/http/rest"
-	"github.com/thalissonfelipe/banking/banking/tests"
 	"github.com/thalissonfelipe/banking/banking/tests/fakes"
 	"github.com/thalissonfelipe/banking/banking/tests/testdata"
 )
@@ -28,11 +26,10 @@ func TestAccountHandler_ListAccounts(t *testing.T) {
 	accounts := []entity.Account{acc}
 
 	testCases := []struct {
-		name         string
-		usecase      usecases.Account
-		expectedBody interface{}
-		decoder      tests.Decoder
-		expectedCode int
+		name     string
+		usecase  usecases.Account
+		wantBody interface{}
+		wantCode int
 	}{
 		{
 			name: "should return a list of accounts successfully",
@@ -41,9 +38,8 @@ func TestAccountHandler_ListAccounts(t *testing.T) {
 					return accounts, nil
 				},
 			},
-			expectedBody: schema.MapToListAccountsResponse(accounts),
-			expectedCode: http.StatusOK,
-			decoder:      listAccountsSuccessDecoder{},
+			wantBody: schema.MapToListAccountsResponse(accounts),
+			wantCode: http.StatusOK,
 		},
 		{
 			name: "should return 500 if usecase fails",
@@ -52,9 +48,8 @@ func TestAccountHandler_ListAccounts(t *testing.T) {
 					return nil, assert.AnError
 				},
 			},
-			expectedBody: rest.ErrorResponse{Message: "internal server error"},
-			decoder:      tests.ErrorMessageDecoder{},
-			expectedCode: http.StatusInternalServerError,
+			wantBody: rest.Error{Error: "internal server error"},
+			wantCode: http.StatusInternalServerError,
 		},
 	}
 
@@ -66,24 +61,14 @@ func TestAccountHandler_ListAccounts(t *testing.T) {
 			request := fakes.FakeRequest(http.MethodGet, "/accounts", nil)
 			response := httptest.NewRecorder()
 
-			http.HandlerFunc(handler.ListAccounts).ServeHTTP(response, request)
+			rest.Wrap(handler.ListAccounts).ServeHTTP(response, request)
 
-			result := tt.decoder.Decode(t, response.Body)
+			want, err := json.Marshal(tt.wantBody)
+			require.NoError(t, err)
 
-			assert.Equal(t, tt.expectedCode, response.Code)
+			assert.Equal(t, tt.wantCode, response.Code)
+			assert.JSONEq(t, string(want), response.Body.String())
 			assert.Equal(t, "application/json", response.Header().Get("Content-Type"))
-			assert.Equal(t, tt.expectedBody, result)
 		})
 	}
-}
-
-type listAccountsSuccessDecoder struct{}
-
-func (listAccountsSuccessDecoder) Decode(t *testing.T, body *bytes.Buffer) interface{} {
-	var result schema.ListAccountsResponse
-
-	err := json.NewDecoder(body).Decode(&result)
-	require.NoError(t, err)
-
-	return result
 }

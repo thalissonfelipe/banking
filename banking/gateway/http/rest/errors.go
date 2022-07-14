@@ -1,21 +1,50 @@
 package rest
 
-import "errors"
-
-// REST API generic errors.
-var (
-	ErrInvalidJSON                      = errors.New("invalid json")
-	ErrAccountNotFound                  = errors.New("account does not exist")
-	ErrAccountOriginNotFound            = errors.New("account origin does not exist")
-	ErrAccountDestinationNotFound       = errors.New("account destination does not exist")
-	ErrInternalError                    = errors.New("internal server error")
-	ErrInsufficientFunds                = errors.New("insufficient funds")
-	ErrInvalidCredentials               = errors.New("cpf or secret are invalid")
-	ErrAccountAlreadyExists             = errors.New("account already exists")
-	ErrMissingNameParameter             = errors.New("missing name parameter")
-	ErrMissingCPFParameter              = errors.New("missing cpf parameter")
-	ErrMissingSecretParameter           = errors.New("missing secret parameter")
-	ErrMissingAccDestinationIDParameter = errors.New("missing account destination id parameter")
-	ErrMissingAmountParameter           = errors.New("missing amount parameter")
-	ErrDestinationIDEqToOriginID        = errors.New("account destination cannot be the account origin id")
+import (
+	"errors"
+	"fmt"
+	"strings"
+	"sync"
 )
+
+var (
+	ErrMissingParameter = errors.New("missing parameter")
+	ErrInvalidUUID      = errors.New("invalid uuid")
+	ErrSameAccounts     = errors.New("account origin id cannot be equal to destination id")
+	ErrUnauthorized     = errors.New("unauthorized")
+)
+
+// TODO: add tests.
+type ValidationError struct {
+	Location string
+	Err      error
+}
+
+func (v ValidationError) Error() string {
+	return fmt.Sprintf("%s: %s", v.Location, v.Err.Error())
+}
+
+func (v ValidationError) Unwrap() error {
+	return v.Err
+}
+
+// TODO: add tests.
+type ValidationErrors []error
+
+func (v ValidationErrors) Error() string {
+	var (
+		builder strings.Builder
+		once    sync.Once
+		sep     string
+	)
+
+	for _, err := range v {
+		builder.WriteString(sep)
+		builder.WriteString(err.Error())
+		once.Do(func() {
+			sep = "; "
+		})
+	}
+
+	return builder.String()
+}

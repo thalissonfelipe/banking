@@ -2,6 +2,18 @@ package schema
 
 import "github.com/thalissonfelipe/banking/banking/gateway/http/rest"
 
+var (
+	ErrMissingCPFParameter = rest.ValidationError{
+		Location: "body.cpf",
+		Err:      rest.ErrMissingParameter,
+	}
+
+	ErrMissingSecretParameter = rest.ValidationError{
+		Location: "body.secret",
+		Err:      rest.ErrMissingParameter,
+	}
+)
+
 type LoginResponse struct {
 	Token string `json:"token"`
 }
@@ -16,12 +28,18 @@ type LoginInput struct {
 }
 
 func (r LoginInput) IsValid() error {
+	var errs rest.ValidationErrors
+
 	if r.CPF == "" {
-		return rest.ErrMissingCPFParameter
+		errs = append(errs, ErrMissingCPFParameter)
 	}
 
 	if r.Secret == "" {
-		return rest.ErrMissingSecretParameter
+		errs = append(errs, ErrMissingSecretParameter)
+	}
+
+	if len(errs) != 0 {
+		return errs
 	}
 
 	return nil

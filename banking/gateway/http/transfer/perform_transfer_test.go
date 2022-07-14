@@ -1,7 +1,6 @@
 package transfer
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -19,7 +18,6 @@ import (
 	"github.com/thalissonfelipe/banking/banking/gateway/http/rest"
 	"github.com/thalissonfelipe/banking/banking/gateway/http/transfer/schema"
 	"github.com/thalissonfelipe/banking/banking/services/auth"
-	"github.com/thalissonfelipe/banking/banking/tests"
 	"github.com/thalissonfelipe/banking/banking/tests/fakes"
 	"github.com/thalissonfelipe/banking/banking/tests/testdata"
 )
@@ -35,13 +33,12 @@ func TestTransferHandler_PerformTransfer(t *testing.T) {
 	require.NoError(t, err)
 
 	testCases := []struct {
-		name         string
-		usecase      usecases.Transfer
-		decoder      tests.Decoder
-		accOriginID  vos.AccountID
-		body         interface{}
-		expectedBody interface{}
-		expectedCode int
+		name        string
+		usecase     usecases.Transfer
+		accOriginID vos.AccountID
+		body        interface{}
+		wantBody    interface{}
+		wantCode    int
 	}{
 		{
 			name: "should perform a transfer successfully",
@@ -50,49 +47,62 @@ func TestTransferHandler_PerformTransfer(t *testing.T) {
 					return nil
 				},
 			},
-			decoder:     createdTransferDecoder{},
 			accOriginID: accOrigin.ID,
 			body: schema.PerformTransferInput{
 				AccountDestinationID: accDest.ID.String(),
 				Amount:               100,
 			},
-			expectedBody: schema.PerformTransferResponse{
+			wantBody: schema.PerformTransferResponse{
 				AccountOriginID:      accOrigin.ID.String(),
 				AccountDestinationID: accDest.ID.String(),
 				Amount:               100,
 			},
-			expectedCode: http.StatusCreated,
+			wantCode: http.StatusCreated,
 		},
 		{
 			name:        "should return status 400 if account dest id was not provided",
 			usecase:     &UsecaseMock{},
-			decoder:     tests.ErrorMessageDecoder{},
 			accOriginID: accOrigin.ID,
 			body:        schema.PerformTransferInput{Amount: 100},
-			expectedBody: rest.ErrorResponse{
-				Message: "missing account destination id parameter",
+			wantBody: rest.Error{
+				Error: "invalid request body",
+				Details: []rest.ErrorDetail{
+					{
+						Location: "body.account_destination_id",
+						Message:  "missing parameter",
+					},
+				},
 			},
-			expectedCode: http.StatusBadRequest,
+			wantCode: http.StatusBadRequest,
 		},
 		{
-			name:         "should return status 400 if amount was not provided",
-			usecase:      &UsecaseMock{},
-			decoder:      tests.ErrorMessageDecoder{},
-			accOriginID:  accOrigin.ID,
-			body:         schema.PerformTransferInput{AccountDestinationID: accDest.ID.String()},
-			expectedBody: rest.ErrorResponse{Message: "missing amount parameter"},
-			expectedCode: http.StatusBadRequest,
-		},
-		{
-			name:        "should return status 400 an invalid json was provided",
+			name:        "should return status 400 if an invalid json was provided",
 			usecase:     &UsecaseMock{},
-			decoder:     tests.ErrorMessageDecoder{},
 			accOriginID: accOrigin.ID,
 			body: map[string]interface{}{
 				"amount": "100",
 			},
-			expectedBody: rest.ErrorResponse{Message: "invalid json"},
-			expectedCode: http.StatusBadRequest,
+			wantBody: rest.Error{Error: "invalid request body"},
+			wantCode: http.StatusBadRequest,
+		},
+		{
+			name:        "should return status 400 if account destination id is invalid",
+			usecase:     &UsecaseMock{},
+			accOriginID: accOrigin.ID,
+			body: schema.PerformTransferInput{
+				AccountDestinationID: "invalid",
+				Amount:               100,
+			},
+			wantBody: rest.Error{
+				Error: "invalid request body",
+				Details: []rest.ErrorDetail{
+					{
+						Location: "body.account_destination_id",
+						Message:  "invalid uuid",
+					},
+				},
+			},
+			wantCode: http.StatusBadRequest,
 		},
 		{
 			name: "should return status 404 if acc origin does not exist",
@@ -101,14 +111,13 @@ func TestTransferHandler_PerformTransfer(t *testing.T) {
 					return entity.ErrAccountNotFound
 				},
 			},
-			decoder:     tests.ErrorMessageDecoder{},
 			accOriginID: accOrigin.ID,
 			body: schema.PerformTransferInput{
 				AccountDestinationID: accDest.ID.String(),
 				Amount:               100,
 			},
-			expectedBody: rest.ErrorResponse{Message: "account origin does not exist"},
-			expectedCode: http.StatusNotFound,
+			wantBody: rest.Error{Error: "account origin not found"},
+			wantCode: http.StatusNotFound,
 		},
 		{
 			name: "should return status 404 if acc dest does not exist",
@@ -117,14 +126,13 @@ func TestTransferHandler_PerformTransfer(t *testing.T) {
 					return entity.ErrAccountDestinationNotFound
 				},
 			},
-			decoder:     tests.ErrorMessageDecoder{},
 			accOriginID: accOrigin.ID,
 			body: schema.PerformTransferInput{
 				AccountDestinationID: accDest.ID.String(),
 				Amount:               100,
 			},
-			expectedBody: rest.ErrorResponse{Message: "account destination does not exist"},
-			expectedCode: http.StatusNotFound,
+			wantBody: rest.Error{Error: "account destination not found"},
+			wantCode: http.StatusNotFound,
 		},
 		{
 			name: "should return status 400 if acc origin has insufficient funds",
@@ -133,28 +141,24 @@ func TestTransferHandler_PerformTransfer(t *testing.T) {
 					return entity.ErrInsufficientFunds
 				},
 			},
-			decoder:     tests.ErrorMessageDecoder{},
 			accOriginID: accOrigin.ID,
 			body: schema.PerformTransferInput{
 				AccountDestinationID: accDest.ID.String(),
 				Amount:               100,
 			},
-			expectedBody: rest.ErrorResponse{Message: "insufficient funds"},
-			expectedCode: http.StatusBadRequest,
+			wantBody: rest.Error{Error: "insufficient funds"},
+			wantCode: http.StatusBadRequest,
 		},
 		{
-			name:        "should return status 400 if accDestID is the same as account origin id",
+			name:        "should return status 400 if acc dest id is the same as acc origin id",
 			usecase:     &UsecaseMock{},
-			decoder:     tests.ErrorMessageDecoder{},
 			accOriginID: accOrigin.ID,
 			body: schema.PerformTransferInput{
 				AccountDestinationID: accOrigin.ID.String(),
 				Amount:               100,
 			},
-			expectedBody: rest.ErrorResponse{
-				Message: "account destination cannot be the account origin id",
-			},
-			expectedCode: http.StatusBadRequest,
+			wantBody: rest.Error{Error: "account origin id cannot be equal to destination id"},
+			wantCode: http.StatusBadRequest,
 		},
 		{
 			name: "should return status 500 if usecase fails",
@@ -163,14 +167,13 @@ func TestTransferHandler_PerformTransfer(t *testing.T) {
 					return assert.AnError
 				},
 			},
-			decoder:     tests.ErrorMessageDecoder{},
 			accOriginID: accOrigin.ID,
 			body: schema.PerformTransferInput{
 				AccountDestinationID: accDest.ID.String(),
 				Amount:               100,
 			},
-			expectedBody: rest.ErrorResponse{Message: "internal server error"},
-			expectedCode: http.StatusInternalServerError,
+			wantBody: rest.Error{Error: "internal server error"},
+			wantCode: http.StatusInternalServerError,
 		},
 	}
 
@@ -185,24 +188,14 @@ func TestTransferHandler_PerformTransfer(t *testing.T) {
 			request.Header.Add("Authorization", bearerToken)
 			response := httptest.NewRecorder()
 
-			http.HandlerFunc(handler.PerformTransfer).ServeHTTP(response, request)
+			rest.Wrap(handler.PerformTransfer).ServeHTTP(response, request)
 
-			result := tt.decoder.Decode(t, response.Body)
+			want, err := json.Marshal(tt.wantBody)
+			require.NoError(t, err)
 
-			assert.Equal(t, tt.expectedBody, result)
-			assert.Equal(t, tt.expectedCode, response.Code)
+			assert.Equal(t, tt.wantCode, response.Code)
+			assert.JSONEq(t, string(want), response.Body.String())
 			assert.Equal(t, "application/json", response.Header().Get("Content-Type"))
 		})
 	}
-}
-
-type createdTransferDecoder struct{}
-
-func (createdTransferDecoder) Decode(t *testing.T, body *bytes.Buffer) interface{} {
-	var result schema.PerformTransferResponse
-
-	err := json.NewDecoder(body).Decode(&result)
-	require.NoError(t, err)
-
-	return result
 }

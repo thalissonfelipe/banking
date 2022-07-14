@@ -1,7 +1,6 @@
 package account
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"net/http"
@@ -17,7 +16,6 @@ import (
 	"github.com/thalissonfelipe/banking/banking/domain/usecases"
 	"github.com/thalissonfelipe/banking/banking/gateway/http/account/schema"
 	"github.com/thalissonfelipe/banking/banking/gateway/http/rest"
-	"github.com/thalissonfelipe/banking/banking/tests"
 	"github.com/thalissonfelipe/banking/banking/tests/fakes"
 	"github.com/thalissonfelipe/banking/banking/tests/testdata"
 )
@@ -32,12 +30,11 @@ func TestAccountHandler_CreateAccount(t *testing.T) {
 	acc.CreatedAt = time.Now()
 
 	testCases := []struct {
-		name         string
-		usecase      usecases.Account
-		decoder      tests.Decoder
-		body         interface{}
-		expectedBody interface{}
-		expectedCode int
+		name     string
+		usecase  usecases.Account
+		body     interface{}
+		wantBody interface{}
+		wantCode int
 	}{
 		{
 			name: "should return status code 201 if acc was created successfully",
@@ -47,63 +44,51 @@ func TestAccountHandler_CreateAccount(t *testing.T) {
 					return nil
 				},
 			},
-			decoder: createdAccountDecoder{},
-			body:    schema.CreateAccountInput{Name: "name", CPF: cpf.String(), Secret: secret.String()},
-			expectedBody: schema.CreateAccountResponse{
+			body: schema.CreateAccountInput{Name: "name", CPF: cpf.String(), Secret: secret.String()},
+			wantBody: schema.CreateAccountResponse{
 				Name:      "name",
 				CPF:       cpf.String(),
 				Balance:   100,
 				CreatedAt: acc.CreatedAt.UTC().Format(time.RFC3339),
 			},
-			expectedCode: http.StatusCreated,
+			wantCode: http.StatusCreated,
 		},
 		{
-			name:         "should return status code 400 if name was not provided",
-			usecase:      &UsecaseMock{},
-			decoder:      tests.ErrorMessageDecoder{},
-			body:         schema.CreateAccountInput{CPF: cpf.String(), Secret: secret.String()},
-			expectedBody: rest.ErrorResponse{Message: "missing name parameter"},
-			expectedCode: http.StatusBadRequest,
+			name:    "should return status code 400 if name was not provided",
+			usecase: &UsecaseMock{},
+			body:    schema.CreateAccountInput{CPF: cpf.String(), Secret: secret.String()},
+			wantBody: rest.Error{
+				Error: "invalid request body",
+				Details: []rest.ErrorDetail{
+					{
+						Location: "body.name",
+						Message:  "missing parameter",
+					},
+				},
+			},
+			wantCode: http.StatusBadRequest,
 		},
 		{
-			name:         "should return status code 400 if cpf was not provided",
-			usecase:      &UsecaseMock{},
-			decoder:      tests.ErrorMessageDecoder{},
-			body:         schema.CreateAccountInput{Name: "name", Secret: secret.String()},
-			expectedBody: rest.ErrorResponse{Message: "missing cpf parameter"},
-			expectedCode: http.StatusBadRequest,
+			name:     "should return status code 400 if an invalid json was provided",
+			usecase:  &UsecaseMock{},
+			body:     map[string]interface{}{"name": 123456},
+			wantBody: rest.Error{Error: "invalid request body"},
+			wantCode: http.StatusBadRequest,
 		},
 		{
-			name:         "should return status code 400 if secret was not provided",
-			usecase:      &UsecaseMock{},
-			decoder:      tests.ErrorMessageDecoder{},
-			body:         schema.CreateAccountInput{Name: "name", CPF: cpf.String()},
-			expectedBody: rest.ErrorResponse{Message: "missing secret parameter"},
-			expectedCode: http.StatusBadRequest,
-		},
-		{
-			name:         "should return status code 400 if an invalid json was provided",
-			usecase:      &UsecaseMock{},
-			decoder:      tests.ErrorMessageDecoder{},
-			body:         map[string]interface{}{"name": 123456},
-			expectedBody: rest.ErrorResponse{Message: "invalid json"},
-			expectedCode: http.StatusBadRequest,
-		},
-		{
-			name:         "should return status code 400 if cpf provided is not valid",
-			usecase:      &UsecaseMock{},
-			decoder:      tests.ErrorMessageDecoder{},
-			body:         schema.CreateAccountInput{Name: "name", CPF: "123.456.789-00", Secret: secret.String()},
-			expectedBody: rest.ErrorResponse{Message: "invalid cpf"},
-			expectedCode: http.StatusBadRequest,
-		},
-		{
-			name:         "should return status code 400 if secret provided is not valid",
-			usecase:      &UsecaseMock{},
-			decoder:      tests.ErrorMessageDecoder{},
-			body:         schema.CreateAccountInput{Name: "name", CPF: cpf.String(), Secret: "12345678"},
-			expectedBody: rest.ErrorResponse{Message: "invalid secret"},
-			expectedCode: http.StatusBadRequest,
+			name:    "should return status code 400 if cpf provided is not valid",
+			usecase: &UsecaseMock{},
+			body:    schema.CreateAccountInput{Name: "name", CPF: "123.456.789-00", Secret: secret.String()},
+			wantBody: rest.Error{
+				Error: "invalid request body",
+				Details: []rest.ErrorDetail{
+					{
+						Location: "body.cpf",
+						Message:  "invalid cpf",
+					},
+				},
+			},
+			wantCode: http.StatusBadRequest,
 		},
 		{
 			name: "should return status code 409 if account already exists",
@@ -112,10 +97,9 @@ func TestAccountHandler_CreateAccount(t *testing.T) {
 					return entity.ErrAccountAlreadyExists
 				},
 			},
-			decoder:      tests.ErrorMessageDecoder{},
-			body:         schema.CreateAccountInput{Name: "name", CPF: cpf.String(), Secret: secret.String()},
-			expectedBody: rest.ErrorResponse{Message: "account already exists"},
-			expectedCode: http.StatusConflict,
+			body:     schema.CreateAccountInput{Name: "name", CPF: cpf.String(), Secret: secret.String()},
+			wantBody: rest.Error{Error: "account already exists"},
+			wantCode: http.StatusConflict,
 		},
 		{
 			name: "should return status code 500 if usecase fails to create an account",
@@ -124,10 +108,9 @@ func TestAccountHandler_CreateAccount(t *testing.T) {
 					return assert.AnError
 				},
 			},
-			decoder:      tests.ErrorMessageDecoder{},
-			body:         schema.CreateAccountInput{Name: "name", CPF: cpf.String(), Secret: secret.String()},
-			expectedBody: rest.ErrorResponse{Message: "internal server error"},
-			expectedCode: http.StatusInternalServerError,
+			body:     schema.CreateAccountInput{Name: "name", CPF: cpf.String(), Secret: secret.String()},
+			wantBody: rest.Error{Error: "internal server error"},
+			wantCode: http.StatusInternalServerError,
 		},
 	}
 
@@ -139,23 +122,14 @@ func TestAccountHandler_CreateAccount(t *testing.T) {
 			request := fakes.FakeRequest(http.MethodPost, "/accounts", tt.body)
 			response := httptest.NewRecorder()
 
-			http.HandlerFunc(handler.CreateAccount).ServeHTTP(response, request)
+			rest.Wrap(handler.CreateAccount).ServeHTTP(response, request)
 
-			result := tt.decoder.Decode(t, response.Body)
+			want, err := json.Marshal(tt.wantBody)
+			require.NoError(t, err)
 
-			assert.Equal(t, tt.expectedBody, result)
-			assert.Equal(t, tt.expectedCode, response.Code)
+			assert.Equal(t, tt.wantCode, response.Code)
+			assert.JSONEq(t, string(want), response.Body.String())
+			assert.Equal(t, "application/json", response.Header().Get("Content-Type"))
 		})
 	}
-}
-
-type createdAccountDecoder struct{}
-
-func (createdAccountDecoder) Decode(t *testing.T, body *bytes.Buffer) interface{} {
-	var result schema.CreateAccountResponse
-
-	err := json.NewDecoder(body).Decode(&result)
-	require.NoError(t, err)
-
-	return result
 }

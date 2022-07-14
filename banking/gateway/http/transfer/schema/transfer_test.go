@@ -1,6 +1,7 @@
 package schema
 
 import (
+	"errors"
 	"testing"
 	"time"
 
@@ -72,7 +73,7 @@ func TestSchema_PerformTransferInput_IsValid(t *testing.T) {
 	tests := []struct {
 		name    string
 		input   PerformTransferInput
-		wantErr error
+		wantErr rest.ValidationErrors
 	}{
 		{
 			name: "should validate input without errors",
@@ -83,25 +84,44 @@ func TestSchema_PerformTransferInput_IsValid(t *testing.T) {
 			wantErr: nil,
 		},
 		{
-			name: "should return err acc destination id is blank",
+			name: "should return err if acc destination id is blank",
 			input: PerformTransferInput{
 				Amount: 100,
 			},
-			wantErr: rest.ErrMissingAccDestinationIDParameter,
+			wantErr: rest.ValidationErrors{ErrMissingAccountDestIDParameter},
 		},
 		{
 			name: "should return err if amount is blank",
 			input: PerformTransferInput{
 				AccountDestinationID: vos.NewAccountID().String(),
 			},
-			wantErr: rest.ErrMissingAmountParameter,
+			wantErr: rest.ValidationErrors{ErrMissingAmountParameter},
+		},
+		{
+			name:    "should return err if acc destination id and amount are blank",
+			input:   PerformTransferInput{},
+			wantErr: rest.ValidationErrors{ErrMissingAccountDestIDParameter, ErrMissingAmountParameter},
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := tt.input.IsValid()
-			assert.ErrorIs(t, got, tt.wantErr)
+			err := tt.input.IsValid()
+			if err != nil {
+				var errs rest.ValidationErrors
+				require.True(t, errors.As(err, &errs))
+
+				assert.Len(t, errs, len(tt.wantErr))
+
+				for i, e := range errs {
+					var verr rest.ValidationError
+					require.True(t, errors.As(e, &verr))
+
+					assert.ErrorIs(t, verr, tt.wantErr[i])
+				}
+			} else {
+				assert.NoError(t, err)
+			}
 		})
 	}
 }

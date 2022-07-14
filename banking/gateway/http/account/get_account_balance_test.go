@@ -1,7 +1,6 @@
 package account
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -18,7 +17,6 @@ import (
 	"github.com/thalissonfelipe/banking/banking/domain/vos"
 	"github.com/thalissonfelipe/banking/banking/gateway/http/account/schema"
 	"github.com/thalissonfelipe/banking/banking/gateway/http/rest"
-	"github.com/thalissonfelipe/banking/banking/tests"
 	"github.com/thalissonfelipe/banking/banking/tests/fakes"
 	"github.com/thalissonfelipe/banking/banking/tests/testdata"
 )
@@ -28,12 +26,11 @@ func TestAccountHandler_GetAccountBalance(t *testing.T) {
 	require.NoError(t, err)
 
 	testCases := []struct {
-		name         string
-		usecase      usecases.Account
-		requestURI   string
-		decoder      tests.Decoder
-		expectedBody interface{}
-		expectedCode int
+		name      string
+		usecase   usecases.Account
+		accountID string
+		wantBody  interface{}
+		wantCode  int
 	}{
 		{
 			name: "should return account balance successfully",
@@ -42,10 +39,24 @@ func TestAccountHandler_GetAccountBalance(t *testing.T) {
 					return 100, nil
 				},
 			},
-			requestURI:   fmt.Sprintf("/accounts/%s/balance", acc.ID),
-			decoder:      balanceResponseDecoder{},
-			expectedBody: schema.BalanceResponse{Balance: 100},
-			expectedCode: http.StatusOK,
+			accountID: acc.ID.String(),
+			wantBody:  schema.BalanceResponse{Balance: 100},
+			wantCode:  http.StatusOK,
+		},
+		{
+			name:      "should return status 400 if account id is invalid",
+			usecase:   &UsecaseMock{},
+			accountID: "invalid",
+			wantBody: rest.Error{
+				Error: "invalid path parameters",
+				Details: []rest.ErrorDetail{
+					{
+						Location: "path.accountID",
+						Message:  "invalid uuid",
+					},
+				},
+			},
+			wantCode: http.StatusBadRequest,
 		},
 		{
 			name: "should return status 404 if account does not exist",
@@ -54,10 +65,9 @@ func TestAccountHandler_GetAccountBalance(t *testing.T) {
 					return 0, entity.ErrAccountNotFound
 				},
 			},
-			requestURI:   fmt.Sprintf("/accounts/%s/balance", acc.ID),
-			decoder:      tests.ErrorMessageDecoder{},
-			expectedBody: rest.ErrorResponse{Message: "account does not exist"},
-			expectedCode: http.StatusNotFound,
+			accountID: acc.ID.String(),
+			wantBody:  rest.Error{Error: "account not found"},
+			wantCode:  http.StatusNotFound,
 		},
 		{
 			name: "should return status 500 if usecase fails",
@@ -66,10 +76,9 @@ func TestAccountHandler_GetAccountBalance(t *testing.T) {
 					return 0, assert.AnError
 				},
 			},
-			requestURI:   fmt.Sprintf("/accounts/%s/balance", acc.ID),
-			decoder:      tests.ErrorMessageDecoder{},
-			expectedBody: rest.ErrorResponse{Message: "internal server error"},
-			expectedCode: http.StatusInternalServerError,
+			accountID: acc.ID.String(),
+			wantBody:  rest.Error{Error: "internal server error"},
+			wantCode:  http.StatusInternalServerError,
 		},
 	}
 
@@ -79,31 +88,23 @@ func TestAccountHandler_GetAccountBalance(t *testing.T) {
 			handler := NewHandler(r, tt.usecase)
 
 			rctx := chi.NewRouteContext()
-			rctx.URLParams.Add("accountID", acc.ID.String())
+			rctx.URLParams.Add("accountID", tt.accountID)
 
-			request := fakes.FakeRequest(http.MethodGet, tt.requestURI, nil)
+			requestURI := fmt.Sprintf("/accounts/%s/balance", tt.accountID)
+
+			request := fakes.FakeRequest(http.MethodGet, requestURI, nil)
 			request = request.WithContext(context.WithValue(request.Context(), chi.RouteCtxKey, rctx))
 
 			response := httptest.NewRecorder()
 
-			http.HandlerFunc(handler.GetAccountBalance).ServeHTTP(response, request)
+			rest.Wrap(handler.GetAccountBalance).ServeHTTP(response, request)
 
-			result := tt.decoder.Decode(t, response.Body)
+			want, err := json.Marshal(tt.wantBody)
+			require.NoError(t, err)
 
-			assert.Equal(t, tt.expectedBody, result)
-			assert.Equal(t, tt.expectedCode, response.Code)
+			assert.Equal(t, tt.wantCode, response.Code)
+			assert.JSONEq(t, string(want), response.Body.String())
 			assert.Equal(t, "application/json", response.Header().Get("Content-Type"))
 		})
 	}
-}
-
-type balanceResponseDecoder struct{}
-
-func (balanceResponseDecoder) Decode(t *testing.T, body *bytes.Buffer) interface{} {
-	var result schema.BalanceResponse
-
-	err := json.NewDecoder(body).Decode(&result)
-	require.NoError(t, err)
-
-	return result
 }

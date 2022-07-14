@@ -1,6 +1,7 @@
 package schema
 
 import (
+	"errors"
 	"testing"
 	"time"
 
@@ -83,7 +84,7 @@ func TestSchema_CreateAccountInput_IsValid(t *testing.T) {
 	tests := []struct {
 		name    string
 		input   CreateAccountInput
-		wantErr error
+		wantErr rest.ValidationErrors
 	}{
 		{
 			name: "should validate input without errors",
@@ -100,7 +101,7 @@ func TestSchema_CreateAccountInput_IsValid(t *testing.T) {
 				CPF:    "cpf",
 				Secret: "secret",
 			},
-			wantErr: rest.ErrMissingNameParameter,
+			wantErr: rest.ValidationErrors{ErrMissingNameParameter},
 		},
 		{
 			name: "should return err if cpf is blank",
@@ -108,7 +109,7 @@ func TestSchema_CreateAccountInput_IsValid(t *testing.T) {
 				Name:   "name",
 				Secret: "secret",
 			},
-			wantErr: rest.ErrMissingCPFParameter,
+			wantErr: rest.ValidationErrors{ErrMissingCPFParameter},
 		},
 		{
 			name: "should return err if secret is blank",
@@ -116,14 +117,33 @@ func TestSchema_CreateAccountInput_IsValid(t *testing.T) {
 				Name: "name",
 				CPF:  "cpf",
 			},
-			wantErr: rest.ErrMissingSecretParameter,
+			wantErr: rest.ValidationErrors{ErrMissingSecretParameter},
+		},
+		{
+			name:    "should return err if all fields are blank",
+			input:   CreateAccountInput{},
+			wantErr: rest.ValidationErrors{ErrMissingNameParameter, ErrMissingCPFParameter, ErrMissingSecretParameter},
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := tt.input.IsValid()
-			assert.ErrorIs(t, got, tt.wantErr)
+			err := tt.input.IsValid()
+			if err != nil {
+				var errs rest.ValidationErrors
+				require.True(t, errors.As(err, &errs))
+
+				assert.Len(t, errs, len(tt.wantErr))
+
+				for i, e := range errs {
+					var verr rest.ValidationError
+					require.True(t, errors.As(e, &verr))
+
+					assert.ErrorIs(t, verr, tt.wantErr[i])
+				}
+			} else {
+				assert.NoError(t, err)
+			}
 		})
 	}
 }

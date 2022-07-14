@@ -7,6 +7,18 @@ import (
 	"github.com/thalissonfelipe/banking/banking/gateway/http/rest"
 )
 
+var (
+	ErrMissingAccountDestIDParameter = rest.ValidationError{
+		Location: "body.account_destination_id",
+		Err:      rest.ErrMissingParameter,
+	}
+
+	ErrMissingAmountParameter = rest.ValidationError{
+		Location: "body.amount",
+		Err:      rest.ErrMissingParameter,
+	}
+)
+
 type Transfer struct {
 	AccountOriginID      string `json:"account_origin_id"`
 	AccountDestinationID string `json:"account_destination_id"`
@@ -41,12 +53,18 @@ type PerformTransferInput struct {
 }
 
 func (t PerformTransferInput) IsValid() error {
+	var errs rest.ValidationErrors
+
 	if t.AccountDestinationID == "" {
-		return rest.ErrMissingAccDestinationIDParameter
+		errs = append(errs, ErrMissingAccountDestIDParameter)
 	}
 
 	if t.Amount == 0 {
-		return rest.ErrMissingAmountParameter
+		errs = append(errs, ErrMissingAmountParameter)
+	}
+
+	if len(errs) != 0 {
+		return errs
 	}
 
 	return nil

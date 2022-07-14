@@ -2,6 +2,7 @@ package transfer
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/thalissonfelipe/banking/banking/domain/vos"
 	"github.com/thalissonfelipe/banking/banking/gateway/http/rest"
@@ -16,20 +17,22 @@ import (
 // @Accept json
 // @Produce json
 // @Param Authorization header string true "Bearer Authorization Token"
-// @Success 200 {array} schema.ListTransfersResponse
+// @Success 200 schema.ListTransfersResponse
 // @Failure 401 {object} responses.ErrorResponse
 // @Failure 500 {object} responses.ErrorResponse
 // @Router /transfers [GET].
-func (h Handler) ListTransfers(w http.ResponseWriter, r *http.Request) {
-	token := getTokenFromHeader(r.Header.Get("Authorization"))
-	accountID := vos.ConvertStringToAccountID(auth.GetIDFromToken(token))
+func (h Handler) ListTransfers(r *http.Request) rest.Response {
+	token := strings.Split(r.Header.Get("Authorization"), "Bearer ")[1]
 
-	transfers, err := h.usecase.ListTransfers(r.Context(), accountID)
+	accountID, err := rest.ParseUUID(auth.GetIDFromToken(token), "token")
 	if err != nil {
-		rest.SendError(w, http.StatusInternalServerError, rest.ErrInternalError)
-
-		return
+		return rest.BadRequest(err, "invalid token")
 	}
 
-	rest.SendJSON(w, http.StatusOK, schema.MapToListTransfersResponse(transfers))
+	transfers, err := h.usecase.ListTransfers(r.Context(), vos.AccountID(accountID))
+	if err != nil {
+		return rest.InternalServer(err)
+	}
+
+	return rest.OK(schema.MapToListTransfersResponse(transfers))
 }

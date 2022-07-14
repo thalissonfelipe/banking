@@ -5,6 +5,8 @@ import (
 	"errors"
 	"time"
 
+	"go.uber.org/multierr"
+
 	"github.com/thalissonfelipe/banking/banking/domain/vos"
 )
 
@@ -29,14 +31,20 @@ type Account struct {
 const defaultBalance = 100
 
 func NewAccount(name, cpfStr, secretStr string) (Account, error) {
+	var errs error
+
 	cpf, err := vos.NewCPF(cpfStr)
 	if err != nil {
-		return Account{}, err
+		errs = multierr.Append(errs, err)
 	}
 
 	secret, err := vos.NewSecret(secretStr)
 	if err != nil {
-		return Account{}, err
+		errs = multierr.Append(errs, err)
+	}
+
+	if errs != nil {
+		return Account{}, errs
 	}
 
 	return Account{

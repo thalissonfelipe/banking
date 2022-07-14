@@ -6,9 +6,10 @@ import (
 	"net/http"
 )
 
+// TODO: add tests.
 func DecodeRequestBody(r *http.Request, dest interface{}) error {
 	if err := json.NewDecoder(r.Body).Decode(&dest); err != nil {
-		return ErrInvalidJSON
+		return fmt.Errorf("invalid json: %w", err)
 	}
 
 	v, ok := dest.(interface{ IsValid() error })

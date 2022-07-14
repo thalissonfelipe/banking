@@ -14,11 +14,11 @@ func TestNewAccount(t *testing.T) {
 	secret := testdata.GetValidSecret()
 
 	tests := []struct {
-		name    string
-		cpf     string
-		secret  string
-		want    Account
-		wantErr error
+		name     string
+		cpf      string
+		secret   string
+		want     Account
+		wantErrs []error
 	}{
 		{
 			name:   "should create an account successfully",
@@ -30,28 +30,39 @@ func TestNewAccount(t *testing.T) {
 				Secret:  secret,
 				Balance: 100,
 			},
-			wantErr: nil,
+			wantErrs: nil,
 		},
 		{
-			name:    "should return an error if cpf is invalid",
-			cpf:     "12345678900",
-			secret:  secret.String(),
-			want:    Account{},
-			wantErr: vos.ErrInvalidCPF,
+			name:     "should return an error if cpf is invalid",
+			cpf:      "12345678900",
+			secret:   secret.String(),
+			want:     Account{},
+			wantErrs: []error{vos.ErrInvalidCPF},
 		},
 		{
-			name:    "should return an error if secret is invalid",
-			cpf:     cpf.String(),
-			secret:  "invalid",
-			want:    Account{},
-			wantErr: vos.ErrInvalidSecret,
+			name:     "should return an error if secret is invalid",
+			cpf:      cpf.String(),
+			secret:   "invalid",
+			want:     Account{},
+			wantErrs: []error{vos.ErrInvalidSecret},
+		},
+		{
+			name:     "should return an error if cpf and secret are invalid",
+			cpf:      "12345678900",
+			secret:   "invalid",
+			want:     Account{},
+			wantErrs: []error{vos.ErrInvalidCPF, vos.ErrInvalidSecret},
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			acc, err := NewAccount("name", tt.cpf, tt.secret)
-			assert.ErrorIs(t, err, tt.wantErr)
+			if err != nil {
+				for _, e := range tt.wantErrs {
+					assert.ErrorIs(t, err, e)
+				}
+			}
 
 			assert.Equal(t, tt.want.Name, acc.Name)
 			assert.Equal(t, tt.want.CPF, acc.CPF)

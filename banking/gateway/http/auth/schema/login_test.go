@@ -1,10 +1,11 @@
 package schema
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-
+	"github.com/stretchr/testify/require"
 	"github.com/thalissonfelipe/banking/banking/gateway/http/rest"
 )
 
@@ -19,7 +20,7 @@ func TestSchema_LoginInput_IsValid(t *testing.T) {
 	tests := []struct {
 		name    string
 		input   LoginInput
-		wantErr error
+		wantErr rest.ValidationErrors
 	}{
 		{
 			name: "should return no error",
@@ -30,25 +31,44 @@ func TestSchema_LoginInput_IsValid(t *testing.T) {
 			wantErr: nil,
 		},
 		{
-			name: "should return error cpf is blank",
+			name: "should return error if cpf is blank",
 			input: LoginInput{
 				Secret: "secret",
 			},
-			wantErr: rest.ErrMissingCPFParameter,
+			wantErr: rest.ValidationErrors{ErrMissingCPFParameter},
 		},
 		{
-			name: "should return error secret is blank",
+			name: "should return error if secret is blank",
 			input: LoginInput{
 				CPF: "cpf",
 			},
-			wantErr: rest.ErrMissingSecretParameter,
+			wantErr: rest.ValidationErrors{ErrMissingSecretParameter},
+		},
+		{
+			name:    "should return error if cpf and secret are blank",
+			input:   LoginInput{},
+			wantErr: rest.ValidationErrors{ErrMissingCPFParameter, ErrMissingSecretParameter},
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := tt.input.IsValid()
-			assert.ErrorIs(t, got, tt.wantErr)
+			err := tt.input.IsValid()
+			if err != nil {
+				var errs rest.ValidationErrors
+				require.True(t, errors.As(err, &errs))
+
+				assert.Len(t, errs, len(tt.wantErr))
+
+				for i, e := range errs {
+					var verr rest.ValidationError
+					require.True(t, errors.As(e, &verr))
+
+					assert.ErrorIs(t, verr, tt.wantErr[i])
+				}
+			} else {
+				assert.NoError(t, err)
+			}
 		})
 	}
 }

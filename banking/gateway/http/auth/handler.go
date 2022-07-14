@@ -3,6 +3,7 @@ package auth
 import (
 	"github.com/go-chi/chi/v5"
 
+	"github.com/thalissonfelipe/banking/banking/gateway/http/rest"
 	"github.com/thalissonfelipe/banking/banking/services"
 )
 
@@ -17,7 +18,7 @@ func NewHandler(r chi.Router, authService services.Auth) *Handler {
 		authService: authService,
 	}
 
-	r.Post("/login", handler.Login)
+	r.Post("/login", rest.Wrap(handler.Login))
 
 	return handler
 }

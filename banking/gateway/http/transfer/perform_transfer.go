@@ -3,6 +3,7 @@ package transfer
 import (
 	"errors"
 	"net/http"
+	"strings"
 
 	"github.com/thalissonfelipe/banking/banking/domain/entity"
 	"github.com/thalissonfelipe/banking/banking/domain/usecases"
@@ -20,45 +21,51 @@ import (
 // @Produce json
 // @Param Authorization header string true "Bearer Authorization Token"
 // @Param Body body transferRequest true "Body"
-// @Success 201 {array} schema.PerformTransferResponse
+// @Success 201 schema.PerformTransferResponse
 // @Failure 401 {object} responses.ErrorResponse
 // @Failure 404 {object} responses.ErrorResponse
 // @Failure 500 {object} responses.ErrorResponse
 // @Router /transfers [POST].
-func (h Handler) PerformTransfer(w http.ResponseWriter, r *http.Request) {
+func (h Handler) PerformTransfer(r *http.Request) rest.Response {
 	var body schema.PerformTransferInput
-
 	if err := rest.DecodeRequestBody(r, &body); err != nil {
-		rest.HandleBadRequestError(w, err)
-
-		return
+		return rest.BadRequest(err, "invalid request body")
 	}
 
-	token := getTokenFromHeader(r.Header.Get("Authorization"))
-	accountID := vos.ConvertStringToAccountID(auth.GetIDFromToken(token))
-	accountDestinationID := vos.ConvertStringToAccountID(body.AccountDestinationID)
+	token := strings.Split(r.Header.Get("Authorization"), "Bearer ")[1]
+
+	accountID, err := rest.ParseUUID(auth.GetIDFromToken(token), "token")
+	if err != nil {
+		return rest.BadRequest(err, "invalid token")
+	}
+
+	accountDestinationID, err := rest.ParseUUID(body.AccountDestinationID, "body.account_destination_id")
+	if err != nil {
+		return rest.BadRequest(err, "invalid request body")
+	}
 
 	if accountID == accountDestinationID {
-		rest.SendError(w, http.StatusBadRequest, rest.ErrDestinationIDEqToOriginID)
-
-		return
+		return rest.BadRequest(rest.ErrSameAccounts, rest.ErrSameAccounts.Error())
 	}
 
-	input := usecases.NewPerformTransferInput(accountID, accountDestinationID, body.Amount)
+	input := usecases.NewPerformTransferInput(vos.AccountID(accountID), vos.AccountID(accountDestinationID), body.Amount)
 
-	err := h.usecase.PerformTransfer(r.Context(), input)
+	err = h.usecase.PerformTransfer(r.Context(), input)
 	if err != nil {
-		if errors.Is(err, entity.ErrAccountNotFound) {
-			rest.SendError(w, http.StatusNotFound, rest.ErrAccountOriginNotFound)
-
-			return
+		if errors.Is(err, entity.ErrInsufficientFunds) {
+			return rest.BadRequest(err, "insufficient funds")
 		}
 
-		rest.HandleError(w, err)
+		if errors.Is(err, entity.ErrAccountNotFound) {
+			return rest.NotFound(err, "account origin not found")
+		}
 
-		return
+		if errors.Is(err, entity.ErrAccountDestinationNotFound) {
+			return rest.NotFound(err, "account destination not found")
+		}
+
+		return rest.InternalServer(err)
 	}
 
-	response := schema.MapToPerformTransferResponse(accountID.String(), body.AccountDestinationID, body.Amount)
-	rest.SendJSON(w, http.StatusCreated, response)
+	return rest.Created(schema.MapToPerformTransferResponse(accountID.String(), body.AccountDestinationID, body.Amount))
 }

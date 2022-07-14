@@ -1,10 +1,12 @@
 package account
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
 
+	"github.com/thalissonfelipe/banking/banking/domain/entity"
 	"github.com/thalissonfelipe/banking/banking/domain/vos"
 	"github.com/thalissonfelipe/banking/banking/gateway/http/account/schema"
 	"github.com/thalissonfelipe/banking/banking/gateway/http/rest"
@@ -20,15 +22,20 @@ import (
 // @Failure 400 {object} responses.ErrorResponse
 // @Failure 500 {object} responses.ErrorResponse
 // @Router /accounts/{accountID}/balance [GET].
-func (h Handler) GetAccountBalance(w http.ResponseWriter, r *http.Request) {
-	accountID := vos.ConvertStringToAccountID(chi.URLParam(r, "accountID"))
-
-	balance, err := h.usecase.GetAccountBalanceByID(r.Context(), accountID)
+func (h Handler) GetAccountBalance(r *http.Request) rest.Response {
+	accountID, err := rest.ParseUUID(chi.URLParam(r, "accountID"), "path.accountID")
 	if err != nil {
-		rest.HandleError(w, err)
-
-		return
+		return rest.BadRequest(err, "invalid path parameters")
 	}
 
-	rest.SendJSON(w, http.StatusOK, schema.MapToBalanceResponse(balance))
+	balance, err := h.usecase.GetAccountBalanceByID(r.Context(), vos.AccountID(accountID))
+	if err != nil {
+		if errors.Is(err, entity.ErrAccountNotFound) {
+			return rest.NotFound(err, "account not found")
+		}
+
+		return rest.InternalServer(err)
+	}
+
+	return rest.OK(schema.MapToBalanceResponse(balance))
 }
