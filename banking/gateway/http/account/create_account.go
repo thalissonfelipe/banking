@@ -9,20 +9,20 @@ import (
 	"github.com/thalissonfelipe/banking/banking/gateway/http/rest"
 )
 
-// CreateAccount creates a new account
-// @Tags accounts
-// @Summary Creates a new account
+// CreateAccount creates a new account.
+// @Tags Accounts
+// @Summary Creates a new account.
 // @Description Creates a new account given a name, cpf and secret.
 // @Description Secret must be a minimum of 8, a maximum of 20, at least one lowercase character,
 // @Description one uppercase character and one number.
 // @Description CPF must have the format XXX.XXX.XXX-XX or XXXXXXXXXXX.
 // @Accept json
 // @Produce json
-// @Param Body body requestBody true "Body"
+// @Param Body body schema.CreateAccountInput true "Body"
 // @Success 201 {object} schema.CreateAccountResponse
-// @Failure 400 {object} responses.ErrorResponse
-// @Failure 409 {object} responses.ErrorResponse
-// @Failure 500 {object} responses.ErrorResponse
+// @Failure 400 {object} rest.Error
+// @Failure 409 {object} rest.ConflictError
+// @Failure 500 {object} rest.InternalServerError
 // @Router /accounts [POST].
 func (h Handler) CreateAccount(r *http.Request) rest.Response {
 	var body schema.CreateAccountInput

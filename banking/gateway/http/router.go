@@ -24,6 +24,14 @@ import (
 	"github.com/thalissonfelipe/banking/banking/gateway/jwt"
 )
 
+// @title Swagger Banking API
+// @version 1.0
+// @description This is a simple banking api.
+
+// @license.name Apache 2.0
+// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
+
+// @BasePath /api/v1
 func NewRouter(logger *zap.Logger, db *pgx.Conn) http.Handler {
 	r := chi.NewRouter()
 	logger = logger.With(zap.String("module", "http-server"))

@@ -20,22 +20,6 @@ import (
 	_ "github.com/thalissonfelipe/banking/docs/swagger"
 )
 
-// @title Swagger Banking API
-// @version 1.0
-// @description This is a simple banking api.
-// @termsOfService http://swagger.io/terms/
-
-// @contact.name API Support
-// @contact.url http://www.swagger.io/support
-// @contact.email support@swagger.io
-
-// @license.name Apache 2.0
-// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
-
-// @host localhost:5000
-// @BasePath /api/v1
-// @query.collection.format multi
-
 func main() {
 	logger := log.New(os.Stderr)
 

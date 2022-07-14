@@ -30,6 +30,4 @@ endif
 .PHONY: generate
 generate:
 	@echo "==> Running generate..."
-	protoc --go_out=. --go_opt=paths=source_relative \
-    --go-grpc_out=. --go-grpc_opt=paths=source_relative \
-    proto/banking/banking.proto
+	swag init -g router.go -d banking/gateway/http -o docs/swagger

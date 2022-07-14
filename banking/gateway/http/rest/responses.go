@@ -14,13 +14,13 @@ type Response struct {
 }
 
 type Error struct {
-	Error   string        `json:"error"`
+	Error   string        `json:"error" example:"invalid request body"`
 	Details []ErrorDetail `json:"details,omitempty"`
 }
 
 type ErrorDetail struct {
-	Location string `json:"location"`
-	Message  string `json:"message"`
+	Location string `json:"location" example:"body.name"`
+	Message  string `json:"message" example:"missing parameter"`
 }
 
 func OK(payload interface{}) Response {

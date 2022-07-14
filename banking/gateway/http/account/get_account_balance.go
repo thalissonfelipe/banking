@@ -12,15 +12,16 @@ import (
 	"github.com/thalissonfelipe/banking/banking/gateway/http/rest"
 )
 
-// GetAccountBalance returns a balance by accountID
-// @Tags accounts
-// @Summary Get account balance
-// @Description Get account balance by accountID, if exists.
+// GetAccountBalance returns a balance by account ID.
+// @Tags Accounts
+// @Summary Gets account balance.
+// @Description Gets account balance by account ID, if exists.
 // @Accept json
 // @Produce json
+// @Param accountID path string true "Account ID"
 // @Success 200 {object} schema.BalanceResponse
-// @Failure 400 {object} responses.ErrorResponse
-// @Failure 500 {object} responses.ErrorResponse
+// @Failure 400 {object} rest.Error
+// @Failure 500 {object} rest.InternalServerError
 // @Router /accounts/{accountID}/balance [GET].
 func (h Handler) GetAccountBalance(r *http.Request) rest.Response {
 	accountID, err := rest.ParseUUID(chi.URLParam(r, "accountID"), "path.accountID")

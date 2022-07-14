@@ -10,16 +10,16 @@ import (
 	"github.com/thalissonfelipe/banking/banking/gateway/jwt"
 )
 
-// ListTransfers returns all transfers
-// @Tags transfers
-// @Summary List transfers
-// @Description List all transfers.
+// ListTransfers returns all transfers.
+// @Tags Transfers
+// @Summary Lists all transfers.
+// @Description Lists all transfers. User must be authenticated.
 // @Accept json
 // @Produce json
 // @Param Authorization header string true "Bearer Authorization Token"
-// @Success 200 schema.ListTransfersResponse
-// @Failure 401 {object} responses.ErrorResponse
-// @Failure 500 {object} responses.ErrorResponse
+// @Success 200 {object} schema.ListTransfersResponse
+// @Failure 401 {object} rest.UnauthorizedError
+// @Failure 500 {object} rest.InternalServerError
 // @Router /transfers [GET].
 func (h Handler) ListTransfers(r *http.Request) rest.Response {
 	token := strings.Split(r.Header.Get("Authorization"), "Bearer ")[1]

@@ -13,18 +13,19 @@ import (
 	"github.com/thalissonfelipe/banking/banking/gateway/jwt"
 )
 
-// CreateTransfer creates a new transfer between two accounts
-// @Tags transfers
-// @Summary Create a new transfer
-// @Description Creates a new transfer between two accounts.
+// PerformTransfer performs a transfer between two accounts.
+// @Tags Transfers
+// @Summary Performs a transfer between two accounts.
+// @Description Performs a transfer between two accounts. User must be authenticated.
 // @Accept json
 // @Produce json
 // @Param Authorization header string true "Bearer Authorization Token"
-// @Param Body body transferRequest true "Body"
-// @Success 201 schema.PerformTransferResponse
-// @Failure 401 {object} responses.ErrorResponse
-// @Failure 404 {object} responses.ErrorResponse
-// @Failure 500 {object} responses.ErrorResponse
+// @Param Body body schema.PerformTransferInput true "Body"
+// @Success 201 {object} schema.PerformTransferResponse
+// @Failure 400 {object} rest.Error
+// @Failure 401 {object} rest.UnauthorizedError
+// @Failure 404 {object} rest.NotFoundError
+// @Failure 500 {object} rest.InternalServerError
 // @Router /transfers [POST].
 func (h Handler) PerformTransfer(r *http.Request) rest.Response {
 	var body schema.PerformTransferInput

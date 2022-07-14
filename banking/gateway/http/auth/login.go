@@ -9,17 +9,16 @@ import (
 	"github.com/thalissonfelipe/banking/banking/gateway/http/rest"
 )
 
-// Login logs in :D
-// @Tags login
-// @Summary Log in
+// Login logs in the server.
+// @Tags Sign In
+// @Summary Logs in the server.
 // @Description Returns a JWT to be used on /transfers endpoints.
 // @Accept json
 // @Produce json
-// @Param Body body requestBody true "Body"
+// @Param Body body schema.LoginInput true "Body"
 // @Success 200 {object} schema.LoginResponse
-// @Failure 400 {object} responses.ErrorResponse
-// @Failure 404 {object} responses.ErrorResponse
-// @Failure 500 {object} responses.ErrorResponse
+// @Failure 400 {object} rest.InvalidCredentialsError
+// @Failure 500 {object} rest.InternalServerError
 // @Router /login [POST].
 func (h Handler) Login(r *http.Request) rest.Response {
 	var body schema.LoginInput

@@ -3,24 +3,18 @@
     "info": {
         "description": "This is a simple banking api.",
         "title": "Swagger Banking API",
-        "termsOfService": "http://swagger.io/terms/",
-        "contact": {
-            "name": "API Support",
-            "url": "http://www.swagger.io/support",
-            "email": "support@swagger.io"
-        },
+        "contact": {},
         "license": {
             "name": "Apache 2.0",
             "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
         },
         "version": "1.0"
     },
-    "host": "localhost:5000",
     "basePath": "/api/v1",
     "paths": {
         "/accounts": {
             "get": {
-                "description": "List all accounts.",
+                "description": "Lists all accounts.",
                 "consumes": [
                     "application/json"
                 ],
@@ -28,23 +22,20 @@
                     "application/json"
                 ],
                 "tags": [
-                    "accounts"
+                    "Accounts"
                 ],
-                "summary": "List accounts",
+                "summary": "Lists all accounts.",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/account.accountResponse"
-                            }
+                            "$ref": "#/definitions/schema.ListAccountsResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/responses.ErrorResponse"
+                            "$ref": "#/definitions/rest.InternalServerError"
                         }
                     }
                 }
@@ -58,9 +49,9 @@
                     "application/json"
                 ],
                 "tags": [
-                    "accounts"
+                    "Accounts"
                 ],
-                "summary": "Creates a new account",
+                "summary": "Creates a new account.",
                 "parameters": [
                     {
                         "description": "Body",
@@ -68,7 +59,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/account.requestBody"
+                            "$ref": "#/definitions/schema.CreateAccountInput"
                         }
                     }
                 ],
@@ -76,25 +67,25 @@
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/account.createdAccountResponse"
+                            "$ref": "#/definitions/schema.CreateAccountResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/responses.ErrorResponse"
+                            "$ref": "#/definitions/rest.Error"
                         }
                     },
                     "409": {
                         "description": "Conflict",
                         "schema": {
-                            "$ref": "#/definitions/responses.ErrorResponse"
+                            "$ref": "#/definitions/rest.ConflictError"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/responses.ErrorResponse"
+                            "$ref": "#/definitions/rest.InternalServerError"
                         }
                     }
                 }
@@ -102,7 +93,7 @@
         },
         "/accounts/{accountID}/balance": {
             "get": {
-                "description": "Get account balance by accountID, if exists.",
+                "description": "Gets account balance by account ID, if exists.",
                 "consumes": [
                     "application/json"
                 ],
@@ -110,26 +101,35 @@
                     "application/json"
                 ],
                 "tags": [
-                    "accounts"
+                    "Accounts"
                 ],
-                "summary": "Get account balance",
+                "summary": "Gets account balance.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Account ID",
+                        "name": "accountID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/account.balanceResponse"
+                            "$ref": "#/definitions/schema.BalanceResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/responses.ErrorResponse"
+                            "$ref": "#/definitions/rest.Error"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/responses.ErrorResponse"
+                            "$ref": "#/definitions/rest.InternalServerError"
                         }
                     }
                 }
@@ -145,9 +145,9 @@
                     "application/json"
                 ],
                 "tags": [
-                    "login"
+                    "Sign In"
                 ],
-                "summary": "Log in",
+                "summary": "Logs in the server.",
                 "parameters": [
                     {
                         "description": "Body",
@@ -155,7 +155,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/auth.requestBody"
+                            "$ref": "#/definitions/schema.LoginInput"
                         }
                     }
                 ],
@@ -163,25 +163,19 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/auth.responseBody"
+                            "$ref": "#/definitions/schema.LoginResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/responses.ErrorResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/responses.ErrorResponse"
+                            "$ref": "#/definitions/rest.InvalidCredentialsError"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/responses.ErrorResponse"
+                            "$ref": "#/definitions/rest.InternalServerError"
                         }
                     }
                 }
@@ -189,7 +183,7 @@
         },
         "/transfers": {
             "get": {
-                "description": "List all transfers.",
+                "description": "Lists all transfers. User must be authenticated.",
                 "consumes": [
                     "application/json"
                 ],
@@ -197,9 +191,9 @@
                     "application/json"
                 ],
                 "tags": [
-                    "transfers"
+                    "Transfers"
                 ],
-                "summary": "List transfers",
+                "summary": "Lists all transfers.",
                 "parameters": [
                     {
                         "type": "string",
@@ -213,28 +207,25 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/transfer.transferResponse"
-                            }
+                            "$ref": "#/definitions/schema.ListTransfersResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/responses.ErrorResponse"
+                            "$ref": "#/definitions/rest.UnauthorizedError"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/responses.ErrorResponse"
+                            "$ref": "#/definitions/rest.InternalServerError"
                         }
                     }
                 }
             },
             "post": {
-                "description": "Creates a new transfer between two accounts.",
+                "description": "Performs a transfer between two accounts. User must be authenticated.",
                 "consumes": [
                     "application/json"
                 ],
@@ -242,9 +233,9 @@
                     "application/json"
                 ],
                 "tags": [
-                    "transfers"
+                    "Transfers"
                 ],
-                "summary": "Create a new transfer",
+                "summary": "Performs a transfer between two accounts.",
                 "parameters": [
                     {
                         "type": "string",
@@ -259,36 +250,39 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/transfer.transferRequest"
+                            "$ref": "#/definitions/schema.PerformTransferInput"
                         }
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK",
+                    "201": {
+                        "description": "Created",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/transfer.transferCreatedResponse"
-                            }
+                            "$ref": "#/definitions/schema.PerformTransferResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/rest.Error"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/responses.ErrorResponse"
+                            "$ref": "#/definitions/rest.UnauthorizedError"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/responses.ErrorResponse"
+                            "$ref": "#/definitions/rest.NotFoundError"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/responses.ErrorResponse"
+                            "$ref": "#/definitions/rest.InternalServerError"
                         }
                     }
                 }
@@ -296,7 +290,80 @@
         }
     },
     "definitions": {
-        "account.accountResponse": {
+        "rest.ConflictError": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "account already exists"
+                }
+            }
+        },
+        "rest.Error": {
+            "type": "object",
+            "properties": {
+                "details": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/rest.ErrorDetail"
+                    }
+                },
+                "error": {
+                    "type": "string",
+                    "example": "invalid request body"
+                }
+            }
+        },
+        "rest.ErrorDetail": {
+            "type": "object",
+            "properties": {
+                "location": {
+                    "type": "string",
+                    "example": "body.name"
+                },
+                "message": {
+                    "type": "string",
+                    "example": "missing parameter"
+                }
+            }
+        },
+        "rest.InternalServerError": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "internal server error"
+                }
+            }
+        },
+        "rest.InvalidCredentialsError": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "invalid credentials"
+                }
+            }
+        },
+        "rest.NotFoundError": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "account not found"
+                }
+            }
+        },
+        "rest.UnauthorizedError": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "unauthorized"
+                }
+            }
+        },
+        "schema.Account": {
             "type": "object",
             "properties": {
                 "balance": {
@@ -316,7 +383,7 @@
                 }
             }
         },
-        "account.balanceResponse": {
+        "schema.BalanceResponse": {
             "type": "object",
             "properties": {
                 "balance": {
@@ -324,21 +391,7 @@
                 }
             }
         },
-        "account.createdAccountResponse": {
-            "type": "object",
-            "properties": {
-                "balance": {
-                    "type": "integer"
-                },
-                "cpf": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                }
-            }
-        },
-        "account.requestBody": {
+        "schema.CreateAccountInput": {
             "type": "object",
             "properties": {
                 "cpf": {
@@ -352,7 +405,46 @@
                 }
             }
         },
-        "auth.requestBody": {
+        "schema.CreateAccountResponse": {
+            "type": "object",
+            "properties": {
+                "balance": {
+                    "type": "integer"
+                },
+                "cpf": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "schema.ListAccountsResponse": {
+            "type": "object",
+            "properties": {
+                "accounts": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/schema.Account"
+                    }
+                }
+            }
+        },
+        "schema.ListTransfersResponse": {
+            "type": "object",
+            "properties": {
+                "transfers": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/schema.Transfer"
+                    }
+                }
+            }
+        },
+        "schema.LoginInput": {
             "type": "object",
             "properties": {
                 "cpf": {
@@ -363,7 +455,7 @@
                 }
             }
         },
-        "auth.responseBody": {
+        "schema.LoginResponse": {
             "type": "object",
             "properties": {
                 "token": {
@@ -371,15 +463,18 @@
                 }
             }
         },
-        "responses.ErrorResponse": {
+        "schema.PerformTransferInput": {
             "type": "object",
             "properties": {
-                "message": {
+                "account_destination_id": {
                     "type": "string"
+                },
+                "amount": {
+                    "type": "integer"
                 }
             }
         },
-        "transfer.transferCreatedResponse": {
+        "schema.PerformTransferResponse": {
             "type": "object",
             "properties": {
                 "account_destination_id": {
@@ -393,21 +488,13 @@
                 }
             }
         },
-        "transfer.transferRequest": {
+        "schema.Transfer": {
             "type": "object",
             "properties": {
                 "account_destination_id": {
                     "type": "string"
                 },
-                "amount": {
-                    "type": "integer"
-                }
-            }
-        },
-        "transfer.transferResponse": {
-            "type": "object",
-            "properties": {
-                "account_destination_id": {
+                "account_origin_id": {
                     "type": "string"
                 },
                 "amount": {

@@ -1,6 +1,55 @@
 basePath: /api/v1
 definitions:
-  account.accountResponse:
+  rest.ConflictError:
+    properties:
+      error:
+        example: account already exists
+        type: string
+    type: object
+  rest.Error:
+    properties:
+      details:
+        items:
+          $ref: '#/definitions/rest.ErrorDetail'
+        type: array
+      error:
+        example: invalid request body
+        type: string
+    type: object
+  rest.ErrorDetail:
+    properties:
+      location:
+        example: body.name
+        type: string
+      message:
+        example: missing parameter
+        type: string
+    type: object
+  rest.InternalServerError:
+    properties:
+      error:
+        example: internal server error
+        type: string
+    type: object
+  rest.InvalidCredentialsError:
+    properties:
+      error:
+        example: invalid credentials
+        type: string
+    type: object
+  rest.NotFoundError:
+    properties:
+      error:
+        example: account not found
+        type: string
+    type: object
+  rest.UnauthorizedError:
+    properties:
+      error:
+        example: unauthorized
+        type: string
+    type: object
+  schema.Account:
     properties:
       balance:
         type: integer
@@ -13,21 +62,12 @@ definitions:
       name:
         type: string
     type: object
-  account.balanceResponse:
+  schema.BalanceResponse:
     properties:
       balance:
         type: integer
     type: object
-  account.createdAccountResponse:
-    properties:
-      balance:
-        type: integer
-      cpf:
-        type: string
-      name:
-        type: string
-    type: object
-  account.requestBody:
+  schema.CreateAccountInput:
     properties:
       cpf:
         type: string
@@ -36,24 +76,51 @@ definitions:
       secret:
         type: string
     type: object
-  auth.requestBody:
+  schema.CreateAccountResponse:
+    properties:
+      balance:
+        type: integer
+      cpf:
+        type: string
+      created_at:
+        type: string
+      name:
+        type: string
+    type: object
+  schema.ListAccountsResponse:
+    properties:
+      accounts:
+        items:
+          $ref: '#/definitions/schema.Account'
+        type: array
+    type: object
+  schema.ListTransfersResponse:
+    properties:
+      transfers:
+        items:
+          $ref: '#/definitions/schema.Transfer'
+        type: array
+    type: object
+  schema.LoginInput:
     properties:
       cpf:
         type: string
       secret:
         type: string
     type: object
-  auth.responseBody:
+  schema.LoginResponse:
     properties:
       token:
         type: string
     type: object
-  responses.ErrorResponse:
+  schema.PerformTransferInput:
     properties:
-      message:
+      account_destination_id:
         type: string
+      amount:
+        type: integer
     type: object
-  transfer.transferCreatedResponse:
+  schema.PerformTransferResponse:
     properties:
       account_destination_id:
         type: string
@@ -62,33 +129,23 @@ definitions:
       amount:
         type: integer
     type: object
-  transfer.transferRequest:
+  schema.Transfer:
     properties:
       account_destination_id:
         type: string
-      amount:
-        type: integer
-    type: object
-  transfer.transferResponse:
-    properties:
-      account_destination_id:
+      account_origin_id:
         type: string
       amount:
         type: integer
       created_at:
         type: string
     type: object
-host: localhost:5000
 info:
-  contact:
-    email: support@swagger.io
-    name: API Support
-    url: http://www.swagger.io/support
+  contact: {}
   description: This is a simple banking api.
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
-  termsOfService: http://swagger.io/terms/
   title: Swagger Banking API
   version: "1.0"
 paths:
@@ -96,23 +153,21 @@ paths:
     get:
       consumes:
       - application/json
-      description: List all accounts.
+      description: Lists all accounts.
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            items:
-              $ref: '#/definitions/account.accountResponse'
-            type: array
+            $ref: '#/definitions/schema.ListAccountsResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/responses.ErrorResponse'
-      summary: List accounts
+            $ref: '#/definitions/rest.InternalServerError'
+      summary: Lists all accounts.
       tags:
-      - accounts
+      - Accounts
     post:
       consumes:
       - application/json
@@ -127,52 +182,58 @@ paths:
         name: Body
         required: true
         schema:
-          $ref: '#/definitions/account.requestBody'
+          $ref: '#/definitions/schema.CreateAccountInput'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/account.createdAccountResponse'
+            $ref: '#/definitions/schema.CreateAccountResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/responses.ErrorResponse'
+            $ref: '#/definitions/rest.Error'
         "409":
           description: Conflict
           schema:
-            $ref: '#/definitions/responses.ErrorResponse'
+            $ref: '#/definitions/rest.ConflictError'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/responses.ErrorResponse'
-      summary: Creates a new account
+            $ref: '#/definitions/rest.InternalServerError'
+      summary: Creates a new account.
       tags:
-      - accounts
+      - Accounts
   /accounts/{accountID}/balance:
     get:
       consumes:
       - application/json
-      description: Get account balance by accountID, if exists.
+      description: Gets account balance by account ID, if exists.
+      parameters:
+      - description: Account ID
+        in: path
+        name: accountID
+        required: true
+        type: string
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/account.balanceResponse'
+            $ref: '#/definitions/schema.BalanceResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/responses.ErrorResponse'
+            $ref: '#/definitions/rest.Error'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/responses.ErrorResponse'
-      summary: Get account balance
+            $ref: '#/definitions/rest.InternalServerError'
+      summary: Gets account balance.
       tags:
-      - accounts
+      - Accounts
   /login:
     post:
       consumes:
@@ -184,34 +245,30 @@ paths:
         name: Body
         required: true
         schema:
-          $ref: '#/definitions/auth.requestBody'
+          $ref: '#/definitions/schema.LoginInput'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/auth.responseBody'
+            $ref: '#/definitions/schema.LoginResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/responses.ErrorResponse'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/responses.ErrorResponse'
+            $ref: '#/definitions/rest.InvalidCredentialsError'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/responses.ErrorResponse'
-      summary: Log in
+            $ref: '#/definitions/rest.InternalServerError'
+      summary: Logs in the server.
       tags:
-      - login
+      - Sign In
   /transfers:
     get:
       consumes:
       - application/json
-      description: List all transfers.
+      description: Lists all transfers. User must be authenticated.
       parameters:
       - description: Bearer Authorization Token
         in: header
@@ -224,24 +281,22 @@ paths:
         "200":
           description: OK
           schema:
-            items:
-              $ref: '#/definitions/transfer.transferResponse'
-            type: array
+            $ref: '#/definitions/schema.ListTransfersResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/responses.ErrorResponse'
+            $ref: '#/definitions/rest.UnauthorizedError'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/responses.ErrorResponse'
-      summary: List transfers
+            $ref: '#/definitions/rest.InternalServerError'
+      summary: Lists all transfers.
       tags:
-      - transfers
+      - Transfers
     post:
       consumes:
       - application/json
-      description: Creates a new transfer between two accounts.
+      description: Performs a transfer between two accounts. User must be authenticated.
       parameters:
       - description: Bearer Authorization Token
         in: header
@@ -253,29 +308,31 @@ paths:
         name: Body
         required: true
         schema:
-          $ref: '#/definitions/transfer.transferRequest'
+          $ref: '#/definitions/schema.PerformTransferInput'
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
+        "201":
+          description: Created
           schema:
-            items:
-              $ref: '#/definitions/transfer.transferCreatedResponse'
-            type: array
+            $ref: '#/definitions/schema.PerformTransferResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/rest.Error'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/responses.ErrorResponse'
+            $ref: '#/definitions/rest.UnauthorizedError'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/responses.ErrorResponse'
+            $ref: '#/definitions/rest.NotFoundError'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/responses.ErrorResponse'
-      summary: Create a new transfer
+            $ref: '#/definitions/rest.InternalServerError'
+      summary: Performs a transfer between two accounts.
       tags:
-      - transfers
+      - Transfers
 swagger: "2.0"

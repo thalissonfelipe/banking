@@ -7,14 +7,14 @@ import (
 	"github.com/thalissonfelipe/banking/banking/gateway/http/rest"
 )
 
-// ListAccounts returns all accounts
-// @Tags accounts
-// @Summary List accounts
-// @Description List all accounts.
+// ListAccounts returns all accounts.
+// @Tags Accounts
+// @Summary Lists all accounts.
+// @Description Lists all accounts.
 // @Accept json
 // @Produce json
-// @Success 200 schema.ListAccountsResponse
-// @Failure 500 {object} responses.ErrorResponse
+// @Success 200 {object} schema.ListAccountsResponse
+// @Failure 500 {object} rest.InternalServerError
 // @Router /accounts [GET].
 func (h Handler) ListAccounts(r *http.Request) rest.Response {
 	accounts, err := h.usecase.ListAccounts(r.Context())
