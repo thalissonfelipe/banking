@@ -45,6 +45,7 @@ func TestAccountHandler_CreateAccount(t *testing.T) {
 			},
 			body: schema.CreateAccountInput{Name: "name", CPF: cpf.String(), Secret: secret.String()},
 			wantBody: schema.CreateAccountResponse{
+				ID:        acc.ID.String(),
 				Name:      "name",
 				CPF:       cpf.String(),
 				Balance:   100,

@@ -91,6 +91,7 @@ func (r CreateAccountInput) IsValid() error {
 }
 
 type CreateAccountResponse struct {
+	ID        string `json:"id"`
 	Name      string `json:"name"`
 	CPF       string `json:"cpf"`
 	Balance   int    `json:"balance"`
@@ -99,6 +100,7 @@ type CreateAccountResponse struct {
 
 func MapToCreateAccountResponse(acc entity.Account) CreateAccountResponse {
 	return CreateAccountResponse{
+		ID:        acc.ID.String(),
 		Name:      acc.Name,
 		CPF:       acc.CPF.String(),
 		Balance:   acc.Balance,
