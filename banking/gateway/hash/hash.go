@@ -1,15 +1,22 @@
 package hash
 
 import (
+	"errors"
 	"fmt"
 
-	"github.com/thalissonfelipe/banking/banking/domain/encrypter"
 	"golang.org/x/crypto/bcrypt"
+
+	"github.com/thalissonfelipe/banking/banking/domain/encrypter"
+	"github.com/thalissonfelipe/banking/banking/domain/usecases"
 )
 
 var _ encrypter.Encrypter = (*Hash)(nil)
 
 type Hash struct{}
+
+func New() *Hash {
+	return &Hash{}
+}
 
 func (h Hash) Hash(secret string) ([]byte, error) {
 	hashedSecret, err := bcrypt.GenerateFromPassword([]byte(secret), bcrypt.DefaultCost)
@@ -23,6 +30,10 @@ func (h Hash) Hash(secret string) ([]byte, error) {
 func (h Hash) CompareHashAndSecret(hashedSecret, secret []byte) error {
 	err := bcrypt.CompareHashAndPassword(hashedSecret, secret)
 	if err != nil {
+		if errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
+			return usecases.ErrInvalidCredentials
+		}
+
 		return fmt.Errorf("comparing hash and password: %w", err)
 	}
 

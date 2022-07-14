@@ -5,8 +5,6 @@ import (
 	"errors"
 	"fmt"
 
-	"golang.org/x/crypto/bcrypt"
-
 	"github.com/thalissonfelipe/banking/banking/domain/entity"
 	"github.com/thalissonfelipe/banking/banking/domain/usecases"
 	"github.com/thalissonfelipe/banking/banking/domain/vos"
@@ -33,10 +31,6 @@ func (a Auth) Autheticate(ctx context.Context, cpfStr, secretStr string) (string
 
 	err = a.encrypter.CompareHashAndSecret(hashedSecret, secret)
 	if err != nil {
-		if errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
-			return "", usecases.ErrInvalidCredentials
-		}
-
 		return "", fmt.Errorf("hashing secret: %w", err)
 	}
 

@@ -6,7 +6,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"golang.org/x/crypto/bcrypt"
 
 	"github.com/thalissonfelipe/banking/banking/domain/encrypter"
 	"github.com/thalissonfelipe/banking/banking/domain/entity"
@@ -76,7 +75,7 @@ func TestAuth_Authenticate(t *testing.T) {
 			},
 			enc: &EncrypterMock{
 				CompareHashAndSecretFunc: func(_, _ []byte) error {
-					return bcrypt.ErrMismatchedHashAndPassword
+					return usecases.ErrInvalidCredentials
 				},
 			},
 			cpf:     cpf.String(),

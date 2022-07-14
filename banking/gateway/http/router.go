@@ -22,7 +22,7 @@ import (
 
 func NewRouter(db *pgx.Conn) http.Handler {
 	// Set dependencies
-	hash := hash.Hash{}
+	hash := hash.New()
 	accountRepo := accountRepo.NewRepository(db)
 	accountUsecase := account.NewAccountUsecase(accountRepo, hash)
 	authService := auth.NewAuth(accountUsecase, hash)
