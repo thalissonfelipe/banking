@@ -12,13 +12,14 @@ import (
 	"github.com/thalissonfelipe/banking/banking/domain/vos"
 	"github.com/thalissonfelipe/banking/banking/gateway/hash"
 	h "github.com/thalissonfelipe/banking/banking/gateway/http"
+	"github.com/thalissonfelipe/banking/banking/instrumentation/log"
 	"github.com/thalissonfelipe/banking/banking/tests/dockertest"
 	"github.com/thalissonfelipe/banking/banking/tests/testenv"
 )
 
 func TestMain(m *testing.M) {
 	pgDocker := dockertest.SetupTest("../../gateway/db/postgres/migrations")
-	r := h.NewRouter(pgDocker.DB)
+	r := h.NewRouter(log.New(os.Stderr), pgDocker.DB)
 	server := httptest.NewServer(r)
 
 	testenv.DB = pgDocker.DB

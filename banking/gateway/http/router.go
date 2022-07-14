@@ -8,6 +8,7 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/jackc/pgx/v4"
 	httpSwagger "github.com/swaggo/http-swagger"
+	"go.uber.org/zap"
 
 	"github.com/thalissonfelipe/banking/banking/domain/usecases/account"
 	"github.com/thalissonfelipe/banking/banking/domain/usecases/auth"
@@ -23,12 +24,14 @@ import (
 	"github.com/thalissonfelipe/banking/banking/gateway/jwt"
 )
 
-func NewRouter(db *pgx.Conn) http.Handler {
+func NewRouter(logger *zap.Logger, db *pgx.Conn) http.Handler {
 	r := chi.NewRouter()
+	logger = logger.With(zap.String("module", "http-server"))
 
 	const timeout = 60 * time.Second
 
 	r.Use(
+		middlewares.Logger(logger),
 		middleware.Recoverer,
 		middleware.StripSlashes,
 		middleware.Timeout(timeout),
@@ -49,7 +52,10 @@ func NewRouter(db *pgx.Conn) http.Handler {
 func apiRouter(db *pgx.Conn) chi.Router {
 	r := chi.NewRouter()
 
-	r.Use(middlewares.RequestID)
+	r.Use(
+		middlewares.RequestID,
+		middlewares.RequestIDToLogger,
+	)
 
 	hash := hash.New()
 	jwt := jwt.New()

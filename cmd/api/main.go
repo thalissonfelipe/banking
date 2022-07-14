@@ -3,14 +3,16 @@ package main
 import (
 	"context"
 	"fmt"
-	"log"
 	"net/http"
+	"os"
 
 	"github.com/jackc/pgx/v4"
+	"go.uber.org/zap"
 
 	"github.com/thalissonfelipe/banking/banking/config"
 	"github.com/thalissonfelipe/banking/banking/gateway/db/postgres"
 	h "github.com/thalissonfelipe/banking/banking/gateway/http"
+	"github.com/thalissonfelipe/banking/banking/instrumentation/log"
 	_ "github.com/thalissonfelipe/banking/docs/swagger"
 )
 
@@ -31,23 +33,27 @@ import (
 // @query.collection.format multi
 
 func main() {
+	logger := log.New(os.Stderr)
+
+	mainLogger := logger.With(zap.String("module", "main"))
+
 	cfg, err := config.LoadConfig()
 	if err != nil {
-		log.Fatalf("unable to load config: %s", err.Error())
+		mainLogger.Panic("failed to load config", zap.Error(err))
 	}
 
 	conn, err := pgx.Connect(context.Background(), cfg.Postgres.DSN())
 	if err != nil {
-		log.Fatalf("unable to connect to database: %s", err.Error())
+		mainLogger.Panic("failed to connect to database", zap.Error(err))
 	}
 	defer conn.Close(context.Background())
 
 	err = postgres.RunMigrations(cfg.Postgres.DSN())
 	if err != nil {
-		log.Panicf("unable to run migrations: %v", err)
+		mainLogger.Panic("failed to run migrations", zap.Error(err))
 	}
 
-	router := h.NewRouter(conn)
+	router := h.NewRouter(logger, conn)
 
 	addr := fmt.Sprintf("%s:%s", cfg.API.Host, cfg.API.Port)
 	server := http.Server{
@@ -55,6 +61,7 @@ func main() {
 		Addr:    addr,
 	}
 
-	log.Printf("Server listening on %s!\n", addr)
-	log.Panic(server.ListenAndServe())
+	logger.Info("server listening", zap.String("address", addr))
+
+	server.ListenAndServe()
 }
