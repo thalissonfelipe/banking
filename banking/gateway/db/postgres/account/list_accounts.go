@@ -7,12 +7,10 @@ import (
 	"github.com/thalissonfelipe/banking/banking/domain/entity"
 )
 
-const listAccountsQuery = `
-select id, name, cpf, balance, created_at from accounts
-`
+const _listAccountsQuery = `select id, name, cpf, balance, created_at from accounts;`
 
 func (r Repository) ListAccounts(ctx context.Context) ([]entity.Account, error) {
-	rows, err := r.db.Query(ctx, listAccountsQuery)
+	rows, err := r.db.Query(ctx, _listAccountsQuery)
 	if err != nil {
 		return nil, fmt.Errorf("db.Query: %w", err)
 	}
@@ -23,14 +21,13 @@ func (r Repository) ListAccounts(ctx context.Context) ([]entity.Account, error) 
 	for rows.Next() {
 		var account entity.Account
 
-		err = rows.Scan(
+		if err = rows.Scan(
 			&account.ID,
 			&account.Name,
 			&account.CPF,
 			&account.Balance,
 			&account.CreatedAt,
-		)
-		if err != nil {
+		); err != nil {
 			return nil, fmt.Errorf("rows.Scan: %w", err)
 		}
 

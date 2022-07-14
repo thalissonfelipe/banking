@@ -8,14 +8,18 @@ import (
 	"github.com/thalissonfelipe/banking/banking/domain/vos"
 )
 
-const listTransfersQuery = `
-select id, account_origin_id, account_destination_id, amount, created_at
+const _listTransfersQuery = `
+select
+	id,
+	account_origin_id,
+	account_destination_id,
+	amount,
+	created_at
 from transfers
-where account_origin_id=$1
-`
+where account_origin_id=$1;`
 
 func (r Repository) ListTransfers(ctx context.Context, id vos.AccountID) ([]entity.Transfer, error) {
-	rows, err := r.db.Query(ctx, listTransfersQuery, id)
+	rows, err := r.db.Query(ctx, _listTransfersQuery, id)
 	if err != nil {
 		return nil, fmt.Errorf("db.Query: %w", err)
 	}
@@ -26,14 +30,13 @@ func (r Repository) ListTransfers(ctx context.Context, id vos.AccountID) ([]enti
 	for rows.Next() {
 		var account entity.Transfer
 
-		err = rows.Scan(
+		if err = rows.Scan(
 			&account.ID,
 			&account.AccountOriginID,
 			&account.AccountDestinationID,
 			&account.Amount,
 			&account.CreatedAt,
-		)
-		if err != nil {
+		); err != nil {
 			return nil, fmt.Errorf("rows.Scan: %w", err)
 		}
 
