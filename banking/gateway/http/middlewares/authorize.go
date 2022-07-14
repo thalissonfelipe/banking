@@ -8,7 +8,7 @@ import (
 	"github.com/thalissonfelipe/banking/banking/gateway/jwt"
 )
 
-func AuthorizeMiddleware(next http.Handler) http.Handler {
+func Authorize(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		const partsSize = 2
 		authHeader := r.Header.Get("Authorization")

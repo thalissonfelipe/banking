@@ -84,8 +84,7 @@ func TestAccountHandler_GetAccountBalance(t *testing.T) {
 
 	for _, tt := range testCases {
 		t.Run(tt.name, func(t *testing.T) {
-			r := chi.NewRouter()
-			handler := NewHandler(r, tt.usecase)
+			handler := NewHandler(tt.usecase)
 
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("accountID", tt.accountID)

@@ -7,7 +7,6 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/go-chi/chi/v5"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -90,8 +89,7 @@ func TestAuthHandler_Login(t *testing.T) {
 
 	for _, tt := range testCases {
 		t.Run(tt.name, func(t *testing.T) {
-			r := chi.NewRouter()
-			handler := NewHandler(r, tt.auth)
+			handler := NewHandler(tt.auth)
 
 			request := fakes.FakeRequest(http.MethodPost, "/login", tt.body)
 			response := httptest.NewRecorder()

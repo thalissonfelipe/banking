@@ -8,7 +8,6 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/go-chi/chi/v5"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -57,8 +56,7 @@ func TestTransferHandler_ListTransfers(t *testing.T) {
 
 	for _, tt := range testCases {
 		t.Run(tt.name, func(t *testing.T) {
-			r := chi.NewRouter()
-			handler := NewHandler(r, tt.usecase)
+			handler := NewHandler(tt.usecase)
 
 			token, err := jwt.NewToken(transfers[0].AccountOriginID.String())
 			require.NoError(t, err)

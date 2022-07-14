@@ -8,7 +8,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/go-chi/chi/v5"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -116,8 +115,7 @@ func TestAccountHandler_CreateAccount(t *testing.T) {
 
 	for _, tt := range testCases {
 		t.Run(tt.name, func(t *testing.T) {
-			r := chi.NewRouter()
-			handler := NewHandler(r, tt.usecase)
+			handler := NewHandler(tt.usecase)
 
 			request := fakes.FakeRequest(http.MethodPost, "/accounts", tt.body)
 			response := httptest.NewRecorder()

@@ -15,49 +15,67 @@ import (
 	accountRepo "github.com/thalissonfelipe/banking/banking/gateway/db/postgres/account"
 	transferRepo "github.com/thalissonfelipe/banking/banking/gateway/db/postgres/transfer"
 	"github.com/thalissonfelipe/banking/banking/gateway/hash"
-	accHandler "github.com/thalissonfelipe/banking/banking/gateway/http/account"
+	accountHandler "github.com/thalissonfelipe/banking/banking/gateway/http/account"
 	authHandler "github.com/thalissonfelipe/banking/banking/gateway/http/auth"
-	trHandler "github.com/thalissonfelipe/banking/banking/gateway/http/transfer"
+	"github.com/thalissonfelipe/banking/banking/gateway/http/middlewares"
+	"github.com/thalissonfelipe/banking/banking/gateway/http/rest"
+	transferHandler "github.com/thalissonfelipe/banking/banking/gateway/http/transfer"
 	"github.com/thalissonfelipe/banking/banking/gateway/jwt"
 )
 
 func NewRouter(db *pgx.Conn) http.Handler {
-	// Set dependencies
+	r := chi.NewRouter()
+
+	const timeout = 60 * time.Second
+
+	r.Use(
+		middleware.Recoverer,
+		middleware.StripSlashes,
+		middleware.Timeout(timeout),
+	)
+
+	r.Route("/docs/", func(r chi.Router) {
+		r.Get("/swagger", func(w http.ResponseWriter, r *http.Request) {
+			http.Redirect(w, r, "swagger/index.html", http.StatusMovedPermanently)
+		})
+		r.Get("/swagger/*", httpSwagger.Handler())
+	})
+
+	r.Mount("/api/v1", apiRouter(db))
+
+	return r
+}
+
+func apiRouter(db *pgx.Conn) chi.Router {
+	r := chi.NewRouter()
+
+	r.Use(middlewares.RequestID)
+
 	hash := hash.New()
 	jwt := jwt.New()
 
-	accountRepo := accountRepo.NewRepository(db)
-	accountUsecase := account.NewAccountUsecase(accountRepo, hash)
-	authService := auth.NewAuth(accountUsecase, hash, jwt)
-	transferRepo := transferRepo.NewRepository(db)
-	transferUsecase := transfer.NewTransferUsecase(transferRepo, accountUsecase)
+	accRepository := accountRepo.NewRepository(db)
+	accountUsecase := account.NewAccountUsecase(accRepository, hash)
+	trRepository := transferRepo.NewRepository(db)
+	transferUsecase := transfer.NewTransferUsecase(trRepository, accountUsecase)
+	authUsecase := auth.NewAuth(accountUsecase, hash, jwt)
+	accHandler := accountHandler.NewHandler(accountUsecase)
+	trHandler := transferHandler.NewHandler(transferUsecase)
+	authHandler := authHandler.NewHandler(authUsecase)
 
-	router := chi.NewRouter()
-
-	// middlewares
-	router.Use(
-		middleware.RequestID,
-		middleware.RealIP,
-		middleware.Logger,
-		middleware.Recoverer,
-	)
-
-	// Set a timeout value on the request context (ctx), that will signal
-	// through ctx.Done() that the request has timed out and further
-	// processing should be stopped.
-	const timeout = 60
-
-	router.Use(middleware.Timeout(timeout * time.Second))
-
-	router.Route("/api/v1", func(r chi.Router) {
-		accHandler.NewHandler(r, accountUsecase)
-		authHandler.NewHandler(r, authService)
-		trHandler.NewHandler(r, transferUsecase)
+	r.Route("/accounts", func(r chi.Router) {
+		r.Get("/", rest.Wrap(accHandler.ListAccounts))
+		r.Post("/", rest.Wrap(accHandler.CreateAccount))
+		r.Get("/{accountID}/balance", rest.Wrap(accHandler.GetAccountBalance))
 	})
 
-	router.Get("/swagger/*", httpSwagger.Handler(
-		httpSwagger.URL("http://localhost:5000/swagger/doc.json"),
-	))
+	r.Route("/transfers", func(r chi.Router) {
+		r.Use(middlewares.Authorize)
+		r.Get("/", rest.Wrap(trHandler.ListTransfers))
+		r.Post("/", rest.Wrap(trHandler.PerformTransfer))
+	})
 
-	return router
+	r.Post("/login", rest.Wrap(authHandler.Login))
+
+	return r
 }

@@ -8,7 +8,6 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/go-chi/chi/v5"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -179,8 +178,7 @@ func TestTransferHandler_PerformTransfer(t *testing.T) {
 
 	for _, tt := range testCases {
 		t.Run(tt.name, func(t *testing.T) {
-			r := chi.NewRouter()
-			handler := NewHandler(r, tt.usecase)
+			handler := NewHandler(tt.usecase)
 
 			request := fakes.FakeRequest(http.MethodPost, "/transfers", tt.body)
 			token, _ := jwt.NewToken(tt.accOriginID.String())
