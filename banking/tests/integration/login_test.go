@@ -26,8 +26,8 @@ func TestIntegration_Login(t *testing.T) {
 		{
 			name: "should log in successfully",
 			requestSetup: func() *http.Request {
-				secret := testdata.GetValidSecret()
-				acc := createAccount(t, testdata.GetValidCPF(), secret, 0)
+				secret := testdata.Secret()
+				acc := createAccount(t, testdata.CPF(), secret, 0)
 
 				reqBody := schema.LoginInput{CPF: acc.CPF.String(), Secret: secret.String()}
 				request := fakes.FakeRequest(http.MethodPost, testenv.ServerURL+"/api/v1/login", reqBody)
@@ -40,8 +40,8 @@ func TestIntegration_Login(t *testing.T) {
 			name: "should return status code 400 if account does not exist",
 			requestSetup: func() *http.Request {
 				reqBody := schema.LoginInput{
-					CPF:    testdata.GetValidCPF().String(),
-					Secret: testdata.GetValidSecret().String(),
+					CPF:    testdata.CPF().String(),
+					Secret: testdata.Secret().String(),
 				}
 				request := fakes.FakeRequest(http.MethodPost, testenv.ServerURL+"/api/v1/login", reqBody)
 
@@ -52,7 +52,7 @@ func TestIntegration_Login(t *testing.T) {
 		{
 			name: "should return status code 400 if secret is not valid",
 			requestSetup: func() *http.Request {
-				acc := createAccount(t, testdata.GetValidCPF(), testdata.GetValidSecret(), 0)
+				acc := createAccount(t, testdata.CPF(), testdata.Secret(), 0)
 
 				reqBody := schema.LoginInput{CPF: acc.CPF.String(), Secret: "12345678"}
 				request := fakes.FakeRequest(http.MethodPost, testenv.ServerURL+"/api/v1/login", reqBody)

@@ -23,7 +23,7 @@ func TestAccountRepository_ListAccounts(t *testing.T) {
 	require.NoError(t, err)
 	assert.Len(t, accounts, 0)
 
-	want, err := entity.NewAccount("name", testdata.GetValidCPF().String(), testdata.GetValidSecret().String())
+	want, err := entity.NewAccount("name", testdata.CPF().String(), testdata.Secret().String())
 	require.NoError(t, err)
 
 	err = r.CreateAccount(ctx, &want)

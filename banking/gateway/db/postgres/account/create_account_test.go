@@ -21,7 +21,7 @@ func TestAccountRepository_CreateAccount(t *testing.T) {
 
 		defer dockertest.TruncateTables(ctx, db)
 
-		want, err := entity.NewAccount("name", testdata.GetValidCPF().String(), testdata.GetValidSecret().String())
+		want, err := entity.NewAccount("name", testdata.CPF().String(), testdata.Secret().String())
 		require.NoError(t, err)
 
 		err = r.CreateAccount(ctx, &want)
@@ -43,7 +43,7 @@ func TestAccountRepository_CreateAccount(t *testing.T) {
 		r := NewRepository(db)
 		ctx := context.Background()
 
-		acc, err := entity.NewAccount("name", testdata.GetValidCPF().String(), testdata.GetValidSecret().String())
+		acc, err := entity.NewAccount("name", testdata.CPF().String(), testdata.Secret().String())
 		require.NoError(t, err)
 
 		err = r.CreateAccount(ctx, &acc)

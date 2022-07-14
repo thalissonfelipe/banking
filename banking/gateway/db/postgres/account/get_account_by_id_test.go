@@ -21,7 +21,7 @@ func TestAccountRepository_GetAccountByID(t *testing.T) {
 
 		defer dockertest.TruncateTables(ctx, db)
 
-		want, err := entity.NewAccount("name", testdata.GetValidCPF().String(), testdata.GetValidSecret().String())
+		want, err := entity.NewAccount("name", testdata.CPF().String(), testdata.Secret().String())
 		require.NoError(t, err)
 
 		err = r.CreateAccount(ctx, &want)

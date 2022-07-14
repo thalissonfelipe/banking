@@ -7,13 +7,13 @@ import (
 	"github.com/thalissonfelipe/banking/banking/domain/vos"
 )
 
-func GetValidCPF() vos.CPF {
-	cpf, _ := vos.NewCPF(generateValidCPF())
+func CPF() vos.CPF {
+	cpf, _ := vos.NewCPF(generateCPF())
 	return cpf
 }
 
 // https://github.com/fnando/cpf/blob/master/src/index.ts
-func generateValidCPF() string {
+func generateCPF() string {
 	numbers := rand.Perm(9)
 	numbers = append(numbers, verifierDigit(numbers))
 	numbers = append(numbers, verifierDigit(numbers))

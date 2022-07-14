@@ -13,7 +13,7 @@ import (
 )
 
 func TestAccountUsecase_GetAccountByCPF(t *testing.T) {
-	acc, err := entity.NewAccount("name", testdata.GetValidCPF().String(), testdata.GetValidSecret().String())
+	acc, err := entity.NewAccount("name", testdata.CPF().String(), testdata.Secret().String())
 	require.NoError(t, err)
 
 	testCases := []struct {
@@ -48,7 +48,7 @@ func TestAccountUsecase_GetAccountByCPF(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			usecase := NewAccountUsecase(tt.repo, nil)
 
-			account, err := usecase.GetAccountByCPF(context.Background(), testdata.GetValidCPF())
+			account, err := usecase.GetAccountByCPF(context.Background(), testdata.CPF())
 			assert.ErrorIs(t, err, tt.wantErr)
 			assert.Equal(t, tt.want, account)
 		})

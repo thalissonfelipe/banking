@@ -63,7 +63,7 @@ func TestAccountUsecase_CreateAccount(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			usecase := NewAccountUsecase(tt.repo, tt.enc)
 
-			acc, err := entity.NewAccount("name", testdata.GetValidCPF().String(), testdata.GetValidSecret().String())
+			acc, err := entity.NewAccount("name", testdata.CPF().String(), testdata.Secret().String())
 			require.NoError(t, err)
 
 			err = usecase.CreateAccount(context.Background(), &acc)

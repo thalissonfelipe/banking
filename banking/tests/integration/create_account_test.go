@@ -28,8 +28,8 @@ func TestIntegration_CreateAccount(t *testing.T) {
 			bodySetup: func() schema.CreateAccountInput {
 				body := schema.CreateAccountInput{
 					Name:   "Felipe",
-					CPF:    testdata.GetValidCPF().String(),
-					Secret: testdata.GetValidSecret().String(),
+					CPF:    testdata.CPF().String(),
+					Secret: testdata.Secret().String(),
 				}
 
 				return body
@@ -41,8 +41,8 @@ func TestIntegration_CreateAccount(t *testing.T) {
 			bodySetup: func() schema.CreateAccountInput {
 				body := schema.CreateAccountInput{
 					Name:   "",
-					CPF:    testdata.GetValidCPF().String(),
-					Secret: testdata.GetValidSecret().String(),
+					CPF:    testdata.CPF().String(),
+					Secret: testdata.Secret().String(),
 				}
 
 				return body
@@ -54,7 +54,7 @@ func TestIntegration_CreateAccount(t *testing.T) {
 				body := schema.CreateAccountInput{
 					Name:   "Felipe",
 					CPF:    "",
-					Secret: testdata.GetValidSecret().String(),
+					Secret: testdata.Secret().String(),
 				}
 
 				return body
@@ -66,7 +66,7 @@ func TestIntegration_CreateAccount(t *testing.T) {
 			bodySetup: func() schema.CreateAccountInput {
 				body := schema.CreateAccountInput{
 					Name:   "Felipe",
-					CPF:    testdata.GetValidCPF().String(),
+					CPF:    testdata.CPF().String(),
 					Secret: "",
 				}
 
@@ -80,7 +80,7 @@ func TestIntegration_CreateAccount(t *testing.T) {
 				body := schema.CreateAccountInput{
 					Name:   "Felipe",
 					CPF:    "123.456.789-00",
-					Secret: testdata.GetValidSecret().String(),
+					Secret: testdata.Secret().String(),
 				}
 
 				return body
@@ -92,7 +92,7 @@ func TestIntegration_CreateAccount(t *testing.T) {
 			bodySetup: func() schema.CreateAccountInput {
 				body := schema.CreateAccountInput{
 					Name:   "Felipe",
-					CPF:    testdata.GetValidCPF().String(),
+					CPF:    testdata.CPF().String(),
 					Secret: "12345678",
 				}
 
@@ -103,12 +103,12 @@ func TestIntegration_CreateAccount(t *testing.T) {
 		{
 			name: "should return status code 409 if account already exists",
 			bodySetup: func() schema.CreateAccountInput {
-				acc := createAccount(t, testdata.GetValidCPF(), testdata.GetValidSecret(), 0)
+				acc := createAccount(t, testdata.CPF(), testdata.Secret(), 0)
 
 				body := schema.CreateAccountInput{
 					Name:   "Felipe",
 					CPF:    acc.CPF.String(),
-					Secret: testdata.GetValidSecret().String(),
+					Secret: testdata.Secret().String(),
 				}
 
 				return body

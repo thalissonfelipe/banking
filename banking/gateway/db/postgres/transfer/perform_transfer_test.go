@@ -22,10 +22,10 @@ func TestTransferRepository_PerformTransfer(t *testing.T) {
 
 	defer dockertest.TruncateTables(ctx, db)
 
-	accOrigin, err := entity.NewAccount("origin", testdata.GetValidCPF().String(), testdata.GetValidSecret().String())
+	accOrigin, err := entity.NewAccount("origin", testdata.CPF().String(), testdata.Secret().String())
 	require.NoError(t, err)
 
-	accDest, err := entity.NewAccount("dest", testdata.GetValidCPF().String(), testdata.GetValidSecret().String())
+	accDest, err := entity.NewAccount("dest", testdata.CPF().String(), testdata.Secret().String())
 	require.NoError(t, err)
 
 	err = accRepository.CreateAccount(ctx, &accOrigin)

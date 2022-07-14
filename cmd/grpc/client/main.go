@@ -48,8 +48,8 @@ func main() {
 
 	id, err := client.CreateAccount(context.Background(), &proto.CreateAccountRequest{
 		Name:   "Sousa",
-		Cpf:    testdata.GetValidCPF().String(),
-		Secret: testdata.GetValidSecret().String(),
+		Cpf:    testdata.CPF().String(),
+		Secret: testdata.Secret().String(),
 	})
 	if err != nil {
 		log.Panicf("Error when calling CreateAccount: %v", err)
@@ -66,7 +66,7 @@ func main() {
 
 	token, err := client.Login(context.Background(), &proto.LoginRequest{
 		Cpf:    accounts.Accounts[0].Cpf,
-		Secret: testdata.GetValidCPF().String(),
+		Secret: testdata.CPF().String(),
 	})
 	if err != nil {
 		log.Panicf("Error when calling Login: %v", err)

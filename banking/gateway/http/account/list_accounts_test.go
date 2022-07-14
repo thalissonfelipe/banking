@@ -19,7 +19,7 @@ import (
 )
 
 func TestAccountHandler_ListAccounts(t *testing.T) {
-	acc, err := entity.NewAccount("name", testdata.GetValidCPF().String(), testdata.GetValidSecret().String())
+	acc, err := entity.NewAccount("name", testdata.CPF().String(), testdata.Secret().String())
 	require.NoError(t, err)
 
 	accounts := []entity.Account{acc}

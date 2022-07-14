@@ -109,7 +109,7 @@ func main() {
 		log.Fatalf("failed to listen: %v", err)
 	}
 
-	acc, err := entity.NewAccount("name", testdata.GetValidCPF().String(), testdata.GetValidSecret().String())
+	acc, err := entity.NewAccount("name", testdata.CPF().String(), testdata.Secret().String())
 	if err != nil {
 		log.Fatalf("failed to create account: %v", err)
 	}

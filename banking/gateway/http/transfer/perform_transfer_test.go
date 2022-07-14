@@ -22,8 +22,8 @@ import (
 )
 
 func TestTransferHandler_PerformTransfer(t *testing.T) {
-	cpf := testdata.GetValidCPF()
-	secret := testdata.GetValidSecret()
+	cpf := testdata.CPF()
+	secret := testdata.Secret()
 
 	accOrigin, err := entity.NewAccount("origin", cpf.String(), secret.String())
 	require.NoError(t, err)

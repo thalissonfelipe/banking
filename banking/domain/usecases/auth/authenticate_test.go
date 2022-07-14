@@ -16,8 +16,8 @@ import (
 )
 
 func TestAuth_Authenticate(t *testing.T) {
-	cpf := testdata.GetValidCPF()
-	secret := testdata.GetValidSecret()
+	cpf := testdata.CPF()
+	secret := testdata.Secret()
 
 	acc, err := entity.NewAccount("name", cpf.String(), secret.String())
 	require.NoError(t, err)

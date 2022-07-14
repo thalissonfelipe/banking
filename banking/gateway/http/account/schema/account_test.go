@@ -14,7 +14,7 @@ import (
 )
 
 func TestSchema_MapToListAccountsResponse(t *testing.T) {
-	acc, err := entity.NewAccount("name", testdata.GetValidCPF().String(), testdata.GetValidSecret().String())
+	acc, err := entity.NewAccount("name", testdata.CPF().String(), testdata.Secret().String())
 	require.NoError(t, err)
 
 	acc.CreatedAt = time.Now()

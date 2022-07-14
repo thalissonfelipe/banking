@@ -18,8 +18,8 @@ import (
 )
 
 func TestAuthHandler_Login(t *testing.T) {
-	cpf := testdata.GetValidCPF()
-	secret := testdata.GetValidSecret()
+	cpf := testdata.CPF()
+	secret := testdata.Secret()
 
 	testCases := []struct {
 		name     string

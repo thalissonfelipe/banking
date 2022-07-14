@@ -20,7 +20,7 @@ func TestAccountRepository_GetAccountByCPF(t *testing.T) {
 
 		defer dockertest.TruncateTables(ctx, db)
 
-		want, err := entity.NewAccount("name", testdata.GetValidCPF().String(), testdata.GetValidSecret().String())
+		want, err := entity.NewAccount("name", testdata.CPF().String(), testdata.Secret().String())
 		require.NoError(t, err)
 
 		err = r.CreateAccount(ctx, &want)
@@ -41,7 +41,7 @@ func TestAccountRepository_GetAccountByCPF(t *testing.T) {
 		r := NewRepository(db)
 		ctx := context.Background()
 
-		account, err := r.GetAccountByCPF(ctx, testdata.GetValidCPF())
+		account, err := r.GetAccountByCPF(ctx, testdata.CPF())
 		assert.ErrorIs(t, err, entity.ErrAccountNotFound)
 		assert.Zero(t, account)
 	})

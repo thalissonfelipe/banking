@@ -27,8 +27,8 @@ func TestIntegration_ListTransfers(t *testing.T) {
 		{
 			name: "should return list of transfers successfully",
 			requestSetup: func() *http.Request {
-				secret := testdata.GetValidSecret()
-				acc := createAccount(t, testdata.GetValidCPF(), secret, 0)
+				secret := testdata.Secret()
+				acc := createAccount(t, testdata.CPF(), secret, 0)
 
 				request := fakes.FakeAuthorizedRequest(t, http.MethodGet, uri, acc.CPF.String(), secret.String(), nil)
 

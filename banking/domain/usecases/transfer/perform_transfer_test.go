@@ -14,10 +14,10 @@ import (
 )
 
 func TestTransferUsecase_PerformTransfer(t *testing.T) {
-	accOrigin, err := entity.NewAccount("origin", testdata.GetValidCPF().String(), testdata.GetValidSecret().String())
+	accOrigin, err := entity.NewAccount("origin", testdata.CPF().String(), testdata.Secret().String())
 	require.NoError(t, err)
 
-	accDest, err := entity.NewAccount("dest", testdata.GetValidCPF().String(), testdata.GetValidSecret().String())
+	accDest, err := entity.NewAccount("dest", testdata.CPF().String(), testdata.Secret().String())
 	require.NoError(t, err)
 
 	testCases := []struct {

@@ -29,9 +29,9 @@ func TestIntegration_PerformTransfer(t *testing.T) {
 		{
 			name: "should transfer successfully",
 			requestSetup: func(t *testing.T) *http.Request {
-				secret := testdata.GetValidSecret()
-				acc1 := createAccount(t, testdata.GetValidCPF(), secret, 100)
-				acc2 := createAccount(t, testdata.GetValidCPF(), testdata.GetValidSecret(), 0)
+				secret := testdata.Secret()
+				acc1 := createAccount(t, testdata.CPF(), secret, 100)
+				acc2 := createAccount(t, testdata.CPF(), testdata.Secret(), 0)
 
 				reqBody := schema.PerformTransferInput{AccountDestinationID: acc2.ID.String(), Amount: 100}
 				request := fakes.FakeAuthorizedRequest(
@@ -44,9 +44,9 @@ func TestIntegration_PerformTransfer(t *testing.T) {
 		{
 			name: "should return 400 if account does not has sufficient funds",
 			requestSetup: func(t *testing.T) *http.Request {
-				secret := testdata.GetValidSecret()
-				acc1 := createAccount(t, testdata.GetValidCPF(), secret, 100)
-				acc2 := createAccount(t, testdata.GetValidCPF(), testdata.GetValidSecret(), 0)
+				secret := testdata.Secret()
+				acc1 := createAccount(t, testdata.CPF(), secret, 100)
+				acc2 := createAccount(t, testdata.CPF(), testdata.Secret(), 0)
 
 				reqBody := schema.PerformTransferInput{AccountDestinationID: acc2.ID.String(), Amount: 200}
 				request := fakes.FakeAuthorizedRequest(
@@ -59,8 +59,8 @@ func TestIntegration_PerformTransfer(t *testing.T) {
 		{
 			name: "should return 400 if the account_destination_id is the same as the account origin",
 			requestSetup: func(t *testing.T) *http.Request {
-				secret := testdata.GetValidSecret()
-				accOrigin := createAccount(t, testdata.GetValidCPF(), secret, 100)
+				secret := testdata.Secret()
+				accOrigin := createAccount(t, testdata.CPF(), secret, 100)
 
 				reqBody := schema.PerformTransferInput{AccountDestinationID: accOrigin.ID.String(), Amount: 200}
 				request := fakes.FakeAuthorizedRequest(
@@ -73,8 +73,8 @@ func TestIntegration_PerformTransfer(t *testing.T) {
 		{
 			name: "should return 404 if account origin does not exist anymore",
 			requestSetup: func(t *testing.T) *http.Request {
-				secret := testdata.GetValidSecret()
-				accOrigin := createAccount(t, testdata.GetValidCPF(), secret, 100)
+				secret := testdata.Secret()
+				accOrigin := createAccount(t, testdata.CPF(), secret, 100)
 
 				reqBody := schema.PerformTransferInput{AccountDestinationID: vos.NewAccountID().String(), Amount: 200}
 				request := fakes.FakeAuthorizedRequest(
@@ -89,8 +89,8 @@ func TestIntegration_PerformTransfer(t *testing.T) {
 		{
 			name: "should return 404 if account destination does not exist",
 			requestSetup: func(t *testing.T) *http.Request {
-				secret := testdata.GetValidSecret()
-				accOrigin := createAccount(t, testdata.GetValidCPF(), secret, 100)
+				secret := testdata.Secret()
+				accOrigin := createAccount(t, testdata.CPF(), secret, 100)
 
 				reqBody := schema.PerformTransferInput{AccountDestinationID: vos.NewAccountID().String(), Amount: 200}
 				request := fakes.FakeAuthorizedRequest(
@@ -103,7 +103,7 @@ func TestIntegration_PerformTransfer(t *testing.T) {
 		{
 			name: "should return 401 if user is not authorized",
 			requestSetup: func(t *testing.T) *http.Request {
-				accDestination := createAccount(t, testdata.GetValidCPF(), testdata.GetValidSecret(), 0)
+				accDestination := createAccount(t, testdata.CPF(), testdata.Secret(), 0)
 
 				reqBody := schema.PerformTransferInput{AccountDestinationID: accDestination.ID.String(), Amount: 100}
 				request := fakes.FakeRequest(http.MethodPost, uri, reqBody)

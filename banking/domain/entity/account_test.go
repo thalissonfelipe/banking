@@ -10,8 +10,8 @@ import (
 )
 
 func TestNewAccount(t *testing.T) {
-	cpf := testdata.GetValidCPF()
-	secret := testdata.GetValidSecret()
+	cpf := testdata.CPF()
+	secret := testdata.Secret()
 
 	tests := []struct {
 		name     string
