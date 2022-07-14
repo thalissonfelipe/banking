@@ -4,25 +4,24 @@ import (
 	"embed"
 	"errors"
 	"fmt"
-	"net/http"
 
 	"github.com/golang-migrate/migrate/v4"
-	_ "github.com/golang-migrate/migrate/v4/database/postgres" // driver
-	"github.com/golang-migrate/migrate/v4/source/httpfs"
+	_ "github.com/golang-migrate/migrate/v4/database/postgres"
+	"github.com/golang-migrate/migrate/v4/source/iofs"
 )
 
-//go:embed migrations
+//go:embed migrations/*.sql
 var migrations embed.FS
 
 func GetMigrationHandler(dbURL string) (*migrate.Migrate, error) {
-	// use httpFS until go-migrate implements ioFS
-	// (see https://github.com/golang-migrate/migrate/issues/480#issuecomment-731518493)
-	source, err := httpfs.New(http.FS(migrations), "migrations")
+	const path = "migrations"
+
+	driver, err := iofs.New(migrations, path)
 	if err != nil {
-		return nil, fmt.Errorf("creating migrate source driver from httpfs: %w", err)
+		return nil, fmt.Errorf("creating driver from io/fs: %w", err)
 	}
 
-	m, err := migrate.NewWithSourceInstance("httpfs", source, dbURL)
+	m, err := migrate.NewWithSourceInstance("iofs", driver, dbURL)
 	if err != nil {
 		return nil, fmt.Errorf("creating migrate instance: %w", err)
 	}
