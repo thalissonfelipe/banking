@@ -2,22 +2,19 @@ package main
 
 import (
 	"context"
-	"errors"
 	"fmt"
-	"net/http"
+	"net"
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
 
 	"github.com/jackc/pgx/v4"
 	"go.uber.org/zap"
 
 	"github.com/thalissonfelipe/banking/banking/config"
 	"github.com/thalissonfelipe/banking/banking/gateway/db/postgres"
-	handler "github.com/thalissonfelipe/banking/banking/gateway/http"
+	grpcServer "github.com/thalissonfelipe/banking/banking/gateway/grpc"
 	"github.com/thalissonfelipe/banking/banking/instrumentation/log"
-	_ "github.com/thalissonfelipe/banking/docs/swagger"
 )
 
 func main() {
@@ -25,7 +22,7 @@ func main() {
 
 	mainLogger := logger.With(zap.String("module", "main"))
 
-	mainLogger.Info("starting http banking application...")
+	mainLogger.Info("starting grpc banking application...")
 
 	cfg, err := config.LoadConfig()
 	if err != nil {
@@ -50,15 +47,18 @@ func startApp(cfg *config.Config, logger, mainLogger *zap.Logger) error {
 		return fmt.Errorf("running migrations: %w", err)
 	}
 
-	router := handler.NewRouter(logger, conn)
-	server := http.Server{
-		Handler: router,
-		Addr:    cfg.API.Address(),
+	lis, err := net.Listen("tcp", cfg.GRPC.Address)
+	if err != nil {
+		return fmt.Errorf("dial connection: %w", err)
 	}
 
+	defer lis.Close()
+
+	server := grpcServer.NewServer(logger, conn)
+
 	go func() {
-		if listenErr := server.ListenAndServe(); listenErr != nil && !errors.Is(listenErr, http.ErrServerClosed) {
-			mainLogger.Error("failed to listen and serve", zap.Error(listenErr))
+		if serveErr := server.Serve(lis); serveErr != nil {
+			mainLogger.Error("failed to serve", zap.Error(serveErr))
 		}
 	}()
 
@@ -66,16 +66,9 @@ func startApp(cfg *config.Config, logger, mainLogger *zap.Logger) error {
 	signal.Notify(shutdownCh, os.Interrupt, syscall.SIGTERM)
 	<-shutdownCh
 
-	mainLogger.Info("shuting down the server...")
+	mainLogger.Info("shutting down the server...")
 
-	const timeout = 5 * time.Second
-
-	ctx, cancel := context.WithTimeout(context.Background(), timeout)
-	defer cancel()
-
-	if err := server.Shutdown(ctx); err != nil {
-		return fmt.Errorf("shutting down the server: %w", err)
-	}
+	server.GracefulStop()
 
 	return nil
 }

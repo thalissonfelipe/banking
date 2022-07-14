@@ -14,8 +14,8 @@ import (
 	proto "github.com/thalissonfelipe/banking/gen/banking/v1"
 )
 
-func (s Server) ListAccounts(ctx context.Context, _ *proto.ListAccountsRequest) (*proto.ListAccountsResponse, error) {
-	accounts, err := s.accountUsecase.ListAccounts(ctx)
+func (h Handler) ListAccounts(ctx context.Context, _ *proto.ListAccountsRequest) (*proto.ListAccountsResponse, error) {
+	accounts, err := h.accountUsecase.ListAccounts(ctx)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "internal server error")
 	}
@@ -29,14 +29,14 @@ func (s Server) ListAccounts(ctx context.Context, _ *proto.ListAccountsRequest) 
 	return &proto.ListAccountsResponse{Accounts: response}, nil
 }
 
-func (s Server) GetAccountBalance(
+func (h Handler) GetAccountBalance(
 	ctx context.Context, request *proto.GetAccountBalanceRequest) (*proto.GetAccountBalanceResponse, error) {
 	accountID, err := uuid.Parse(request.AccountId)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "invalid account id")
 	}
 
-	balance, err := s.accountUsecase.GetAccountBalanceByID(ctx, vos.AccountID(accountID))
+	balance, err := h.accountUsecase.GetAccountBalanceByID(ctx, vos.AccountID(accountID))
 	if err != nil {
 		if errors.Is(err, entity.ErrAccountNotFound) {
 			return nil, status.Errorf(codes.NotFound, "account does not exist")
@@ -48,7 +48,7 @@ func (s Server) GetAccountBalance(
 	return &proto.GetAccountBalanceResponse{Balance: int64(balance)}, nil
 }
 
-func (s Server) CreateAccount(
+func (h Handler) CreateAccount(
 	ctx context.Context, request *proto.CreateAccountRequest) (*proto.CreateAccountResponse, error) {
 	// TODO: refact
 	if request.Name == "" {
@@ -68,7 +68,7 @@ func (s Server) CreateAccount(
 		return nil, status.Errorf(codes.InvalidArgument, "invalid request parameters")
 	}
 
-	err = s.accountUsecase.CreateAccount(ctx, &account)
+	err = h.accountUsecase.CreateAccount(ctx, &account)
 	if err != nil {
 		if errors.Is(err, entity.ErrAccountAlreadyExists) {
 			return nil, status.Errorf(codes.AlreadyExists, "account already exists")

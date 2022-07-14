@@ -17,7 +17,7 @@ import (
 	proto "github.com/thalissonfelipe/banking/gen/banking/v1"
 )
 
-func (s Server) ListTransfers(
+func (h Handler) ListTransfers(
 	ctx context.Context, _ *proto.ListTransfersRequest) (*proto.ListTransfersResponse, error) {
 	meta, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
@@ -31,7 +31,7 @@ func (s Server) ListTransfers(
 		return nil, status.Errorf(codes.InvalidArgument, "invalid account id")
 	}
 
-	transfers, err := s.transferUsecase.ListTransfers(ctx, vos.AccountID(accountID))
+	transfers, err := h.transferUsecase.ListTransfers(ctx, vos.AccountID(accountID))
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "internal server error")
 	}
@@ -45,7 +45,7 @@ func (s Server) ListTransfers(
 	return &proto.ListTransfersResponse{Transfers: response}, nil
 }
 
-func (s Server) PerformTransfer(
+func (h Handler) PerformTransfer(
 	ctx context.Context, request *proto.PerformTransferRequest) (*proto.PerformTransferResponse, error) {
 	if request.AccountDestinationId == "" {
 		return nil, status.Errorf(codes.InvalidArgument, "missing account destination id parameter")
@@ -88,7 +88,7 @@ func (s Server) PerformTransfer(
 		int(request.Amount),
 	)
 
-	err = s.transferUsecase.PerformTransfer(ctx, input)
+	err = h.transferUsecase.PerformTransfer(ctx, input)
 	if err != nil {
 		if errors.Is(err, entity.ErrAccountNotFound) {
 			return nil, status.Errorf(codes.NotFound, "account origin does not exist")

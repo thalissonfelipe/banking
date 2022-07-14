@@ -11,8 +11,8 @@ import (
 	proto "github.com/thalissonfelipe/banking/gen/banking/v1"
 )
 
-func (s Server) Login(ctx context.Context, request *proto.LoginRequest) (*proto.LoginResponse, error) {
-	token, err := s.authUsecase.Autheticate(ctx, request.Cpf, request.Secret)
+func (h Handler) Login(ctx context.Context, request *proto.LoginRequest) (*proto.LoginResponse, error) {
+	token, err := h.authUsecase.Autheticate(ctx, request.Cpf, request.Secret)
 	if err != nil {
 		if errors.Is(err, usecases.ErrInvalidCredentials) {
 			return nil, status.Errorf(codes.InvalidArgument, "wrong credentials")

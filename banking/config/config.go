@@ -7,20 +7,25 @@ import (
 )
 
 type Config struct {
-	API      *apiConfig
-	Postgres *postgresConfig
+	API      APIConfig
+	GRPC     GRPCConfig
+	Postgres PostgresConfig
 }
 
-type apiConfig struct {
+type APIConfig struct {
 	Host string `envconfig:"API_HOST" default:"0.0.0.0"`
 	Port string `envconfig:"API_PORT" default:"5000"`
 }
 
-func (a apiConfig) Address() string {
+func (a APIConfig) Address() string {
 	return fmt.Sprintf("%s:%s", a.Host, a.Port)
 }
 
-type postgresConfig struct {
+type GRPCConfig struct {
+	Address string `envconfig:"GRPC_ADDRESS" default:"0.0.0.0:9000"`
+}
+
+type PostgresConfig struct {
 	DatabaseName     string `envconfig:"DB_NAME" default:"postgres"`
 	DatabaseUser     string `envconfig:"DB_USER" default:"postgres"`
 	DatabasePassword string `envconfig:"DB_PASSWORD" default:"postgres"`
@@ -29,7 +34,7 @@ type postgresConfig struct {
 	SSLMode          string `envconfig:"DB_SSL_MODE" default:"disable"`
 }
 
-func (p postgresConfig) DSN() string {
+func (p PostgresConfig) DSN() string {
 	return fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=%s",
 		p.DatabaseUser,
 		p.DatabasePassword,
@@ -41,37 +46,14 @@ func (p postgresConfig) DSN() string {
 }
 
 func LoadConfig() (*Config, error) {
-	apiCfg, err := loadAPIConfig()
+	const noPrefix = ""
+
+	var config Config
+
+	err := envconfig.Process(noPrefix, &config)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("loading config: %w", err)
 	}
 
-	postgresCfg, err := loadPostgresConfig()
-	if err != nil {
-		return nil, err
-	}
-
-	return &Config{apiCfg, postgresCfg}, nil
-}
-
-func loadAPIConfig() (*apiConfig, error) {
-	var apiCfg apiConfig
-
-	err := envconfig.Process("API", &apiCfg)
-	if err != nil {
-		return nil, fmt.Errorf("loading api config: %w", err)
-	}
-
-	return &apiCfg, nil
-}
-
-func loadPostgresConfig() (*postgresConfig, error) {
-	var postgresCfg postgresConfig
-
-	err := envconfig.Process("DB", &postgresCfg)
-	if err != nil {
-		return nil, fmt.Errorf("loading postgres config: %w", err)
-	}
-
-	return &postgresCfg, nil
+	return &config, nil
 }
