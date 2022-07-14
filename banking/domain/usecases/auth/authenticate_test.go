@@ -23,12 +23,14 @@ func TestAuth_Authenticate(t *testing.T) {
 	require.NoError(t, err)
 
 	testCases := []struct {
-		name    string
-		repo    entity.AccountRepository
-		enc     encrypter.Encrypter
-		cpf     string
-		secret  string
-		wantErr error
+		name      string
+		repo      entity.AccountRepository
+		enc       encrypter.Encrypter
+		service   Service
+		cpf       string
+		secret    string
+		wantToken string
+		wantErr   error
 	}{
 		{
 			name: "should return a token if authentication succeeds",
@@ -42,9 +44,15 @@ func TestAuth_Authenticate(t *testing.T) {
 					return nil
 				},
 			},
-			cpf:     cpf.String(),
-			secret:  secret.String(),
-			wantErr: nil,
+			service: &ServiceMock{
+				NewTokenFunc: func(string) (string, error) {
+					return "token", nil
+				},
+			},
+			cpf:       cpf.String(),
+			secret:    secret.String(),
+			wantToken: "token",
+			wantErr:   nil,
 		},
 		{
 			name: "should return an error if account does not exist",
@@ -53,18 +61,22 @@ func TestAuth_Authenticate(t *testing.T) {
 					return entity.Account{}, entity.ErrAccountNotFound
 				},
 			},
-			enc:     &EncrypterMock{},
-			cpf:     cpf.String(),
-			secret:  secret.String(),
-			wantErr: usecases.ErrInvalidCredentials,
+			enc:       &EncrypterMock{},
+			service:   &ServiceMock{},
+			cpf:       cpf.String(),
+			secret:    secret.String(),
+			wantToken: "",
+			wantErr:   usecases.ErrInvalidCredentials,
 		},
 		{
-			name:    "should return an error if cpf provided is invalid",
-			repo:    &RepositoryMock{},
-			enc:     &EncrypterMock{},
-			cpf:     "123.456.789-00",
-			secret:  secret.String(),
-			wantErr: vos.ErrInvalidCPF,
+			name:      "should return an error if cpf provided is invalid",
+			repo:      &RepositoryMock{},
+			enc:       &EncrypterMock{},
+			service:   &ServiceMock{},
+			cpf:       "123.456.789-00",
+			secret:    secret.String(),
+			wantToken: "",
+			wantErr:   vos.ErrInvalidCPF,
 		},
 		{
 			name: "should return an error if secret does not match",
@@ -78,19 +90,22 @@ func TestAuth_Authenticate(t *testing.T) {
 					return usecases.ErrInvalidCredentials
 				},
 			},
-			cpf:     cpf.String(),
-			secret:  secret.String(),
-			wantErr: usecases.ErrInvalidCredentials,
+			service:   &ServiceMock{},
+			cpf:       cpf.String(),
+			secret:    secret.String(),
+			wantToken: "",
+			wantErr:   usecases.ErrInvalidCredentials,
 		},
 	}
 
 	for _, tt := range testCases {
 		t.Run(tt.name, func(t *testing.T) {
 			accUsecase := account.NewAccountUsecase(tt.repo, tt.enc)
-			service := NewAuth(accUsecase, tt.enc)
+			service := NewAuth(accUsecase, tt.enc, tt.service)
 
-			_, err := service.Autheticate(context.Background(), tt.cpf, tt.secret)
+			token, err := service.Autheticate(context.Background(), tt.cpf, tt.secret)
 			assert.ErrorIs(t, err, tt.wantErr)
+			assert.Equal(t, tt.wantToken, token)
 		})
 	}
 }

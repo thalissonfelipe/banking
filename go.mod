@@ -5,8 +5,8 @@ go 1.18
 require (
 	github.com/Nhanderu/brdoc v1.1.2
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
-	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-chi/chi/v5 v5.0.7
+	github.com/golang-jwt/jwt/v4 v4.4.2
 	github.com/golang-migrate/migrate/v4 v4.15.2
 	github.com/golang/protobuf v1.5.2
 	github.com/google/uuid v1.3.0

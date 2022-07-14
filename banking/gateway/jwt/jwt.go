@@ -2,42 +2,58 @@ package jwt
 
 import (
 	"fmt"
+	"log"
 	"time"
 
-	"github.com/dgrijalva/jwt-go"
+	"github.com/golang-jwt/jwt/v4"
+
 	"github.com/thalissonfelipe/banking/banking/domain/usecases"
 )
 
-var (
-	jwtKey         = []byte("secret-key")
-	expirationTime = 24 * time.Hour
-)
+var jwtKey = []byte("secret-key")
 
-type Claims struct {
-	AccountOriginID string `json:"account_origin_id"`
-	jwt.StandardClaims
+type JWT struct{}
+
+func New() *JWT {
+	return &JWT{}
 }
 
-func NewToken(accountOriginID string) (string, error) {
-	expirationTime := time.Now().Add(expirationTime)
+func (JWT) NewToken(accountID string) (string, error) {
+	return NewToken(accountID)
+}
+
+type Claims struct {
+	AccountID string `json:"account_id"`
+	jwt.RegisteredClaims
+}
+
+func NewToken(accountID string) (string, error) {
+	const expiresAt = 24 * time.Hour // 1 day
+
 	claims := &Claims{
-		AccountOriginID: accountOriginID,
-		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: expirationTime.Unix(),
+		AccountID: accountID,
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(expiresAt)),
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
 		},
 	}
+
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
-	tokenString, err := token.SignedString(jwtKey)
+	signedToken, err := token.SignedString(jwtKey)
 	if err != nil {
 		return "", fmt.Errorf("getting signed token: %w", err)
 	}
 
-	return tokenString, nil
+	return signedToken, nil
 }
 
-func IsValidToken(tokenString string) error {
-	token, err := jwt.Parse(tokenString, func(t *jwt.Token) (interface{}, error) {
+func IsTokenValid(tokenStr string) error {
+	token, err := jwt.Parse(tokenStr, func(t *jwt.Token) (interface{}, error) {
+		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("invalid signing method: %v: %w", t.Header["alg"], usecases.ErrUnauthorized)
+		}
+
 		return jwtKey, nil
 	})
 	if err != nil || !token.Valid {
@@ -47,15 +63,20 @@ func IsValidToken(tokenString string) error {
 	return nil
 }
 
-func GetIDFromToken(tokenString string) string {
-	claims := &Claims{}
+func GetAccountIDFromToken(tokenStr string) string {
+	claims := Claims{}
 
-	_, err := jwt.ParseWithClaims(tokenString, claims, func(t *jwt.Token) (interface{}, error) {
+	token, err := jwt.ParseWithClaims(tokenStr, &claims, func(t *jwt.Token) (interface{}, error) {
+		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("invalid signing method: %v: %w", t.Header["alg"], usecases.ErrUnauthorized)
+		}
+
 		return jwtKey, nil
 	})
-	if err != nil {
+	if err != nil || !token.Valid {
+		log.Println(err)
 		return ""
 	}
 
-	return claims.AccountOriginID
+	return claims.AccountID
 }

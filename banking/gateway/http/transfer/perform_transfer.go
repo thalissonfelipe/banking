@@ -34,7 +34,7 @@ func (h Handler) PerformTransfer(r *http.Request) rest.Response {
 
 	token := strings.Split(r.Header.Get("Authorization"), "Bearer ")[1]
 
-	accountID, err := rest.ParseUUID(jwt.GetIDFromToken(token), "token")
+	accountID, err := rest.ParseUUID(jwt.GetAccountIDFromToken(token), "token")
 	if err != nil {
 		return rest.BadRequest(err, "invalid token")
 	}

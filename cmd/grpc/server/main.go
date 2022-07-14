@@ -80,6 +80,12 @@ func (i InMemoryEncrypter) CompareHashAndSecret(hashedSecret, secret []byte) err
 	return nil
 }
 
+type InMemoryJWT struct{}
+
+func (i InMemoryJWT) NewToken(accountID string) (string, error) {
+	return "token", nil
+}
+
 type InMemoryTransferDatabase struct {
 	Transfers []entity.Transfer
 }
@@ -111,9 +117,10 @@ func main() {
 	accRepo := &InMemoryAccountDatabase{Accounts: []entity.Account{acc}}
 	trRepo := &InMemoryTransferDatabase{}
 	enc := &InMemoryEncrypter{}
+	jwt := &InMemoryJWT{}
 	accountUsecase := account.NewAccountUsecase(accRepo, enc)
 	transferUsecase := transfer.NewTransferUsecase(trRepo, accountUsecase)
-	auth := auth.NewAuth(accountUsecase, enc)
+	auth := auth.NewAuth(accountUsecase, enc, jwt)
 
 	srv := grpcServer.NewServer(accountUsecase, transferUsecase, auth)
 

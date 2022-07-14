@@ -13,20 +13,23 @@ func TestNewToken(t *testing.T) {
 	assert.NotEmpty(t, token)
 }
 
-func TestIsValidToken(t *testing.T) {
+func TestIsTokenValid(t *testing.T) {
 	token, err := NewToken("account_id")
 	require.NoError(t, err)
 
-	err = IsValidToken(token)
+	err = IsTokenValid(token)
 	assert.NoError(t, err)
+
+	err = IsTokenValid("random_token")
+	assert.Error(t, err)
 }
 
 func TestGetIDFromToken(t *testing.T) {
-	want := "account_id"
+	const want = "account_id"
 
 	token, err := NewToken(want)
 	require.NoError(t, err)
 
-	got := GetIDFromToken(token)
+	got := GetAccountIDFromToken(token)
 	assert.Equal(t, want, got)
 }

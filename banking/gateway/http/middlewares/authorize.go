@@ -16,14 +16,12 @@ func AuthorizeMiddleware(next http.Handler) http.Handler {
 		parts := strings.Split(authHeader, "Bearer ")
 		if len(parts) != partsSize {
 			rest.SendJSON(w, http.StatusUnauthorized, rest.ErrUnauthorized)
-
 			return
 		}
 
 		token := parts[1]
-		if err := jwt.IsValidToken(token); err != nil {
+		if err := jwt.IsTokenValid(token); err != nil {
 			rest.SendJSON(w, http.StatusUnauthorized, rest.ErrUnauthorized)
-
 			return
 		}
 

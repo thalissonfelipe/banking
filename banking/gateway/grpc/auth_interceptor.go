@@ -35,7 +35,7 @@ func AuthInterceptor(
 
 	token := meta["authorization"][0]
 
-	err := jwt.IsValidToken(token)
+	err := jwt.IsTokenValid(token)
 	if err != nil {
 		return nil, status.Errorf(codes.Unauthenticated, "incorrect access token")
 	}

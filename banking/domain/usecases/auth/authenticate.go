@@ -8,7 +8,6 @@ import (
 	"github.com/thalissonfelipe/banking/banking/domain/entity"
 	"github.com/thalissonfelipe/banking/banking/domain/usecases"
 	"github.com/thalissonfelipe/banking/banking/domain/vos"
-	"github.com/thalissonfelipe/banking/banking/gateway/jwt"
 )
 
 func (a Auth) Autheticate(ctx context.Context, cpfStr, secretStr string) (string, error) {
@@ -34,7 +33,7 @@ func (a Auth) Autheticate(ctx context.Context, cpfStr, secretStr string) (string
 		return "", fmt.Errorf("hashing secret: %w", err)
 	}
 
-	token, err := jwt.NewToken(acc.ID.String())
+	token, err := a.service.NewToken(acc.ID.String())
 	if err != nil {
 		return "", fmt.Errorf("creating token: %w", err)
 	}

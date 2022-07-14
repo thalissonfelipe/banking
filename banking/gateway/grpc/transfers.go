@@ -26,7 +26,7 @@ func (s Server) GetTransfers(
 
 	token := meta["authorization"][0]
 
-	accountID, err := uuid.Parse(jwt.GetIDFromToken(token))
+	accountID, err := uuid.Parse(jwt.GetAccountIDFromToken(token))
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "invalid account id")
 	}
@@ -66,7 +66,7 @@ func (s Server) CreateTransfer(
 
 	token := meta["authorization"][0]
 
-	accounOriginID, err := uuid.Parse(jwt.GetIDFromToken(token))
+	accounOriginID, err := uuid.Parse(jwt.GetAccountIDFromToken(token))
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "invalid account origin id")
 	}

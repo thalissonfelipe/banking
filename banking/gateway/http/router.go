@@ -18,14 +18,17 @@ import (
 	accHandler "github.com/thalissonfelipe/banking/banking/gateway/http/account"
 	authHandler "github.com/thalissonfelipe/banking/banking/gateway/http/auth"
 	trHandler "github.com/thalissonfelipe/banking/banking/gateway/http/transfer"
+	"github.com/thalissonfelipe/banking/banking/gateway/jwt"
 )
 
 func NewRouter(db *pgx.Conn) http.Handler {
 	// Set dependencies
 	hash := hash.New()
+	jwt := jwt.New()
+
 	accountRepo := accountRepo.NewRepository(db)
 	accountUsecase := account.NewAccountUsecase(accountRepo, hash)
-	authService := auth.NewAuth(accountUsecase, hash)
+	authService := auth.NewAuth(accountUsecase, hash, jwt)
 	transferRepo := transferRepo.NewRepository(db)
 	transferUsecase := transfer.NewTransferUsecase(transferRepo, accountUsecase)
 
