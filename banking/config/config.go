@@ -16,6 +16,10 @@ type apiConfig struct {
 	Port string `envconfig:"API_PORT" default:"5000"`
 }
 
+func (a apiConfig) Address() string {
+	return fmt.Sprintf("%s:%s", a.Host, a.Port)
+}
+
 type postgresConfig struct {
 	DatabaseName     string `envconfig:"DB_NAME" default:"postgres"`
 	DatabaseUser     string `envconfig:"DB_USER" default:"postgres"`
