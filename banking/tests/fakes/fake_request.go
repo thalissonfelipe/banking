@@ -4,16 +4,9 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"fmt"
 	"io"
 	"log"
 	"net/http"
-	"testing"
-
-	"github.com/stretchr/testify/require"
-
-	"github.com/thalissonfelipe/banking/banking/gateway/http/auth/schema"
-	"github.com/thalissonfelipe/banking/banking/tests/testenv"
 )
 
 func FakeRequest(method, path string, requestBody interface{}) *http.Request {
@@ -34,22 +27,4 @@ func FakeRequest(method, path string, requestBody interface{}) *http.Request {
 	}
 
 	return req
-}
-
-func FakeAuthorizedRequest(t *testing.T, method, path, cpf, secret string, requestBody interface{}) *http.Request {
-	loginBody := schema.LoginInput{CPF: cpf, Secret: secret}
-	request := FakeRequest(http.MethodPost, testenv.ServerURL+"/api/v1/login", loginBody)
-	resp, err := http.DefaultClient.Do(request)
-	require.NoError(t, err)
-
-	defer resp.Body.Close()
-
-	var respBody schema.LoginResponse
-	err = json.NewDecoder(resp.Body).Decode(&respBody)
-	require.NoError(t, err)
-
-	request = FakeRequest(method, path, requestBody)
-	request.Header.Add("Authorization", fmt.Sprintf("Bearer %s", respBody.Token))
-
-	return request
 }
