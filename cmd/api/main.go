@@ -17,6 +17,7 @@ import (
 	"github.com/thalissonfelipe/banking/banking/gateway/db/postgres"
 	handler "github.com/thalissonfelipe/banking/banking/gateway/http"
 	"github.com/thalissonfelipe/banking/banking/instrumentation/log"
+	"github.com/thalissonfelipe/banking/banking/instrumentation/tracer"
 	_ "github.com/thalissonfelipe/banking/docs/swagger"
 )
 
@@ -49,6 +50,17 @@ func startApp(cfg *config.Config, logger, mainLogger *zap.Logger) error {
 	if err != nil {
 		return fmt.Errorf("running migrations: %w", err)
 	}
+
+	closer, err := tracer.New()
+	if err != nil {
+		return fmt.Errorf("creating otel tracer: %w", err)
+	}
+
+	defer func() {
+		if err := closer(); err != nil {
+			mainLogger.Error("closing exporter and tracer: %w", zap.Error(err))
+		}
+	}()
 
 	router := handler.NewRouter(logger, conn)
 	server := http.Server{

@@ -22,6 +22,7 @@ import (
 	"github.com/thalissonfelipe/banking/banking/gateway/http/rest"
 	transferHandler "github.com/thalissonfelipe/banking/banking/gateway/http/transfer"
 	"github.com/thalissonfelipe/banking/banking/gateway/jwt"
+	"github.com/thalissonfelipe/banking/banking/instrumentation/tracer"
 )
 
 // @title Swagger Banking API
@@ -63,6 +64,7 @@ func apiRouter(db *pgx.Conn) chi.Router {
 	r.Use(
 		middlewares.RequestID,
 		middlewares.RequestIDToLogger,
+		tracer.OtelHTTPMiddleware,
 	)
 
 	h, j := hash.New(), jwt.New()
