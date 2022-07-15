@@ -20,6 +20,8 @@ import (
 )
 
 func TestAccountHandler_CreateAccount(t *testing.T) {
+	t.Parallel()
+
 	cpf := testdata.CPF()
 	secret := testdata.Secret()
 
@@ -40,6 +42,7 @@ func TestAccountHandler_CreateAccount(t *testing.T) {
 			usecase: &UsecaseMock{
 				CreateAccountFunc: func(_ context.Context, account *entity.Account) error {
 					*account = acc
+
 					return nil
 				},
 			},
@@ -115,7 +118,11 @@ func TestAccountHandler_CreateAccount(t *testing.T) {
 	}
 
 	for _, tt := range testCases {
+		tt := tt
+
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			handler := NewHandler(tt.usecase)
 
 			request := fakes.FakeRequest(http.MethodPost, "/accounts", tt.body)

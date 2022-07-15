@@ -14,6 +14,8 @@ import (
 )
 
 func TestSchema_MapToListTransferResponse(t *testing.T) {
+	t.Parallel()
+
 	transfer, err := entity.NewTransfer(vos.NewAccountID(), vos.NewAccountID(), 100, 100)
 	require.NoError(t, err)
 
@@ -62,7 +64,11 @@ func TestSchema_MapToListTransferResponse(t *testing.T) {
 	}
 
 	for _, tt := range tests {
+		tt := tt
+
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			got := MapToListTransfersResponse(tt.transfers)
 			assert.Equal(t, tt.want, got)
 		})
@@ -70,6 +76,8 @@ func TestSchema_MapToListTransferResponse(t *testing.T) {
 }
 
 func TestSchema_PerformTransferInput_IsValid(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		name    string
 		input   PerformTransferInput
@@ -105,7 +113,11 @@ func TestSchema_PerformTransferInput_IsValid(t *testing.T) {
 	}
 
 	for _, tt := range tests {
+		tt := tt
+
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			err := tt.input.IsValid()
 			if err != nil {
 				var errs rest.ValidationErrors
@@ -127,6 +139,8 @@ func TestSchema_PerformTransferInput_IsValid(t *testing.T) {
 }
 
 func TestSchema_MapToPerformTransferResponse(t *testing.T) {
+	t.Parallel()
+
 	originID := vos.NewAccountID().String()
 	destinationID := vos.NewAccountID().String()
 	amount := 100

@@ -37,7 +37,8 @@ func (h Handler) ListAccounts(ctx context.Context, _ *proto.ListAccountsRequest)
 }
 
 func (h Handler) GetAccountBalance(
-	ctx context.Context, req *proto.GetAccountBalanceRequest) (*proto.GetAccountBalanceResponse, error) {
+	ctx context.Context, req *proto.GetAccountBalanceRequest,
+) (*proto.GetAccountBalanceResponse, error) {
 	accountID, err := uuid.Parse(req.GetAccountId())
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid account id")

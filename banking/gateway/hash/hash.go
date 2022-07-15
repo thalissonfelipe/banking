@@ -18,7 +18,7 @@ func New() *Hash {
 	return &Hash{}
 }
 
-func (h Hash) Hash(secret string) ([]byte, error) {
+func (Hash) Hash(secret string) ([]byte, error) {
 	hashedSecret, err := bcrypt.GenerateFromPassword([]byte(secret), bcrypt.DefaultCost)
 	if err != nil {
 		return nil, fmt.Errorf("generating hash from password: %w", err)
@@ -27,7 +27,7 @@ func (h Hash) Hash(secret string) ([]byte, error) {
 	return hashedSecret, nil
 }
 
-func (h Hash) CompareHashAndSecret(hashedSecret, secret []byte) error {
+func (Hash) CompareHashAndSecret(hashedSecret, secret []byte) error {
 	err := bcrypt.CompareHashAndPassword(hashedSecret, secret)
 	if err != nil {
 		if errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {

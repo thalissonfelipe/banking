@@ -19,6 +19,8 @@ import (
 )
 
 func TestAccountHandler_ListAccounts(t *testing.T) {
+	t.Parallel()
+
 	acc, err := entity.NewAccount("name", testdata.CPF().String(), testdata.Secret().String())
 	require.NoError(t, err)
 
@@ -53,7 +55,11 @@ func TestAccountHandler_ListAccounts(t *testing.T) {
 	}
 
 	for _, tt := range testCases {
+		tt := tt
+
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			handler := NewHandler(tt.usecase)
 
 			request := fakes.FakeRequest(http.MethodGet, "/accounts", nil)

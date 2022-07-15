@@ -18,6 +18,8 @@ import (
 )
 
 func TestAuthHandler_Login(t *testing.T) {
+	t.Parallel()
+
 	cpf := testdata.CPF()
 	secret := testdata.Secret()
 
@@ -88,7 +90,11 @@ func TestAuthHandler_Login(t *testing.T) {
 	}
 
 	for _, tt := range testCases {
+		tt := tt
+
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			handler := NewHandler(tt.auth)
 
 			request := fakes.FakeRequest(http.MethodPost, "/login", tt.body)

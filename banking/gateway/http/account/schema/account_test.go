@@ -14,6 +14,8 @@ import (
 )
 
 func TestSchema_MapToListAccountsResponse(t *testing.T) {
+	t.Parallel()
+
 	acc, err := entity.NewAccount("name", testdata.CPF().String(), testdata.Secret().String())
 	require.NoError(t, err)
 
@@ -66,7 +68,11 @@ func TestSchema_MapToListAccountsResponse(t *testing.T) {
 	}
 
 	for _, tt := range tests {
+		tt := tt
+
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			got := MapToListAccountsResponse(tt.accounts)
 			assert.Equal(t, tt.want, got)
 		})
@@ -74,6 +80,8 @@ func TestSchema_MapToListAccountsResponse(t *testing.T) {
 }
 
 func TestSchema_MapToBalanceResponse(t *testing.T) {
+	t.Parallel()
+
 	const balance = 100
 
 	got := MapToBalanceResponse(balance)
@@ -81,6 +89,8 @@ func TestSchema_MapToBalanceResponse(t *testing.T) {
 }
 
 func TestSchema_CreateAccountInput_IsValid(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		name    string
 		input   CreateAccountInput
@@ -127,7 +137,11 @@ func TestSchema_CreateAccountInput_IsValid(t *testing.T) {
 	}
 
 	for _, tt := range tests {
+		tt := tt
+
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			err := tt.input.IsValid()
 			if err != nil {
 				var errs rest.ValidationErrors

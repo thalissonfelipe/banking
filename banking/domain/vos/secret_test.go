@@ -7,6 +7,8 @@ import (
 )
 
 func TestNewSecret(t *testing.T) {
+	t.Parallel()
+
 	testCases := []struct {
 		name    string
 		secret  string
@@ -22,7 +24,11 @@ func TestNewSecret(t *testing.T) {
 	}
 
 	for _, tt := range testCases {
+		tt := tt
+
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			secret, err := NewSecret(tt.secret)
 			assert.ErrorIs(t, err, tt.wantErr)
 			assert.Equal(t, tt.want, secret.String())

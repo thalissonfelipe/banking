@@ -6,10 +6,13 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
 	"github.com/thalissonfelipe/banking/banking/gateway/http/rest"
 )
 
 func TestSchema_MapToLoginResponse(t *testing.T) {
+	t.Parallel()
+
 	const token = "token"
 
 	got := MapToLoginResponse(token)
@@ -17,6 +20,8 @@ func TestSchema_MapToLoginResponse(t *testing.T) {
 }
 
 func TestSchema_LoginInput_IsValid(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		name    string
 		input   LoginInput
@@ -52,7 +57,11 @@ func TestSchema_LoginInput_IsValid(t *testing.T) {
 	}
 
 	for _, tt := range tests {
+		tt := tt
+
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			err := tt.input.IsValid()
 			if err != nil {
 				var errs rest.ValidationErrors

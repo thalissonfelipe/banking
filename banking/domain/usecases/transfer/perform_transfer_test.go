@@ -14,6 +14,8 @@ import (
 )
 
 func TestTransferUsecase_PerformTransfer(t *testing.T) {
+	t.Parallel()
+
 	accOrigin, err := entity.NewAccount("origin", testdata.CPF().String(), testdata.Secret().String())
 	require.NoError(t, err)
 
@@ -120,7 +122,11 @@ func TestTransferUsecase_PerformTransfer(t *testing.T) {
 	}
 
 	for _, tt := range testCases {
+		tt := tt
+
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			usecase := NewTransferUsecase(tt.repo, tt.accUsecase)
 
 			err := usecase.PerformTransfer(context.Background(), tt.input)

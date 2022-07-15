@@ -2,6 +2,7 @@ package rest
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"go.uber.org/zap"
@@ -32,5 +33,9 @@ func SendJSON(w http.ResponseWriter, statusCode int, payload interface{}) error 
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
 
-	return json.NewEncoder(w).Encode(payload)
+	if err := json.NewEncoder(w).Encode(payload); err != nil {
+		return fmt.Errorf("encoding payload: %w", err)
+	}
+
+	return nil
 }

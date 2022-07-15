@@ -7,11 +7,10 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/golang-migrate/migrate/v4"
-	_ "github.com/golang-migrate/migrate/v4/database/postgres" // driver
-	_ "github.com/golang-migrate/migrate/v4/source/file"       // driver
 	"github.com/jackc/pgx/v4"
 	"github.com/ory/dockertest"
+
+	"github.com/thalissonfelipe/banking/banking/gateway/db/postgres"
 )
 
 type PostgresDocker struct {
@@ -20,7 +19,7 @@ type PostgresDocker struct {
 	Resource *dockertest.Resource
 }
 
-func SetupTest(migrationsPath string) *PostgresDocker {
+func SetupTest(_ string) *PostgresDocker {
 	var conn *pgx.Conn
 
 	pool, err := dockertest.NewPool("")
@@ -62,8 +61,8 @@ func SetupTest(migrationsPath string) *PostgresDocker {
 		log.Fatalf("could not connect to docker: %v", err)
 	}
 
-	if err := runMigrations(migrationsPath, connString); err != nil {
-		log.Fatalf("could not run migrations: %v", err)
+	if err = postgres.RunMigrations(connString); err != nil {
+		log.Fatalf("running migrations: %v", err)
 	}
 
 	return &PostgresDocker{
@@ -83,22 +82,6 @@ func TruncateTables(ctx context.Context, db *pgx.Conn) {
 	if _, err := db.Exec(ctx, "truncate transfers, accounts"); err != nil {
 		log.Fatalf("could not truncate tables: %v", err)
 	}
-}
-
-func runMigrations(migrationsPath, connString string) error {
-	if migrationsPath != "" {
-		mig, err := migrate.New("file://"+migrationsPath, connString)
-		if err != nil {
-			return fmt.Errorf("creating migrations: %w", err)
-		}
-		defer mig.Close()
-
-		if err = mig.Up(); err != nil {
-			return fmt.Errorf("running migration: %w", err)
-		}
-	}
-
-	return nil
 }
 
 func getRandomDBName() string {

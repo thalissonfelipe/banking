@@ -7,6 +7,8 @@ import (
 )
 
 func TestNewCPF(t *testing.T) {
+	t.Parallel()
+
 	testCases := []struct {
 		name    string
 		cpf     string
@@ -26,7 +28,11 @@ func TestNewCPF(t *testing.T) {
 	}
 
 	for _, tt := range testCases {
+		tt := tt
+
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			cpf, err := NewCPF(tt.cpf)
 			assert.ErrorIs(t, err, tt.wantErr)
 			assert.Equal(t, tt.want, cpf.String())

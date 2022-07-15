@@ -11,15 +11,16 @@ import (
 	"github.com/thalissonfelipe/banking/banking/gateway/jwt"
 )
 
-// jwtMethods is an array of methods that need authentication validation.
-var jwtMethods = []string{
-	"/banking.BankingService/GetTransfers",
-	"/banking.BankingService/CreateTransfer",
+//nolint:gochecknoglobals
+var jwtAllowedMethods = map[string]struct{}{
+	"/banking.BankingService/ListTransfers":   {},
+	"/banking.BankingService/PerformTransfer": {},
 }
 
 func AuthInterceptor(
-	ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
-	ok := needAuthentication(info.FullMethod)
+	ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler,
+) (interface{}, error) {
+	_, ok := jwtAllowedMethods[info.FullMethod]
 	if !ok {
 		return handler(ctx, req)
 	}
@@ -35,22 +36,9 @@ func AuthInterceptor(
 
 	token := meta["authorization"][0]
 
-	err := jwt.IsTokenValid(token)
-	if err != nil {
-		return nil, status.Errorf(codes.Unauthenticated, "incorrect access token")
+	if err := jwt.IsTokenValid(token); err != nil {
+		return nil, status.Errorf(codes.Unauthenticated, "invalid token")
 	}
 
 	return handler(ctx, req)
-}
-
-// needAuthentication will check if the provided method need authentication validation. Only transfers
-// methods will need jwt authentication.
-func needAuthentication(method string) bool {
-	for _, m := range jwtMethods {
-		if m == method {
-			return true
-		}
-	}
-
-	return false
 }

@@ -16,6 +16,8 @@ import (
 )
 
 func TestAuth_Authenticate(t *testing.T) {
+	t.Parallel()
+
 	cpf := testdata.CPF()
 	secret := testdata.Secret()
 
@@ -99,7 +101,11 @@ func TestAuth_Authenticate(t *testing.T) {
 	}
 
 	for _, tt := range testCases {
+		tt := tt
+
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			accUsecase := account.NewAccountUsecase(tt.repo, tt.enc)
 			service := NewAuth(accUsecase, tt.enc, tt.service)
 

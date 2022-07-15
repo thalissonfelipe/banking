@@ -13,6 +13,8 @@ import (
 )
 
 func TestAccountUsecase_CreateAccount(t *testing.T) {
+	t.Parallel()
+
 	testCases := []struct {
 		name    string
 		repo    entity.AccountRepository
@@ -60,7 +62,11 @@ func TestAccountUsecase_CreateAccount(t *testing.T) {
 	}
 
 	for _, tt := range testCases {
+		tt := tt
+
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			usecase := NewAccountUsecase(tt.repo, tt.enc)
 
 			acc, err := entity.NewAccount("name", testdata.CPF().String(), testdata.Secret().String())

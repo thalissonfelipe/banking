@@ -8,12 +8,16 @@ import (
 )
 
 func TestNewToken(t *testing.T) {
+	t.Parallel()
+
 	token, err := NewToken("account_id")
 	require.NoError(t, err)
 	assert.NotEmpty(t, token)
 }
 
 func TestIsTokenValid(t *testing.T) {
+	t.Parallel()
+
 	token, err := NewToken("account_id")
 	require.NoError(t, err)
 
@@ -25,6 +29,8 @@ func TestIsTokenValid(t *testing.T) {
 }
 
 func TestGetIDFromToken(t *testing.T) {
+	t.Parallel()
+
 	const want = "account_id"
 
 	token, err := NewToken(want)

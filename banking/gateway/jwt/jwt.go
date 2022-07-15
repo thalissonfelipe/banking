@@ -2,7 +2,6 @@ package jwt
 
 import (
 	"fmt"
-	"log"
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
@@ -10,6 +9,7 @@ import (
 	"github.com/thalissonfelipe/banking/banking/domain/usecases"
 )
 
+//nolint:gochecknoglobals
 var jwtKey = []byte("secret-key")
 
 type JWT struct{}
@@ -74,7 +74,6 @@ func GetAccountIDFromToken(tokenStr string) string {
 		return jwtKey, nil
 	})
 	if err != nil || !token.Valid {
-		log.Println(err)
 		return ""
 	}
 

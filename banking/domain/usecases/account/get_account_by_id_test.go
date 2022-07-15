@@ -13,6 +13,8 @@ import (
 )
 
 func TestAccountUsecase_GetAccountByID(t *testing.T) {
+	t.Parallel()
+
 	acc, err := entity.NewAccount("name", testdata.CPF().String(), testdata.Secret().String())
 	require.NoError(t, err)
 
@@ -45,7 +47,11 @@ func TestAccountUsecase_GetAccountByID(t *testing.T) {
 	}
 
 	for _, tt := range testCases {
+		tt := tt
+
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			usecase := NewAccountUsecase(tt.repo, nil)
 
 			account, err := usecase.GetAccountByID(context.Background(), vos.NewAccountID())

@@ -61,6 +61,7 @@ func (s Secret) Size() int {
 	return len(s.value)
 }
 
+//nolint:unparam
 func (s Secret) Value() (driver.Value, error) {
 	return s.String(), nil
 }
@@ -84,8 +85,8 @@ func (s *Secret) Scan(value interface{}) error {
 	return fmt.Errorf("scan secret: %w", err)
 }
 
-func (s *Secret) Hash(encrypter encrypter.Encrypter) error {
-	hashedSecret, err := encrypter.Hash(s.value)
+func (s *Secret) Hash(enc encrypter.Encrypter) error {
+	hashedSecret, err := enc.Hash(s.value)
 	if err != nil {
 		return fmt.Errorf("hashing secret: %w", err)
 	}

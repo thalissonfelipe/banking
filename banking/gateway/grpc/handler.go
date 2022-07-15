@@ -1,10 +1,11 @@
 package grpc
 
 import (
-	"github.com/thalissonfelipe/banking/banking/domain/usecases"
 	"google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+
+	"github.com/thalissonfelipe/banking/banking/domain/usecases"
 )
 
 type Handler struct {
@@ -13,10 +14,10 @@ type Handler struct {
 	authUsecase     usecases.Auth
 }
 
-func NewHandler(accountUsecase usecases.Account, transferUsecase usecases.Transfer, authUsecase usecases.Auth) *Handler {
+func NewHandler(accUsecase usecases.Account, trUsecase usecases.Transfer, authUsecase usecases.Auth) *Handler {
 	return &Handler{
-		accountUsecase:  accountUsecase,
-		transferUsecase: transferUsecase,
+		accountUsecase:  accUsecase,
+		transferUsecase: trUsecase,
 		authUsecase:     authUsecase,
 	}
 }

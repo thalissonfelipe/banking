@@ -4,10 +4,13 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
 	"github.com/thalissonfelipe/banking/banking/domain/vos"
 )
 
 func TestNewTransfer(t *testing.T) {
+	t.Parallel()
+
 	const amount = 100
 
 	accOriginID := vos.NewAccountID()
@@ -38,7 +41,11 @@ func TestNewTransfer(t *testing.T) {
 	}
 
 	for _, tt := range tests {
+		tt := tt
+
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			transfer, err := NewTransfer(accOriginID, accDestID, amount, tt.balance)
 			assert.ErrorIs(t, err, tt.wantErr)
 

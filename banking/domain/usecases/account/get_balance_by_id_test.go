@@ -11,6 +11,8 @@ import (
 )
 
 func TestAccountUsecase_GetAccountBalanceByID(t *testing.T) {
+	t.Parallel()
+
 	wantBalance := 100
 
 	testCases := []struct {
@@ -42,7 +44,11 @@ func TestAccountUsecase_GetAccountBalanceByID(t *testing.T) {
 	}
 
 	for _, tt := range testCases {
+		tt := tt
+
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			usecase := NewAccountUsecase(tt.repo, nil)
 
 			balance, err := usecase.GetAccountBalanceByID(context.Background(), vos.NewAccountID())

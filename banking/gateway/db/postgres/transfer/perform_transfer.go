@@ -33,7 +33,7 @@ func (r Repository) PerformTransfer(ctx context.Context, transfer *entity.Transf
 	}
 
 	if err = tx.Commit(ctx); err != nil {
-		return fmt.Errorf("commiting transaction: %w", err)
+		return fmt.Errorf("committing transaction: %w", err)
 	}
 
 	return nil
@@ -41,7 +41,7 @@ func (r Repository) PerformTransfer(ctx context.Context, transfer *entity.Transf
 
 const _updateBalanceQuery = `update accounts set balance=balance+$1 where id=$2;`
 
-func (r Repository) updateBalance(ctx context.Context, tx pgx.Tx, balance int, id vos.AccountID) error {
+func (Repository) updateBalance(ctx context.Context, tx pgx.Tx, balance int, id vos.AccountID) error {
 	_, err := tx.Exec(ctx, _updateBalanceQuery, balance, id)
 	if err != nil {
 		return fmt.Errorf("tx.Exec: %w", err)
@@ -55,7 +55,7 @@ insert into transfers (id, account_origin_id, account_destination_id, amount)
 values ($1, $2, $3, $4)
 returning created_at;`
 
-func (r Repository) saveTransfer(ctx context.Context, tx pgx.Tx, transfer *entity.Transfer) error {
+func (Repository) saveTransfer(ctx context.Context, tx pgx.Tx, transfer *entity.Transfer) error {
 	if err := tx.QueryRow(ctx, _insertTransferQuery,
 		transfer.ID,
 		transfer.AccountOriginID,

@@ -17,10 +17,10 @@ type Auth struct {
 	service   Service
 }
 
-func NewAuth(usecase usecases.Account, encrypter encrypter.Encrypter, service Service) *Auth {
+func NewAuth(usecase usecases.Account, enc encrypter.Encrypter, service Service) *Auth {
 	return &Auth{
 		usecase:   usecase,
-		encrypter: encrypter,
+		encrypter: enc,
 		service:   service,
 	}
 }

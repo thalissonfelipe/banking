@@ -65,17 +65,16 @@ func apiRouter(db *pgx.Conn) chi.Router {
 		middlewares.RequestIDToLogger,
 	)
 
-	hash := hash.New()
-	jwt := jwt.New()
+	h, j := hash.New(), jwt.New()
 
 	accRepository := accountRepo.NewRepository(db)
-	accountUsecase := account.NewAccountUsecase(accRepository, hash)
+	accountUsecase := account.NewAccountUsecase(accRepository, h)
 	trRepository := transferRepo.NewRepository(db)
 	transferUsecase := transfer.NewTransferUsecase(trRepository, accountUsecase)
-	authUsecase := auth.NewAuth(accountUsecase, hash, jwt)
+	authUsecase := auth.NewAuth(accountUsecase, h, j)
 	accHandler := accountHandler.NewHandler(accountUsecase)
 	trHandler := transferHandler.NewHandler(transferUsecase)
-	authHandler := authHandler.NewHandler(authUsecase)
+	auHandler := authHandler.NewHandler(authUsecase)
 
 	r.Route("/accounts", func(r chi.Router) {
 		r.Get("/", rest.Wrap(accHandler.ListAccounts))
@@ -89,7 +88,7 @@ func apiRouter(db *pgx.Conn) chi.Router {
 		r.Post("/", rest.Wrap(trHandler.PerformTransfer))
 	})
 
-	r.Post("/login", rest.Wrap(authHandler.Login))
+	r.Post("/login", rest.Wrap(auHandler.Login))
 
 	return r
 }

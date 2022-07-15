@@ -50,6 +50,7 @@ func NewCPF(cpf string) (CPF, error) {
 	return c, nil
 }
 
+//nolint:unparam
 func (c CPF) Value() (driver.Value, error) {
 	return c.String(), nil
 }

@@ -5,8 +5,9 @@ import (
 	"net/http"
 
 	"github.com/google/uuid"
-	"github.com/thalissonfelipe/banking/banking/instrumentation/log"
 	"go.uber.org/zap"
+
+	"github.com/thalissonfelipe/banking/banking/instrumentation/log"
 )
 
 type requestIDKey struct{}
@@ -16,7 +17,12 @@ func contextWithRequestID(ctx context.Context) context.Context {
 }
 
 func requestIDFromContext(ctx context.Context) string {
-	return ctx.Value(requestIDKey{}).(string)
+	requestID, ok := ctx.Value(requestIDKey{}).(string)
+	if !ok {
+		log.FromContext(ctx).Warn("missing request id in context")
+	}
+
+	return requestID
 }
 
 func RequestID(next http.Handler) http.Handler {

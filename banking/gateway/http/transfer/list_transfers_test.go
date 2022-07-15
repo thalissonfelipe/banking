@@ -21,6 +21,8 @@ import (
 )
 
 func TestTransferHandler_ListTransfers(t *testing.T) {
+	t.Parallel()
+
 	tr, err := entity.NewTransfer(vos.NewAccountID(), vos.NewAccountID(), 50, 100)
 	require.NoError(t, err)
 
@@ -55,7 +57,11 @@ func TestTransferHandler_ListTransfers(t *testing.T) {
 	}
 
 	for _, tt := range testCases {
+		tt := tt
+
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			handler := NewHandler(tt.usecase)
 
 			token, err := jwt.NewToken(transfers[0].AccountOriginID.String())

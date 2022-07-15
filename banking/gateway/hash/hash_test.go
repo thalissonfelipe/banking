@@ -5,10 +5,13 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
 	"github.com/thalissonfelipe/banking/banking/domain/usecases"
 )
 
 func TestHash_Hash(t *testing.T) {
+	t.Parallel()
+
 	h := Hash{}
 
 	hash, err := h.Hash("12345678")
@@ -17,7 +20,7 @@ func TestHash_Hash(t *testing.T) {
 }
 
 func TestHash_CompareHashAndSecret(t *testing.T) {
-	h := New()
+	t.Parallel()
 
 	testCases := []struct {
 		name    string
@@ -37,7 +40,13 @@ func TestHash_CompareHashAndSecret(t *testing.T) {
 	}
 
 	for _, tt := range testCases {
+		tt := tt
+
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			h := New()
+
 			hash, err := h.Hash("12345678")
 			require.NoError(t, err)
 

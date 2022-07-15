@@ -10,6 +10,8 @@ import (
 )
 
 func TestNewAccount(t *testing.T) {
+	t.Parallel()
+
 	cpf := testdata.CPF()
 	secret := testdata.Secret()
 
@@ -56,7 +58,11 @@ func TestNewAccount(t *testing.T) {
 	}
 
 	for _, tt := range tests {
+		tt := tt
+
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			acc, err := NewAccount("name", tt.cpf, tt.secret)
 			if err != nil {
 				for _, e := range tt.wantErrs {

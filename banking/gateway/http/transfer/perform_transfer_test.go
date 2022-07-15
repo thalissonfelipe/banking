@@ -22,6 +22,8 @@ import (
 )
 
 func TestTransferHandler_PerformTransfer(t *testing.T) {
+	t.Parallel()
+
 	cpf := testdata.CPF()
 	secret := testdata.Secret()
 
@@ -177,7 +179,11 @@ func TestTransferHandler_PerformTransfer(t *testing.T) {
 	}
 
 	for _, tt := range testCases {
+		tt := tt
+
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			handler := NewHandler(tt.usecase)
 
 			request := fakes.FakeRequest(http.MethodPost, "/transfers", tt.body)

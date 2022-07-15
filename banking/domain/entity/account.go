@@ -3,6 +3,7 @@ package entity
 import (
 	"context"
 	"errors"
+	"fmt"
 	"time"
 
 	"go.uber.org/multierr"
@@ -44,7 +45,7 @@ func NewAccount(name, cpfStr, secretStr string) (Account, error) {
 	}
 
 	if errs != nil {
-		return Account{}, errs
+		return Account{}, fmt.Errorf("new account: %w", errs)
 	}
 
 	return Account{

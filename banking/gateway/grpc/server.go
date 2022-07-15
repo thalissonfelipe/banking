@@ -21,14 +21,13 @@ import (
 func NewServer(logger *zap.Logger, db *pgx.Conn) *grpc.Server {
 	logger = logger.With(zap.String("module", "grpc"))
 
-	hash := hash.New()
-	jwt := jwt.New()
+	h, j := hash.New(), jwt.New()
 
 	accRepository := accountRepo.NewRepository(db)
-	accountUsecase := account.NewAccountUsecase(accRepository, hash)
+	accountUsecase := account.NewAccountUsecase(accRepository, h)
 	trRepository := transferRepo.NewRepository(db)
 	transferUsecase := transfer.NewTransferUsecase(trRepository, accountUsecase)
-	authUsecase := auth.NewAuth(accountUsecase, hash, jwt)
+	authUsecase := auth.NewAuth(accountUsecase, h, j)
 	handler := NewHandler(accountUsecase, transferUsecase, authUsecase)
 
 	server := grpc.NewServer(

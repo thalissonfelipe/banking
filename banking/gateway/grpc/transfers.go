@@ -19,7 +19,8 @@ import (
 )
 
 func (h Handler) ListTransfers(
-	ctx context.Context, _ *proto.ListTransfersRequest) (*proto.ListTransfersResponse, error) {
+	ctx context.Context, _ *proto.ListTransfersRequest,
+) (*proto.ListTransfersResponse, error) {
 	meta, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
 		return nil, status.Error(codes.Unauthenticated, "missing context metadata")
