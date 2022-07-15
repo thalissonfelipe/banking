@@ -1,6 +1,7 @@
 package account
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"net/http"
@@ -15,7 +16,6 @@ import (
 	"github.com/thalissonfelipe/banking/banking/domain/usecases"
 	"github.com/thalissonfelipe/banking/banking/gateway/http/account/schema"
 	"github.com/thalissonfelipe/banking/banking/gateway/http/rest"
-	"github.com/thalissonfelipe/banking/banking/tests/fakes"
 	"github.com/thalissonfelipe/banking/banking/tests/testdata"
 )
 
@@ -125,17 +125,20 @@ func TestAccountHandler_CreateAccount(t *testing.T) {
 
 			handler := NewHandler(tt.usecase)
 
-			request := fakes.FakeRequest(http.MethodPost, "/accounts", tt.body)
-			response := httptest.NewRecorder()
+			b, err := json.Marshal(tt.body)
+			require.NoError(t, err)
 
-			rest.Wrap(handler.CreateAccount).ServeHTTP(response, request)
+			req := httptest.NewRequest(http.MethodPost, "/accounts", bytes.NewReader(b))
+			rec := httptest.NewRecorder()
+
+			rest.Wrap(handler.CreateAccount).ServeHTTP(rec, req)
 
 			want, err := json.Marshal(tt.wantBody)
 			require.NoError(t, err)
 
-			assert.Equal(t, tt.wantCode, response.Code)
-			assert.JSONEq(t, string(want), response.Body.String())
-			assert.Equal(t, "application/json", response.Header().Get("Content-Type"))
+			assert.Equal(t, tt.wantCode, rec.Code)
+			assert.JSONEq(t, string(want), rec.Body.String())
+			assert.Equal(t, "application/json", rec.Header().Get("Content-Type"))
 		})
 	}
 }

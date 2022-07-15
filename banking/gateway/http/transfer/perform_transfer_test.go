@@ -1,6 +1,7 @@
 package transfer
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -17,7 +18,6 @@ import (
 	"github.com/thalissonfelipe/banking/banking/gateway/http/rest"
 	"github.com/thalissonfelipe/banking/banking/gateway/http/transfer/schema"
 	"github.com/thalissonfelipe/banking/banking/gateway/jwt"
-	"github.com/thalissonfelipe/banking/banking/tests/fakes"
 	"github.com/thalissonfelipe/banking/banking/tests/testdata"
 )
 
@@ -186,20 +186,24 @@ func TestTransferHandler_PerformTransfer(t *testing.T) {
 
 			handler := NewHandler(tt.usecase)
 
-			request := fakes.FakeRequest(http.MethodPost, "/transfers", tt.body)
-			token, _ := jwt.NewToken(tt.accOriginID.String())
-			bearerToken := fmt.Sprintf("Bearer %s", token)
-			request.Header.Add("Authorization", bearerToken)
-			response := httptest.NewRecorder()
+			token, err := jwt.NewToken(tt.accOriginID.String())
+			require.NoError(t, err)
 
-			rest.Wrap(handler.PerformTransfer).ServeHTTP(response, request)
+			b, err := json.Marshal(tt.body)
+			require.NoError(t, err)
+
+			req := httptest.NewRequest(http.MethodPost, "/transfers", bytes.NewReader(b))
+			req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", token))
+			rec := httptest.NewRecorder()
+
+			rest.Wrap(handler.PerformTransfer).ServeHTTP(rec, req)
 
 			want, err := json.Marshal(tt.wantBody)
 			require.NoError(t, err)
 
-			assert.Equal(t, tt.wantCode, response.Code)
-			assert.JSONEq(t, string(want), response.Body.String())
-			assert.Equal(t, "application/json", response.Header().Get("Content-Type"))
+			assert.Equal(t, tt.wantCode, rec.Code)
+			assert.JSONEq(t, string(want), rec.Body.String())
+			assert.Equal(t, "application/json", rec.Header().Get("Content-Type"))
 		})
 	}
 }

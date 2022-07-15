@@ -17,7 +17,6 @@ import (
 	"github.com/thalissonfelipe/banking/banking/gateway/http/rest"
 	"github.com/thalissonfelipe/banking/banking/gateway/http/transfer/schema"
 	"github.com/thalissonfelipe/banking/banking/gateway/jwt"
-	"github.com/thalissonfelipe/banking/banking/tests/fakes"
 )
 
 func TestTransferHandler_ListTransfers(t *testing.T) {
@@ -67,20 +66,18 @@ func TestTransferHandler_ListTransfers(t *testing.T) {
 			token, err := jwt.NewToken(transfers[0].AccountOriginID.String())
 			require.NoError(t, err)
 
-			request := fakes.FakeRequest(http.MethodGet, "/transfers", nil)
-			bearerToken := fmt.Sprintf("Bearer %s", token)
-			request.Header.Add("Authorization", bearerToken)
+			req := httptest.NewRequest(http.MethodGet, "/transfers", nil)
+			req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", token))
+			rec := httptest.NewRecorder()
 
-			response := httptest.NewRecorder()
-
-			rest.Wrap(handler.ListTransfers).ServeHTTP(response, request)
+			rest.Wrap(handler.ListTransfers).ServeHTTP(rec, req)
 
 			want, err := json.Marshal(tt.wantBody)
 			require.NoError(t, err)
 
-			assert.Equal(t, tt.wantCode, response.Code)
-			assert.JSONEq(t, string(want), response.Body.String())
-			assert.Equal(t, "application/json", response.Header().Get("Content-Type"))
+			assert.Equal(t, tt.wantCode, rec.Code)
+			assert.JSONEq(t, string(want), rec.Body.String())
+			assert.Equal(t, "application/json", rec.Header().Get("Content-Type"))
 		})
 	}
 }

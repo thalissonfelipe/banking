@@ -17,7 +17,6 @@ import (
 	"github.com/thalissonfelipe/banking/banking/domain/vos"
 	"github.com/thalissonfelipe/banking/banking/gateway/http/account/schema"
 	"github.com/thalissonfelipe/banking/banking/gateway/http/rest"
-	"github.com/thalissonfelipe/banking/banking/tests/fakes"
 	"github.com/thalissonfelipe/banking/banking/tests/testdata"
 )
 
@@ -95,21 +94,20 @@ func TestAccountHandler_GetAccountBalance(t *testing.T) {
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("accountID", tt.accountID)
 
-			requestURI := fmt.Sprintf("/accounts/%s/balance", tt.accountID)
+			uri := fmt.Sprintf("/accounts/%s/balance", tt.accountID)
 
-			request := fakes.FakeRequest(http.MethodGet, requestURI, nil)
-			request = request.WithContext(context.WithValue(request.Context(), chi.RouteCtxKey, rctx))
+			req := httptest.NewRequest(http.MethodGet, uri, nil)
+			req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
+			rec := httptest.NewRecorder()
 
-			response := httptest.NewRecorder()
-
-			rest.Wrap(handler.GetAccountBalance).ServeHTTP(response, request)
+			rest.Wrap(handler.GetAccountBalance).ServeHTTP(rec, req)
 
 			want, err := json.Marshal(tt.wantBody)
 			require.NoError(t, err)
 
-			assert.Equal(t, tt.wantCode, response.Code)
-			assert.JSONEq(t, string(want), response.Body.String())
-			assert.Equal(t, "application/json", response.Header().Get("Content-Type"))
+			assert.Equal(t, tt.wantCode, rec.Code)
+			assert.JSONEq(t, string(want), rec.Body.String())
+			assert.Equal(t, "application/json", rec.Header().Get("Content-Type"))
 		})
 	}
 }
