@@ -13,12 +13,14 @@ import (
 )
 
 func TestAccountRepository_GetAccountByCPF(t *testing.T) {
+	t.Parallel()
+
 	t.Run("should get account by cpf successfully", func(t *testing.T) {
-		db := pgDocker.DB
+		t.Parallel()
+
+		db := dockertest.NewDB(t, t.Name())
 		r := NewRepository(db)
 		ctx := context.Background()
-
-		defer dockertest.TruncateTables(ctx, db)
 
 		want, err := entity.NewAccount("name", testdata.CPF().String(), testdata.Secret().String())
 		require.NoError(t, err)
@@ -37,7 +39,9 @@ func TestAccountRepository_GetAccountByCPF(t *testing.T) {
 	})
 
 	t.Run("should return an error if account does not exist", func(t *testing.T) {
-		db := pgDocker.DB
+		t.Parallel()
+
+		db := dockertest.NewDB(t, t.Name())
 		r := NewRepository(db)
 		ctx := context.Background()
 

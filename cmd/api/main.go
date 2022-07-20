@@ -10,7 +10,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/jackc/pgx/v4"
+	"github.com/jackc/pgx/v4/pgxpool"
 	"go.uber.org/zap"
 
 	"github.com/thalissonfelipe/banking/banking/config"
@@ -39,12 +39,12 @@ func main() {
 }
 
 func startApp(cfg *config.Config, logger, mainLogger *zap.Logger) error {
-	conn, err := pgx.Connect(context.Background(), cfg.Postgres.DSN())
+	conn, err := pgxpool.Connect(context.Background(), cfg.Postgres.DSN())
 	if err != nil {
 		return fmt.Errorf("connecting to postgres: %w", err)
 	}
 
-	defer conn.Close(context.Background())
+	defer conn.Close()
 
 	err = postgres.RunMigrations(cfg.Postgres.DSN())
 	if err != nil {

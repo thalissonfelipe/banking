@@ -3,39 +3,39 @@ package dockertest
 import (
 	"context"
 	"fmt"
-	"log"
 	"math/rand"
+	"regexp"
+	"strings"
+	"testing"
 	"time"
 
-	"github.com/jackc/pgx/v4"
+	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/ory/dockertest"
+	"github.com/ory/dockertest/docker"
+	"github.com/stretchr/testify/require"
 
 	"github.com/thalissonfelipe/banking/banking/gateway/db/postgres"
 )
 
-type PostgresDocker struct {
-	DB       *pgx.Conn
-	Pool     *dockertest.Pool
-	Resource *dockertest.Resource
-}
+var db *pgxpool.Pool
 
-func SetupTest(_ string) *PostgresDocker {
-	var conn *pgx.Conn
-
+func NewPostgresContainer() (teardownFn func(), err error) {
 	pool, err := dockertest.NewPool("")
 	if err != nil {
-		log.Fatalf("could not connect to docker: %v", err)
+		return nil, fmt.Errorf("creating pool: %w", err)
 	}
 
 	database := getRandomDBName()
 
-	resource, err := pool.Run(
-		"postgres",
-		"13.2",
-		[]string{"POSTGRES_PASSWORD=postgres", "POSTGRES_DB=" + database},
-	)
+	resource, err := pool.RunWithOptions(&dockertest.RunOptions{
+		Repository: "postgres",
+		Tag:        "13.2",
+		Env:        []string{"POSTGRES_PASSWORD=postgres", "POSTGRES_DB=" + database},
+	}, func(hc *docker.HostConfig) {
+		hc.AutoRemove = true
+	})
 	if err != nil {
-		log.Fatalf("could not start resource: %v", err)
+		return nil, fmt.Errorf("starting docker container: %w", err)
 	}
 
 	connString := fmt.Sprintf(
@@ -46,42 +46,65 @@ func SetupTest(_ string) *PostgresDocker {
 	if err = pool.Retry(func() error {
 		ctx := context.Background()
 
-		conn, err = pgx.Connect(ctx, connString)
+		db, err = pgxpool.Connect(ctx, connString)
 		if err != nil {
-			return fmt.Errorf("connecting with postgres: %w", err)
+			return fmt.Errorf("connecting to postgres: %w", err)
 		}
 
-		err = conn.Ping(ctx)
+		err = db.Ping(ctx)
 		if err != nil {
 			return fmt.Errorf("ping connection: %w", err)
 		}
 
 		return nil
 	}); err != nil {
-		log.Fatalf("could not connect to docker: %v", err)
+		return nil, fmt.Errorf("connecting to postgres: %w", err)
 	}
 
 	if err = postgres.RunMigrations(connString); err != nil {
-		log.Fatalf("running migrations: %v", err)
+		return nil, fmt.Errorf("running migrations")
 	}
 
-	return &PostgresDocker{
-		DB:       conn,
-		Pool:     pool,
-		Resource: resource,
+	teardownFn = func() {
+		resource.Close()
 	}
+
+	return teardownFn, nil
 }
 
-func RemoveContainer(pgDocker *PostgresDocker) {
-	if err := pgDocker.Pool.Purge(pgDocker.Resource); err != nil {
-		log.Fatalf("could not purge resource: %v", err)
-	}
-}
+func NewDB(t *testing.T, name string) *pgxpool.Pool {
+	t.Helper()
 
-func TruncateTables(ctx context.Context, db *pgx.Conn) {
-	if _, err := db.Exec(ctx, "truncate transfers, accounts"); err != nil {
-		log.Fatalf("could not truncate tables: %v", err)
+	if name == "" {
+		require.FailNow(t, "name must no be an empty string")
 	}
+
+	re := regexp.MustCompile(`[\W]`)
+
+	name = re.ReplaceAllString(strings.ToLower(name), "_")
+	dropDatabaseQuery := fmt.Sprintf("drop database if exists %s", name)
+
+	_, err := db.Exec(context.Background(), dropDatabaseQuery)
+	require.NoError(t, err)
+
+	_, err = db.Exec(context.Background(), fmt.Sprintf("create database %s", name))
+	require.NoError(t, err)
+
+	connString := strings.Replace(db.Config().ConnString(), db.Config().ConnConfig.Database, name, 1)
+
+	newDB, err := pgxpool.Connect(context.Background(), connString)
+	require.NoError(t, err)
+
+	err = postgres.RunMigrations(connString)
+	require.NoError(t, err)
+
+	t.Cleanup(func() {
+		newDB.Close()
+		_, err := db.Exec(context.Background(), dropDatabaseQuery)
+		require.NoError(t, err)
+	})
+
+	return newDB
 }
 
 func getRandomDBName() string {

@@ -4,7 +4,7 @@ import (
 	grpcmiddleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	grpczap "github.com/grpc-ecosystem/go-grpc-middleware/logging/zap"
 	grpcrecovery "github.com/grpc-ecosystem/go-grpc-middleware/recovery"
-	"github.com/jackc/pgx/v4"
+	"github.com/jackc/pgx/v4/pgxpool"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 
@@ -18,7 +18,7 @@ import (
 	proto "github.com/thalissonfelipe/banking/gen/banking/v1"
 )
 
-func NewServer(logger *zap.Logger, db *pgx.Conn) *grpc.Server {
+func NewServer(logger *zap.Logger, db *pgxpool.Pool) *grpc.Server {
 	logger = logger.With(zap.String("module", "grpc"))
 
 	h, j := hash.New(), jwt.New()

@@ -15,12 +15,12 @@ import (
 )
 
 func TestTransferRepository_PerformTransfer(t *testing.T) {
-	db := pgDocker.DB
+	t.Parallel()
+
+	db := dockertest.NewDB(t, t.Name())
 	accRepository := account.NewRepository(db)
 	r := NewRepository(db)
 	ctx := context.Background()
-
-	defer dockertest.TruncateTables(ctx, db)
 
 	accOrigin, err := entity.NewAccount("origin", testdata.CPF().String(), testdata.Secret().String())
 	require.NoError(t, err)

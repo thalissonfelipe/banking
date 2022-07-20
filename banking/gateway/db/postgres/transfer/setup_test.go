@@ -1,20 +1,24 @@
 package transfer
 
 import (
+	"log"
 	"os"
 	"testing"
 
 	"github.com/thalissonfelipe/banking/banking/tests/dockertest"
 )
 
-var pgDocker *dockertest.PostgresDocker
-
 func TestMain(m *testing.M) {
-	pgDocker = dockertest.SetupTest("../migrations")
+	os.Exit(testMain(m))
+}
 
-	exitCode := m.Run()
+func testMain(m *testing.M) int {
+	teardownFn, err := dockertest.NewPostgresContainer()
+	if err != nil {
+		log.Panicf("failed to setup postgres container: %v", err)
+	}
 
-	dockertest.RemoveContainer(pgDocker)
+	defer teardownFn()
 
-	os.Exit(exitCode)
+	return m.Run()
 }

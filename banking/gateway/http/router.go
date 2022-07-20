@@ -6,7 +6,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
-	"github.com/jackc/pgx/v4"
+	"github.com/jackc/pgx/v4/pgxpool"
 	httpSwagger "github.com/swaggo/http-swagger"
 	"go.uber.org/zap"
 
@@ -33,7 +33,7 @@ import (
 // @license.url http://www.apache.org/licenses/LICENSE-2.0.html
 
 // @BasePath /api/v1
-func NewRouter(logger *zap.Logger, db *pgx.Conn) http.Handler {
+func NewRouter(logger *zap.Logger, db *pgxpool.Pool) http.Handler {
 	r := chi.NewRouter()
 	logger = logger.With(zap.String("module", "http-server"))
 
@@ -58,7 +58,7 @@ func NewRouter(logger *zap.Logger, db *pgx.Conn) http.Handler {
 	return r
 }
 
-func apiRouter(db *pgx.Conn) chi.Router {
+func apiRouter(db *pgxpool.Pool) chi.Router {
 	r := chi.NewRouter()
 
 	r.Use(

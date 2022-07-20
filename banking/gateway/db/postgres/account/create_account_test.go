@@ -14,12 +14,14 @@ import (
 )
 
 func TestAccountRepository_CreateAccount(t *testing.T) {
+	t.Parallel()
+
 	t.Run("should create an account successfully", func(t *testing.T) {
-		db := pgDocker.DB
+		t.Parallel()
+
+		db := dockertest.NewDB(t, t.Name())
 		r := NewRepository(db)
 		ctx := context.Background()
-
-		defer dockertest.TruncateTables(ctx, db)
 
 		want, err := entity.NewAccount("name", testdata.CPF().String(), testdata.Secret().String())
 		require.NoError(t, err)
@@ -39,7 +41,9 @@ func TestAccountRepository_CreateAccount(t *testing.T) {
 	})
 
 	t.Run("should return an error if account already exists", func(t *testing.T) {
-		db := pgDocker.DB
+		t.Parallel()
+
+		db := dockertest.NewDB(t, t.Name())
 		r := NewRepository(db)
 		ctx := context.Background()
 

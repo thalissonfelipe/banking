@@ -16,12 +16,12 @@ import (
 )
 
 func TestRepository_ListTransfers(t *testing.T) {
-	db := pgDocker.DB
+	t.Parallel()
+
+	db := dockertest.NewDB(t, t.Name())
 	accRepository := account.NewRepository(db)
 	r := NewRepository(db)
 	ctx := context.Background()
-
-	defer dockertest.TruncateTables(ctx, db)
 
 	transfers, err := r.ListTransfers(ctx, vos.NewAccountID())
 	require.NoError(t, err)

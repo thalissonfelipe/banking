@@ -14,12 +14,14 @@ import (
 )
 
 func TestAccountRepository_GetAccountBalanceByID(t *testing.T) {
+	t.Parallel()
+
 	t.Run("should get balance successfully", func(t *testing.T) {
-		db := pgDocker.DB
+		t.Parallel()
+
+		db := dockertest.NewDB(t, t.Name())
 		r := NewRepository(db)
 		ctx := context.Background()
-
-		defer dockertest.TruncateTables(ctx, db)
 
 		wantBalance := 100
 
@@ -36,7 +38,9 @@ func TestAccountRepository_GetAccountBalanceByID(t *testing.T) {
 	})
 
 	t.Run("should return an error if account does not exist", func(t *testing.T) {
-		db := pgDocker.DB
+		t.Parallel()
+
+		db := dockertest.NewDB(t, t.Name())
 		r := NewRepository(db)
 		ctx := context.Background()
 

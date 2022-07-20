@@ -13,11 +13,11 @@ import (
 )
 
 func TestAccountRepository_ListAccounts(t *testing.T) {
-	db := pgDocker.DB
+	t.Parallel()
+
+	db := dockertest.NewDB(t, t.Name())
 	r := NewRepository(db)
 	ctx := context.Background()
-
-	defer dockertest.TruncateTables(ctx, db)
 
 	accounts, err := r.ListAccounts(ctx)
 	require.NoError(t, err)
