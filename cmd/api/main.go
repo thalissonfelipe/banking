@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"sync"
 	"syscall"
 	"time"
 
@@ -68,7 +69,12 @@ func startApp(cfg *config.Config, logger, mainLogger *zap.Logger) error {
 		Addr:    cfg.API.Address(),
 	}
 
+	wg := sync.WaitGroup{}
+	wg.Add(1)
+
 	go func() {
+		defer wg.Done()
+
 		if listenErr := server.ListenAndServe(); listenErr != nil && !errors.Is(listenErr, http.ErrServerClosed) {
 			mainLogger.Error("failed to listen and serve", zap.Error(listenErr))
 		}
@@ -85,7 +91,11 @@ func startApp(cfg *config.Config, logger, mainLogger *zap.Logger) error {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
-	if err := server.Shutdown(ctx); err != nil {
+	err = server.Shutdown(ctx)
+
+	wg.Wait()
+
+	if err != nil {
 		return fmt.Errorf("shutting down the server: %w", err)
 	}
 

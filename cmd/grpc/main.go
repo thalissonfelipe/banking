@@ -6,6 +6,7 @@ import (
 	"net"
 	"os"
 	"os/signal"
+	"sync"
 	"syscall"
 
 	"go.uber.org/zap"
@@ -56,7 +57,12 @@ func startApp(cfg *config.Config, logger, mainLogger *zap.Logger) error {
 
 	server := grpcServer.NewServer(logger, conn)
 
+	wg := sync.WaitGroup{}
+	wg.Add(1)
+
 	go func() {
+		defer wg.Done()
+
 		if serveErr := server.Serve(lis); serveErr != nil {
 			mainLogger.Error("failed to serve", zap.Error(serveErr))
 		}
@@ -69,6 +75,8 @@ func startApp(cfg *config.Config, logger, mainLogger *zap.Logger) error {
 	mainLogger.Info("shutting down the server...")
 
 	server.GracefulStop()
+
+	wg.Wait()
 
 	return nil
 }
