@@ -1,35 +1,35 @@
 # Banking
 
-Banking is a go project using [clean architecture](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html). This project is a challenge proposed by the Stone company.
+Banking is a go project using [clean architecture](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html). This project is a technical challenge proposed by the Stone company.
 
 Banking is a REST API that allows users to create accounts and to perform transactions.
 
-## Technologies
+## Technologies and libraries used in this project
 
 - [Go](https://golang.org/)
 - [Docker](https://www.docker.com/)
 - [PostgreSQL](https://www.postgresql.org/)
-
-## Libraries
-
 - [chi](https://github.com/go-chi/chi)
-- [jwt-go](https://github.com/dgrijalva/jwt-go)
-- [uuid](https://github.com/google/uuid)
-- [pgx](https://github.com/jackc/pgx)
+- [jwt](https://github.com/golang-jwt/jwt)
+- [pgxpool](https://github.com/jackc/pgx)
 - [golang-migrate](https://github.com/golang-migrate/migrate)
 - [brdoc](https://github.com/Nhanderu/brdoc)
 - [envconfig](https://github.com/kelseyhightower/envconfig)
 - [bcrypt](https://pkg.go.dev/golang.org/x/crypto@v0.0.0-20210513164829-c07d793c2f9a/bcrypt)
 - [cli](https://github.com/urfave/cli)
-- [testify](https://github.com/stretchr/testify)
 - [dockertest](https://github.com/ory/dockertest)
 - [swag](https://github.com/swaggo/swag)
+- [gRPC](https://grpc.io/)
+- [otel](https://opentelemetry.io/)
+- [zap](https://github.com/uber-go/zap)
+- [golangci](https://github.com/golangci/golangci-lint)
+- [buf.build](https://buf.build/)
 
 ## Getting Started
 
-To get started quickly, you must have `docker`, `docker-compose` and `make` installed in your machine to start the application easily.
+To get started quickly, you must have `docker`, `docker-compose` and `make` installed in your machine.
 
-1. If you want to configure your own API and database settings, create an .env file in the root folder and fill it out following the .env.example file as a template. Be aware that if you change the default portgres configuration, you may need to configure something manually within the Docker container.
+1. If you want to configure your own API and database settings, create an .env file in the root folder and fill it out following the .env.example file as a template. Be aware that if you change the default portgres configuration, you may need to configure something manually inside the Docker container.
 
 2. Run the following command if you want to start the application inside docker container:
     ```shell
@@ -40,47 +40,15 @@ To get started quickly, you must have `docker`, `docker-compose` and `make` inst
     ```shell   
     make dev-local
     ```
-The server will be listening on `0.0.0.0:5000`.
 
-## Endpoints
+The server will be listening on `localhost:5000`.
 
-- **GET /accounts**
-    - List all accounts.
-- **GET /accounts/{id}/balance.**
-    - Gets the account balance by ID, if exists.
-- **POST /accounts**
-    - Creates a new account.
-- **POST /login**
-    - If login succeeds, a jwt token will be returned and must be used on endpoints that involve transfers.
-- **GET /transfers**
-    - Lists all transfers. The user must be authenticated to use this endpoint.
-- **POST /transfers**
-    - Performs a new transfer between accounts. The user must be authenticated to use this endpoint.
+## Documentation
 
-Once the server is started, you can go to http://localhost:5000/swagger/index.html to see more details about each endpoint.
+Swagger URL: http://localhost:5000/swagger/index.html
 
 ## Tests
-
-To run the tests:
 
 ```shell
 make test
 ```
-
-## TODO
-
-- [x] Improve endpoints documentation.
-- [x] Add swagger.
-- [ ] Add logger.
-- [x] Add integration tests.
-- [ ] Add coverage tests.
-- [x] Add unit tests for repository methods.
-- [x] Fix json responses (the names are capitalized).
-- [ ] Add endpoint to deposit money (the default balance is 0, so it's not possible to perform transaction since the user does not have funds).
-- [x] Add Github Actions.
-- [x] Add prefix endpoint (must start with /api/v1/ or something like that).
-- [ ] Add common pkg to centralize some functions, errors, constants...
-- [x] Change id saved in the bank to be a UUID type (currently the id is being saved as a string).
-- [x] Move created_at timestamp to PostgreSQL responsability.
-- [ ] Add CORS middleware.
-- [x] Change the error response of the login route (return only one http status and one message to avoid enumeration attacks, an ideia is to use http status 400 and something like "Invalid cpf and/or secret.").
