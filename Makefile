@@ -13,7 +13,7 @@ dev-local:
 .PHONY: test
 test:
 	@echo "==> Running tests..."
-	go test -v ./...
+	go test -v -race ./...
 
 .PHONY: lint
 lint:
