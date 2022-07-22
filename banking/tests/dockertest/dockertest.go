@@ -17,6 +17,7 @@ import (
 	"github.com/thalissonfelipe/banking/banking/gateway/db/postgres"
 )
 
+//nolint:gochecknoglobals
 var db *pgxpool.Pool
 
 func NewPostgresContainer() (teardownFn func(), err error) {
@@ -62,7 +63,7 @@ func NewPostgresContainer() (teardownFn func(), err error) {
 	}
 
 	if err = postgres.RunMigrations(connString); err != nil {
-		return nil, fmt.Errorf("running migrations")
+		return nil, fmt.Errorf("running migrations: %w", err)
 	}
 
 	teardownFn = func() {

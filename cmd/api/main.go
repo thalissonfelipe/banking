@@ -58,15 +58,23 @@ func startApp(cfg *config.Config, logger, mainLogger *zap.Logger) error {
 	}
 
 	defer func() {
-		if err := closer(); err != nil {
-			mainLogger.Error("closing exporter and tracer: %w", zap.Error(err))
+		if closerErr := closer(); closerErr != nil {
+			mainLogger.Error("closing exporter and tracer: %w", zap.Error(closerErr))
 		}
 	}()
 
+	const (
+		readTimeout  = 5 * time.Second
+		writeTimeout = 15 * time.Second
+	)
+
 	router := handler.NewRouter(logger, conn)
 	server := http.Server{
-		Handler: router,
-		Addr:    cfg.API.Address(),
+		Handler:           router,
+		Addr:              cfg.API.Address(),
+		ReadTimeout:       readTimeout,
+		ReadHeaderTimeout: readTimeout,
+		WriteTimeout:      writeTimeout,
 	}
 
 	wg := sync.WaitGroup{}
