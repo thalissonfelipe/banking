@@ -9,13 +9,13 @@ import (
 	"github.com/thalissonfelipe/banking/banking/domain/usecases"
 )
 
-func (t Transfer) PerformTransfer(ctx context.Context, input usecases.PerformTransferInput) error {
-	accOrigin, err := t.accountUsecase.GetAccountByID(ctx, input.AccountOriginID)
+func (u Usecase) PerformTransfer(ctx context.Context, input usecases.PerformTransferInput) error {
+	accOrigin, err := u.accountUsecase.GetAccountByID(ctx, input.AccountOriginID)
 	if err != nil {
 		return fmt.Errorf("getting origin account by id: %w", err)
 	}
 
-	_, err = t.accountUsecase.GetAccountByID(ctx, input.AccountDestinationID)
+	_, err = u.accountUsecase.GetAccountByID(ctx, input.AccountDestinationID)
 	if err != nil {
 		if errors.Is(err, entity.ErrAccountNotFound) {
 			return entity.ErrAccountDestinationNotFound
@@ -34,7 +34,7 @@ func (t Transfer) PerformTransfer(ctx context.Context, input usecases.PerformTra
 		return fmt.Errorf("creating transfer: %w", err)
 	}
 
-	err = t.repository.PerformTransfer(ctx, &transfer)
+	err = u.repository.PerformTransfer(ctx, &transfer)
 	if err != nil {
 		return fmt.Errorf("creating transfer: %w", err)
 	}

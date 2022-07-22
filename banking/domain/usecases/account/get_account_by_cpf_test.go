@@ -52,7 +52,7 @@ func TestAccountUsecase_GetAccountByCPF(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			usecase := NewAccountUsecase(tt.repo, nil)
+			usecase := NewUsecase(tt.repo, nil)
 
 			account, err := usecase.GetAccountByCPF(context.Background(), testdata.CPF())
 			assert.ErrorIs(t, err, tt.wantErr)

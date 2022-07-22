@@ -8,8 +8,8 @@ import (
 	"github.com/thalissonfelipe/banking/banking/domain/vos"
 )
 
-func (a Account) GetAccountByID(ctx context.Context, accountID vos.AccountID) (entity.Account, error) {
-	acc, err := a.repository.GetAccountByID(ctx, accountID)
+func (u Usecase) GetAccountByID(ctx context.Context, accountID vos.AccountID) (entity.Account, error) {
+	acc, err := u.repository.GetAccountByID(ctx, accountID)
 	if err != nil {
 		return entity.Account{}, fmt.Errorf("getting account by id: %w", err)
 	}

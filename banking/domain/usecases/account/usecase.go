@@ -9,15 +9,15 @@ import (
 //go:generate moq -pkg account -out repository_mock.gen.go ../../entity AccountRepository:RepositoryMock
 //go:generate moq -pkg account -out encrypter_mock.gen.go ../../encrypter Encrypter
 
-var _ usecases.Account = (*Account)(nil)
+var _ usecases.Account = (*Usecase)(nil)
 
-type Account struct {
+type Usecase struct {
 	repository entity.AccountRepository
 	encrypter  encrypter.Encrypter
 }
 
-func NewAccountUsecase(repo entity.AccountRepository, enc encrypter.Encrypter) *Account {
-	return &Account{
+func NewUsecase(repo entity.AccountRepository, enc encrypter.Encrypter) *Usecase {
+	return &Usecase{
 		repository: repo,
 		encrypter:  enc,
 	}
