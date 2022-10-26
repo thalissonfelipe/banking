@@ -19,7 +19,7 @@ jobs:
       run: go mod download
 
     - name: Test
-      run: make test >> $GITHUB_OUTPUT
+      run: echo "Hello My name" >> $GITHUB_OUPUT
       id: test
   
     - name: Comment on PR  
