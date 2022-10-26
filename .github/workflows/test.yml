@@ -15,21 +15,21 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    # - name: Download dependencies
-    #   run: go mod download
+    - name: Download dependencies
+      run: go mod download
 
-    - name: Set color
-      id: random-color-generator
-      run: echo "qualquer coisa" >> $GITHUB_OUTPUT
+    - name: Test
+      id: test
+      run: make test >> $GITHUB_OUTPUT
 
     - name: Get color
-      run: echo "The selected color is ${{ steps.random-color-generator.outputs }}"
+      run: echo "The selected color is ${{ steps.test.outputs }}"
   
     - name: Comment on PR  
       uses: actions/github-script@v6
       with:
         script: |
-          const color = "Hello ${{ steps.random-color-generator.outputs }}";
+          const color = "Hello ${{ steps.test.outputs }}";
           github.rest.issues.createComment({
             issue_number: context.issue.number,
             owner: context.repo.owner,
