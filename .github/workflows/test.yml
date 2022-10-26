@@ -18,9 +18,12 @@ jobs:
     - name: Download dependencies
       run: go mod download
 
-    - name: Test
-      run: echo "Hello My name" >> "$GITHUB_OUPUT"
-      id: test
+    - name: Set color
+        id: random-color-generator
+        run: echo "SELECTED_COLOR=green" >> $GITHUB_OUTPUT
+
+    - name: Get color
+      run: echo "The selected color is ${{ steps.random-color-generator.outputs.SELECTED_COLOR }}"
   
     - name: Comment on PR  
       uses: actions/github-script@v6
