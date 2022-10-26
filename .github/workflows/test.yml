@@ -20,7 +20,8 @@ jobs:
 
     - name: Test
       id: test
-      run: make test >> $GITHUB_OUTPUT
+      run: output=$(make test)
+           echo "SUMMARY=$output" >> $GITHUB_OUTPUT
 
     - name: Get color
       run: echo "The selected color is ${{ steps.test.outputs }}"
