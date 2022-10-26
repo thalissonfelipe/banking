@@ -13,7 +13,7 @@ dev-local:
 .PHONY: test
 test:
 	@echo "==> Running tests..."
-	go test ./banking/domain/vos/
+	go test ./banking/domain/vos/ | tee output.txt
 
 .PHONY: lint
 lint:
