@@ -20,16 +20,16 @@ jobs:
 
     - name: Set color
       id: random-color-generator
-      run: echo "SELECTED_COLOR=green" >> $GITHUB_OUTPUT
+      run: echo "qualquer coisa" >> $GITHUB_OUTPUT
 
     - name: Get color
-      run: echo "The selected color is ${{ steps.random-color-generator.outputs.SELECTED_COLOR }}"
+      run: echo "The selected color is ${{ steps.random-color-generator.outputs }}"
   
     - name: Comment on PR  
       uses: actions/github-script@v6
       with:
         script: |
-          const color = "Hello ${{ steps.random-color-generator.outputs.SELECTED_COLOR }}";
+          const color = "Hello ${{ steps.random-color-generator.outputs }}";
           github.rest.issues.createComment({
             issue_number: context.issue.number,
             owner: context.repo.owner,
