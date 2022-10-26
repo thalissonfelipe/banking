@@ -29,10 +29,10 @@ jobs:
       uses: actions/github-script@v6
       with:
         script: |
-          const color = ${{ steps.random-color-generator.outputs.SELECTED_COLOR }}
-          await github.rest.issues.createComment({
+          const color = ${{ steps.random-color-generator.outputs.SELECTED_COLOR }};
+          github.rest.issues.createComment({
             issue_number: context.issue.number,
             owner: context.repo.owner,
             repo: context.repo.repo,
-            body: color
-          })
+            body: `The color is ${color}`
+          });
