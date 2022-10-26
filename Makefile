@@ -12,7 +12,7 @@ dev-local:
 
 .PHONY: test
 test:
-	go test ./banking/domain/vos/
+	@go test ./banking/domain/vos/
 
 .PHONY: lint
 lint:
