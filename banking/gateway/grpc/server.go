@@ -24,9 +24,9 @@ func NewServer(logger *zap.Logger, db *pgxpool.Pool) *grpc.Server {
 	h, j := hash.New(), jwt.New()
 
 	accRepository := accountRepo.NewRepository(db)
-	accountUsecase := account.NewAccountUsecase(accRepository, h)
+	accountUsecase := account.NewUsecase(accRepository, h)
 	trRepository := transferRepo.NewRepository(db)
-	transferUsecase := transfer.NewTransferUsecase(trRepository, accountUsecase)
+	transferUsecase := transfer.NewUsecase(trRepository, accountUsecase)
 	authUsecase := auth.NewAuth(accountUsecase, h, j)
 	handler := NewHandler(accountUsecase, transferUsecase, authUsecase)
 

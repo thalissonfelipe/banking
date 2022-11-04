@@ -127,7 +127,7 @@ func TestTransferUsecase_PerformTransfer(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			usecase := NewTransferUsecase(tt.repo, tt.accUsecase)
+			usecase := NewUsecase(tt.repo, tt.accUsecase)
 
 			err := usecase.PerformTransfer(context.Background(), tt.input)
 			assert.ErrorIs(t, err, tt.wantErr)

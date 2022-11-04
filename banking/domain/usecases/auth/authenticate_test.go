@@ -106,7 +106,7 @@ func TestAuth_Authenticate(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			accUsecase := account.NewAccountUsecase(tt.repo, tt.enc)
+			accUsecase := account.NewUsecase(tt.repo, tt.enc)
 			service := NewAuth(accUsecase, tt.enc, tt.service)
 
 			token, err := service.Autheticate(context.Background(), tt.cpf, tt.secret)

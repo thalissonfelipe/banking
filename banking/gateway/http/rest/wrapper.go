@@ -28,7 +28,6 @@ func Wrap(handler func(r *http.Request) Response) http.HandlerFunc {
 	})
 }
 
-// TODO: add tests.
 func SendJSON(w http.ResponseWriter, statusCode int, payload interface{}) error {
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(statusCode)

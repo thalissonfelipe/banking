@@ -70,9 +70,9 @@ func apiRouter(db *pgxpool.Pool) chi.Router {
 	h, j := hash.New(), jwt.New()
 
 	accRepository := accountRepo.NewRepository(db)
-	accountUsecase := account.NewAccountUsecase(accRepository, h)
+	accountUsecase := account.NewUsecase(accRepository, h)
 	trRepository := transferRepo.NewRepository(db)
-	transferUsecase := transfer.NewTransferUsecase(trRepository, accountUsecase)
+	transferUsecase := transfer.NewUsecase(trRepository, accountUsecase)
 	authUsecase := auth.NewAuth(accountUsecase, h, j)
 	accHandler := accountHandler.NewHandler(accountUsecase)
 	trHandler := transferHandler.NewHandler(transferUsecase)

@@ -8,8 +8,8 @@ import (
 	"github.com/thalissonfelipe/banking/banking/domain/vos"
 )
 
-func (t Transfer) ListTransfers(ctx context.Context, accountID vos.AccountID) ([]entity.Transfer, error) {
-	transfers, err := t.repository.ListTransfers(ctx, accountID)
+func (u Usecase) ListTransfers(ctx context.Context, accountID vos.AccountID) ([]entity.Transfer, error) {
+	transfers, err := u.repository.ListTransfers(ctx, accountID)
 	if err != nil {
 		return nil, fmt.Errorf("listing transfers: %w", err)
 	}

@@ -50,7 +50,7 @@ func TestTransferUsecase_ListTransfers(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			usecase := NewTransferUsecase(tt.repo, nil)
+			usecase := NewUsecase(tt.repo, nil)
 
 			_, err := usecase.ListTransfers(context.Background(), vos.NewAccountID())
 			assert.ErrorIs(t, err, tt.wantErr)

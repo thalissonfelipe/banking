@@ -49,7 +49,7 @@ func TestAccountUsecase_GetAccountBalanceByID(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			usecase := NewAccountUsecase(tt.repo, nil)
+			usecase := NewUsecase(tt.repo, nil)
 
 			balance, err := usecase.GetAccountBalanceByID(context.Background(), vos.NewAccountID())
 			assert.ErrorIs(t, err, tt.wantErr)

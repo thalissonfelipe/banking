@@ -9,9 +9,9 @@ import (
 	"sync"
 	"syscall"
 
+	"github.com/jackc/pgx/v4/pgxpool"
 	"go.uber.org/zap"
 
-	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/thalissonfelipe/banking/banking/config"
 	"github.com/thalissonfelipe/banking/banking/gateway/db/postgres"
 	grpcServer "github.com/thalissonfelipe/banking/banking/gateway/grpc"
